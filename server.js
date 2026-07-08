@@ -14,6 +14,9 @@ const connectRoutes = require("./routes/connect");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
+app.set("view engine","ejs");
+app.set("views","./views/pages");
+app.use(express.static("public"));
 
 connectDB().then(() => {
 
