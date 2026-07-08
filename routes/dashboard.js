@@ -1,20 +1,63 @@
 const express = require("express");
-
 const auth = require("../middleware/auth");
+const License = require("../models/License");
 
 const router = express.Router();
 
-router.get("/dashboard", auth, (req, res) => {
+router.get("/dashboard", auth, async (req, res) => {
 
-    res.json({
+    try {
 
-        success: true,
+        const totalKeys = await License.countDocuments({
+            type: "public"
+        });
 
-        admin: req.admin,
+        const activeKeys = await License.countDocuments({
+            type: "public",
+            status: "active"
+        });
 
-        message: "Dashboard Access Granted"
+        const expiredKeys = await License.countDocuments({
+            type: "public",
+            status: "expired"
+        });
 
-    });
+        const bannedKeys = await License.countDocuments({
+            type: "public",
+            status: "banned"
+        });
+
+        res.json({
+
+            success: true,
+
+            stats: {
+
+                totalKeys,
+
+                activeKeys,
+
+                expiredKeys,
+
+                bannedKeys
+
+            }
+
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
 
 });
 
