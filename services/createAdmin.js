@@ -3,24 +3,32 @@ const Admin = require("../models/Admin");
 
 async function createAdmin() {
 
-const username = "bhukha_cheeta01";
+    const username = "bhukha_cheeta01";
 
-const exists = await Admin.findOne({ username });
+    const password = "ta@lib@swati##";
+
+    const exists = await Admin.findOne({
+        username
+    });
 
     if (exists) {
+
         console.log("✅ Admin already exists");
+
         return;
+
     }
 
-    const hashedPassword = await bcrypt.hash("ta@lib@@swati##", 10);
+    const hashedPassword =
+        await bcrypt.hash(password, 10);
 
-await Admin.create({
+    await Admin.create({
 
-    username,
+        username,
 
-    password: hashedPassword
+        password: hashedPassword
 
-});
+    });
 
     console.log("✅ Default Admin Created");
 
