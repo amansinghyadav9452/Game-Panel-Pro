@@ -1,9 +1,15 @@
 const License = require("../models/License");
 const generateKey = require("./keyGenerator");
 
-async function createLicense(type, expiryDays, maxUses, admin) {
+async function createLicense(key, type, expiryDays, maxUses, admin) {
 
-    const key = generateKey(type);
+    const exists = await License.findOne({ key });
+
+if (exists) {
+
+    throw new Error("License Key Already Exists");
+
+}
 
     const expiry = new Date();
 

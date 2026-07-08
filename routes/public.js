@@ -9,6 +9,7 @@ const {
     deleteLicense
 
 } = require("../services/licenseService");
+
 const express = require("express");
 const auth = require("../middleware/auth");
 
@@ -21,13 +22,30 @@ router.post("/public/create", auth, async (req, res) => {
 
     try {
 
-        const { expiryDays, maxUses } = req.body;
+        const {
 
-        const license = await createLicense(
-    "public",
+    key,
+
+    type = "public",
+
     expiryDays,
+
+    maxUses
+
+} = req.body;
+
+const license = await createLicense(
+
+    key,
+
+    type,
+
+    expiryDays,
+
     maxUses,
+
     req.admin.username
+
 );
 
         res.status(201).json({
@@ -42,17 +60,29 @@ router.post("/public/create", auth, async (req, res) => {
 
     } catch (err) {
 
-        console.log(err);
+    console.error(err);
 
-        res.status(500).json({
+    if (err.message === "License Key Already Exists") {
+
+        return res.status(400).json({
 
             success: false,
 
-            message: "Server Error"
+            message: err.message
 
         });
 
     }
+
+    res.status(500).json({
+
+        success: false,
+
+        message: "Server Error"
+
+    });
+
+}
 
 });
 

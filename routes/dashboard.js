@@ -4,6 +4,12 @@ const License = require("../models/License");
 
 const router = express.Router();
 
+router.get("/panel", (req, res) => {
+
+    res.render("dashboard");
+
+});
+
 router.get("/dashboard", auth, async (req, res) => {
 
     try {
@@ -174,6 +180,56 @@ router.put("/dashboard/ban/:key", auth, async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Server Error"
+        });
+
+    }
+
+});
+
+router.put("/dashboard/unban/:key", auth, async (req, res) => {
+
+    try {
+
+        const license = await License.findOne({
+
+            key: req.params.key
+
+        });
+
+        if (!license) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "License Not Found"
+
+            });
+
+        }
+
+        license.status = "active";
+
+        await license.save();
+
+        res.json({
+
+            success: true,
+
+            message: "License Unbanned Successfully"
+
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
         });
 
     }
