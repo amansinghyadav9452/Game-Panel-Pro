@@ -36,7 +36,7 @@ app.use(connectRoutes);
 app.use(errorHandler);
 
 app.get("/", (req, res) => {
-    res.send("GAME PANEL Backend Running 🚀");
+    res.redirect(login);
 });
 
 const PORT = process.env.PORT || 3000;

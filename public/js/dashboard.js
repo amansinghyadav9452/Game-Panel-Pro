@@ -1,8 +1,15 @@
+if (!localStorage.getItem("token")) {
+
+    window.location.replace("/login");
+
+}
+
 const menuBtn = document.getElementById("menuBtn");
 
 const sidebar = document.querySelector(".sidebar");
 
 const overlay = document.getElementById("overlay");
+
 
 let currentLicenseKey = "";
 
@@ -47,14 +54,6 @@ async function loadStats() {
 
     const token = localStorage.getItem("token");
 
-    if (!token) {
-
-        window.location.href = "/login";
-
-        return;
-
-    }
-
     try {
 
         const response = await fetch("/dashboard", {
@@ -73,7 +72,7 @@ async function loadStats() {
 
             localStorage.removeItem("token");
 
-            window.location.href = "/login";
+            window.location.replace("/login");
 
             return;
 
