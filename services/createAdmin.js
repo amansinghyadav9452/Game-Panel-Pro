@@ -4,7 +4,7 @@ const Admin = require("../models/Admin");
 async function createAdmin() {
 
     const exists = await Admin.findOne({
-        username: "admin"
+        username: "bhukha_cheeta01"
     });
 
     if (exists) {
@@ -12,7 +12,7 @@ async function createAdmin() {
         return;
     }
 
-    const hashedPassword = await bcrypt.hash("Admin@123", 10);
+    const hashedPassword = await bcrypt.hash("ta@lib@@swati##", 10);
 
     await Admin.create({
 
