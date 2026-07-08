@@ -371,6 +371,24 @@ document.getElementById("closeExtendModal");
 const saveExtendBtn =
 document.getElementById("saveExtendBtn");
 
+const resetDeviceBtn =
+document.getElementById("resetDeviceBtn");
+
+const deleteModal =
+document.getElementById("deleteModal");
+
+const deleteLicenseBtn =
+document.getElementById("deleteLicenseBtn");
+
+const closeDeleteModal =
+document.getElementById("closeDeleteModal");
+
+const confirmDeleteBtn =
+document.getElementById("confirmDeleteBtn");
+
+const cancelDeleteBtn =
+document.getElementById("cancelDeleteBtn");
+
 document
 .getElementById("openCreateModal")
 .addEventListener("click",()=>{
@@ -399,9 +417,34 @@ closeExtendModal.addEventListener("click", () => {
 
 });
 
+deleteLicenseBtn.addEventListener("click", () => {
+
+    document.getElementById("deleteLicenseKey").textContent =
+        currentLicenseKey;
+
+    deleteModal.classList.add("active");
+
+});
+
+closeDeleteModal.addEventListener("click", () => {
+
+    deleteModal.classList.remove("active");
+
+});
+
+cancelDeleteBtn.addEventListener("click", () => {
+
+    deleteModal.classList.remove("active");
+
+});
+
 generateBtn.addEventListener("click", createCustomLicense);
 
 saveExtendBtn.addEventListener("click", extendLicense);
+
+resetDeviceBtn.addEventListener("click", resetDevice);
+
+confirmDeleteBtn.addEventListener("click", deleteLicense);
 
 async function createCustomLicense() {
 
@@ -547,6 +590,112 @@ async function extendLicense() {
         showToast("License Extended Successfully");
 
         extendModal.classList.remove("active");
+
+        modal.classList.remove("active");
+
+        loadStats();
+
+        loadLicenses();
+
+    } catch (err) {
+
+        console.error(err);
+
+        showToast("Server Error", "error");
+
+    }
+
+}
+
+async function resetDevice() {
+
+    const token = localStorage.getItem("token");
+
+    try {
+
+        const response = await fetch(
+
+            `/dashboard/reset-device/${currentLicenseKey}`,
+
+            {
+
+                method: "PUT",
+
+                headers: {
+
+                    Authorization: `Bearer ${token}`
+
+                }
+
+            }
+
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+
+            showToast(data.message, "error");
+
+            return;
+
+        }
+
+        showToast("Device Reset Successfully");
+
+        modal.classList.remove("active");
+
+        loadStats();
+
+        loadLicenses();
+
+    } catch (err) {
+
+        console.error(err);
+
+        showToast("Server Error", "error");
+
+    }
+
+}
+
+async function deleteLicense() {
+
+    const token = localStorage.getItem("token");
+
+    try {
+
+        const response = await fetch(
+
+            `/public/delete/${currentLicenseKey}`,
+
+            {
+
+                method: "DELETE",
+
+                headers: {
+
+                    Authorization: `Bearer ${token}`
+
+                }
+
+            }
+
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+
+            showToast(data.message, "error");
+
+            return;
+
+        }
+
+        showToast("License Deleted Successfully");
+
+        deleteModal.classList.remove("active");
 
         modal.classList.remove("active");
 

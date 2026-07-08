@@ -90,7 +90,7 @@ router.get("/public/list", auth, async (req, res) => {
 
     try {
 
-        const licences = await listLicences("public");
+        const licences = await listLicenses("public");
 
         res.json({
             success: true,
@@ -151,12 +151,12 @@ router.get("/public/search/:key", auth, async (req, res) => {
 
 });
 
-router.delete("/public/delete/:id", auth, async (req, res) => {
+router.delete("/public/delete/:key", auth, async (req, res) => {
 
     try {
 
 const license = await deleteLicense(
-    req.params.id
+    req.params.key
 );
 
         if (!license) {

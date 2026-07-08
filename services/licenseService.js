@@ -59,9 +59,13 @@ async function searchLicense(type, key) {
 
 }
 
-async function deleteLicense(id) {
+async function deleteLicense(key) {
 
-    return await License.findByIdAndDelete(id);
+    return await License.findOneAndDelete({
+
+        key
+
+    });
 
 }
 

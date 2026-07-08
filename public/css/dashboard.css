@@ -677,6 +677,14 @@ TOPBAR
 
 }
 
+.delete-btn{
+
+    background:#DC2626;
+
+    color:white;
+
+}
+
 /* ==========================
    TOAST
 ========================== */
