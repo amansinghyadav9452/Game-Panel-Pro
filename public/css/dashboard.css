@@ -796,6 +796,122 @@ TOPBAR
 
 }
 
+.table-responsive{
+
+    width:100%;
+
+    overflow-x:auto;
+
+    -webkit-overflow-scrolling:touch;
+
+}
+
+.table-responsive::-webkit-scrollbar{
+
+    height:6px;
+
+}
+
+.table-responsive::-webkit-scrollbar-thumb{
+
+    background:#3b82f6;
+
+    border-radius:20px;
+
+}
+
+table{
+
+    min-width:900px;
+
+}
+
+.create-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    background:linear-gradient(135deg,#3B82F6,#2563EB);
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:12px 22px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.create-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 25px rgba(59,130,246,.35);
+
+}
+
+.mobile-license-list{
+    display:none;
+}
+
+.license-card{
+
+    background:#1B233A;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.license-card h3{
+
+    font-size:17px;
+
+    color:#fff;
+
+    word-break:break-all;
+
+}
+
+.license-card p{
+
+    color:#CBD5E1;
+
+    font-size:14px;
+
+}
+
+.license-card .action-btn{
+
+    width:100%;
+
+    margin-top:8px;
+
+}
+
 @media(max-width:768px){
 
     .layout{
@@ -827,6 +943,134 @@ TOPBAR
         gap:18px;
 
     }
+
+    .create-btn{
+
+    width:100%;
+
+    margin-top:12px;
+
+}
+
+.table-header{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+    gap:12px;
+
+}
+
+.table-responsive{
+
+    display:none;
+
+}
+
+.mobile-license-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.cards{
+
+    grid-template-columns:1fr;
+
+}
+
+.topbar{
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+    gap:15px;
+
+}
+
+.right-section{
+
+    width:100%;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+}
+
+.search-box{
+
+    width:100%;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+}
+
+.icon-btn{
+
+    width:48px;
+
+    height:48px;
+
+}
+
+#logoutBtn{
+
+    width:100%;
+
+}
+
+.table-header{
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+}
+
+.license-card{
+
+    padding:20px;
+
+    border-radius:18px;
+
+}
+
+.license-card h3{
+
+    font-size:16px;
+
+}
+
+.license-card p{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin:6px 0;
+
+}
+
+.license-card button{
+
+    width:100%;
+
+}
 
 }
 

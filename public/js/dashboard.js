@@ -114,6 +114,11 @@ async function loadLicenses() {
 
         const table = document.getElementById("licenseTable");
 
+        const mobileList =
+document.getElementById("mobileLicenseList");
+
+mobileList.innerHTML = "";
+
         table.innerHTML = "";
 
         data.licenses.forEach((license) => {
@@ -163,6 +168,54 @@ async function loadLicenses() {
             </tr>
 
             `;
+
+            mobileList.innerHTML += `
+
+<div class="license-card">
+
+    <h3>${license.key}</h3>
+
+    <p>
+
+        <strong>Status :</strong>
+
+        <span class="status ${license.status}">
+
+            ${license.status}
+
+        </span>
+
+    </p>
+
+    <p>
+
+        <strong>Expiry :</strong>
+
+        ${new Date(license.expiry).toLocaleDateString()}
+
+    </p>
+
+    <p>
+
+        <strong>Devices :</strong>
+
+        ${license.usedCount}/${license.maxUses}
+
+    </p>
+
+    <button
+        class="action-btn view-btn"
+        data-key="${license.key}">
+
+        <i class="fa-solid fa-eye"></i>
+
+        View
+
+    </button>
+
+</div>
+
+`;
 
         });
 
