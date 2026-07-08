@@ -539,11 +539,17 @@ TOPBAR
 
     padding:8px 16px;
 
-    border-radius:10px;
-
     cursor:pointer;
 
     transition:.25s;
+
+    height: 46px;
+
+    border-radius: 12px;
+
+    font-weight: 600;
+
+
 
 }
 
@@ -804,6 +810,8 @@ TOPBAR
 
     -webkit-overflow-scrolling:touch;
 
+    display: block;
+
 }
 
 .table-responsive::-webkit-scrollbar{
@@ -884,6 +892,9 @@ table{
 
     gap:12px;
 
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+
+    transition:.3s;
 }
 
 .license-card h3{
@@ -909,6 +920,65 @@ table{
     width:100%;
 
     margin-top:8px;
+
+}
+.license-card:active{
+    transform: scale(.98);
+}
+
+.filter-bar{
+
+    display:flex;
+
+    gap:12px;
+
+    margin:20px 0;
+
+    overflow-x:auto;
+
+    padding-bottom:8px;
+
+}
+
+.filter-bar::-webkit-scrollbar{
+
+    display:none;
+
+}
+
+.filter-btn{
+
+    border:none;
+
+    background:#1E293B;
+
+    color:#CBD5E1;
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+
+    transition:.25s;
+
+}
+
+.filter-btn:hover{
+
+    background:#2563EB;
+
+    color:white;
+
+}
+
+.filter-btn.active{
+
+    background:#2563EB;
+
+    color:white;
 
 }
 
@@ -938,9 +1008,9 @@ table{
 
         flex-direction:column;
 
-        align-items:flex-start;
+        align-items:stretch;
 
-        gap:18px;
+        gap:15px;
 
     }
 
@@ -1072,6 +1142,7 @@ table{
 
 }
 
+
 }
 
 @media(max-width:900px){
@@ -1118,8 +1189,8 @@ table{
 
     .search-box{
 
-        display:none;
-
+        display: flex;
+        width: 100%;
     }
 
     .content{

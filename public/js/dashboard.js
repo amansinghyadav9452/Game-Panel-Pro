@@ -6,6 +6,15 @@ const overlay = document.getElementById("overlay");
 
 let currentLicenseKey = "";
 
+let allLicenses = [];
+
+let currentFilter = "all";
+
+const searchInput = document.querySelector(".search-box input");
+
+const filterButtons =
+document.querySelectorAll(".filter-btn");
+
 menuBtn.addEventListener("click", () => {
 
     sidebar.classList.add("active");
@@ -112,114 +121,11 @@ async function loadLicenses() {
 
         if (!data.success) return;
 
-        const table = document.getElementById("licenseTable");
+        allLicenses = data.licenses;
 
-        const mobileList =
-document.getElementById("mobileLicenseList");
+        applyFilters();
 
-mobileList.innerHTML = "";
-
-        table.innerHTML = "";
-
-        data.licenses.forEach((license) => {
-
-            table.innerHTML += `
-
-            <tr>
-
-                <td>${license.key}</td>
-
-                <td>
-
-                    <span class="status ${license.status}">
-
-                        ${license.status}
-
-                    </span>
-
-                </td>
-
-                <td>
-
-                    ${new Date(license.expiry).toLocaleDateString()}
-
-                </td>
-
-                <td>
-
-                    ${license.usedCount}/${license.maxUses}
-
-                </td>
-
-                <td>
-
-                    <button
-    class="action-btn view-btn"
-    data-key="${license.key}">
-
-    <i class="fa-solid fa-eye"></i>
-
-    View
-
-</button>
-
-                </td>
-
-            </tr>
-
-            `;
-
-            mobileList.innerHTML += `
-
-<div class="license-card">
-
-    <h3>${license.key}</h3>
-
-    <p>
-
-        <strong>Status :</strong>
-
-        <span class="status ${license.status}">
-
-            ${license.status}
-
-        </span>
-
-    </p>
-
-    <p>
-
-        <strong>Expiry :</strong>
-
-        ${new Date(license.expiry).toLocaleDateString()}
-
-    </p>
-
-    <p>
-
-        <strong>Devices :</strong>
-
-        ${license.usedCount}/${license.maxUses}
-
-    </p>
-
-    <button
-        class="action-btn view-btn"
-        data-key="${license.key}">
-
-        <i class="fa-solid fa-eye"></i>
-
-        View
-
-    </button>
-
-</div>
-
-`;
-
-        });
-
-    } catch(err){
+    } catch (err) {
 
         console.error(err);
 
@@ -228,6 +134,181 @@ mobileList.innerHTML = "";
 }
 
 loadLicenses();
+
+function renderLicenses(licenses) {
+
+    const table = document.getElementById("licenseTable");
+    const mobileList = document.getElementById("mobileLicenseList");
+
+    table.innerHTML = "";
+    mobileList.innerHTML = "";
+
+    licenses.forEach((license) => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>${license.key}</td>
+
+            <td>
+                <span class="status ${license.status}">
+                    ${license.status}
+                </span>
+            </td>
+
+            <td>${new Date(license.expiry).toLocaleDateString()}</td>
+
+            <td>${license.usedCount}/${license.maxUses}</td>
+
+            <td>
+
+                <button
+                    class="action-btn view-btn"
+                    data-key="${license.key}">
+
+                    <i class="fa-solid fa-eye"></i>
+
+                    View
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+        mobileList.innerHTML += `
+
+        <div class="license-card">
+
+            <h3>${license.key}</h3>
+
+            <p>
+
+                <strong>Status :</strong>
+
+                <span class="status ${license.status}">
+
+                    ${license.status}
+
+                </span>
+
+            </p>
+
+            <p>
+
+                <strong>Expiry :</strong>
+
+                ${new Date(license.expiry).toLocaleDateString()}
+
+            </p>
+
+            <p>
+
+                <strong>Devices :</strong>
+
+                ${license.usedCount}/${license.maxUses}
+
+            </p>
+
+            <button
+                class="action-btn view-btn"
+                data-key="${license.key}">
+
+                <i class="fa-solid fa-eye"></i>
+
+                View
+
+            </button>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+function applyFilters() {
+
+    const keyword = searchInput.value
+        .trim()
+        .toLowerCase();
+
+    let filtered = allLicenses.filter((license) => {
+
+        const matchSearch =
+
+            license.key.toLowerCase().includes(keyword) ||
+
+            license.status.toLowerCase().includes(keyword) ||
+
+            (license.type || "")
+                .toLowerCase()
+                .includes(keyword) ||
+
+String(license.maxUses || "").includes(keyword) ||
+
+new Date(license.expiry)
+    .toLocaleDateString()
+    .includes(keyword);
+
+        if (!matchSearch) {
+
+            return false;
+
+        }
+
+        if (currentFilter === "all") {
+
+            return true;
+
+        }
+
+        if (
+            currentFilter === "public" ||
+            currentFilter === "premium"
+        ) {
+
+            return license.type === currentFilter;
+
+        }
+
+        return license.status === currentFilter;
+
+    });
+
+    renderLicenses(filtered);
+
+}
+
+searchInput.addEventListener("input", () => {
+
+    applyFilters();
+
+});
+
+filterButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+        filterButtons.forEach((btn) => {
+
+            btn.classList.remove("active");
+
+        });
+
+        button.classList.add("active");
+
+        currentFilter = button.dataset.filter;
+
+        applyFilters();
+
+    });
+
+});
 
 async function openLicenseModal(key){
 
@@ -387,8 +468,8 @@ const response = await fetch(
 
             modal.classList.remove("active");
 
-            loadStats(),
-            loadLicenses()
+            loadStats();
+            loadLicenses();
             
         }else{
             
@@ -566,7 +647,13 @@ body: JSON.stringify({
 
             document.getElementById("maxUses").value = 1;
 
-        } else {
+            loadStats();
+    
+            loadLicenses();
+        }
+        
+
+        else {
 
             showToast(data.message, "error");
 
@@ -765,8 +852,3 @@ async function deleteLicense() {
     }
 
 }
-
-          Promise.all([
-            loadStats(),
-            loadLicenses()
-        ])
