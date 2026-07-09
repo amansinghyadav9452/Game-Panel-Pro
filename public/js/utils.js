@@ -87,7 +87,7 @@ function initSidebar() {
 
 }
 
-function initAutoLogout(timeout = 15 * 60 * 1000) {
+function initAutoLogout(timeout = 15 * 1000) {
 
     let timer;
 

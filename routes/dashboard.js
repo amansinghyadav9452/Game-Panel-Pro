@@ -184,7 +184,21 @@ router.put("/dashboard/ban/:key", auth, async (req, res) => {
 
         await license.save();
 
-        res.json({
+        await logActivity({
+
+    action: "BAN",
+
+    licenseKey: license.key,
+
+    licenseType: license.type,
+
+    admin: req.admin.username,
+
+    details: "License banned"
+
+});
+
+            res.json({
             success: true,
             message: "License Banned Successfully"
         });
@@ -227,6 +241,20 @@ router.put("/dashboard/unban/:key", auth, async (req, res) => {
         license.status = "active";
 
         await license.save();
+
+        await logActivity({
+
+    action: "UNBAN",
+
+    licenseKey: license.key,
+
+    licenseType: license.type,
+
+    admin: req.admin.username,
+
+    details: "License unbanned"
+
+});
 
         res.json({
 

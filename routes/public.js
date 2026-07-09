@@ -12,6 +12,7 @@ const {
 
 const express = require("express");
 const auth = require("../middleware/auth");
+const logActivity = require("../services/activityLogger");
 
 const License = require("../models/License");
 const generateKey = require("../services/keyGenerator");
@@ -47,6 +48,20 @@ const license = await createLicense(
     req.admin.username
 
 );
+
+await logActivity({
+
+    action: "CREATE",
+
+    licenseKey: license.key,
+
+    licenseType: license.type,
+
+    admin: req.admin.username,
+
+    details: "Public license created"
+
+});
 
         res.status(201).json({
 
@@ -170,6 +185,20 @@ const license = await deleteLicense(
             });
 
         }
+
+        await logActivity({
+
+    action: "DELETE",
+
+    licenseKey: license.key,
+
+    licenseType: license.type,
+
+    admin: req.admin.username,
+
+    details: "Public license deleted"
+
+});
 
         res.json({
 
