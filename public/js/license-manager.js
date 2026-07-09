@@ -343,6 +343,7 @@ document.getElementById("sidebarLogout")
     e.preventDefault();
 
     localStorage.removeItem("token");
+    localStorage.removeItem("logoutAt");
 
     window.location.replace("/login");
 

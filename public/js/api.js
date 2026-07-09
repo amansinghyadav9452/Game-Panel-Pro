@@ -21,6 +21,7 @@ async function apiFetch(url, options = {}) {
 if (response.status === 401) {
 
     localStorage.removeItem("token");
+    localStorage.removeItem("logoutAt");
 
     showToast("Session Expired", "error");
 

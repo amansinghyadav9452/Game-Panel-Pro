@@ -81,6 +81,10 @@ form.addEventListener("submit", async (e) => {
 
             localStorage.setItem("token", data.token);
 
+            localStorage.setItem(
+    "logoutAt",Date.now() + 15 * 60 * 1000
+);
+
             loginBtn.innerHTML =
                 `<i class="fa-solid fa-check"></i> Success`;
 

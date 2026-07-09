@@ -58,56 +58,62 @@ function closeSidebar() {
 
 }
 
-function initSidebar() {
-
-    const menuBtn = document.getElementById("menuBtn");
-    const overlay = document.getElementById("overlay");
-
-    if (menuBtn) {
-
-        menuBtn.addEventListener("click", openSidebar);
-
-    }
-
-    if (overlay) {
-
-        overlay.addEventListener("click", closeSidebar);
-
-    }
-
-    document.addEventListener("keydown", (e) => {
-
-        if (e.key === "Escape") {
-
-            closeSidebar();
-
-        }
-
-    });
-
-}
-
-function initAutoLogout(timeout = 15 * 1000) {
+function initAutoLogout(timeout = 15 * 60 * 1000) {
 
     let timer;
+
+    function logout() {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("logoutAt");
+
+        showToast("Session Expired");
+
+        setTimeout(() => {
+
+            window.location.replace("/login");
+
+        }, 1000);
+
+    }
 
     function resetTimer() {
 
         clearTimeout(timer);
 
-        timer = setTimeout(() => {
+        const logoutAt = Date.now() + timeout;
 
-            localStorage.removeItem("token");
+        localStorage.setItem("logoutAt", logoutAt);
 
-            showToast("Session Expired");
+        timer = setTimeout(logout, timeout);
 
-            setTimeout(() => {
+    }
 
-                window.location.replace("/login");
+    const logoutAt =
+        Number(localStorage.getItem("logoutAt"));
 
-            }, 1000);
+    if (logoutAt && Date.now() >= logoutAt) {
 
-        }, timeout);
+        logout();
+
+        return;
+
+    }
+
+    if (logoutAt) {
+
+        timer = setTimeout(
+
+            logout,
+
+            logoutAt - Date.now()
+
+        );
+
+    } else {
+
+        resetTimer();
 
     }
 
@@ -129,6 +135,31 @@ function initAutoLogout(timeout = 15 * 1000) {
 
     });
 
-    resetTimer();
+    document.addEventListener("visibilitychange", () => {
 
+    if (document.visibilityState === "visible") {
+
+        const logoutAt = Number(localStorage.getItem("logoutAt"));
+
+        if (logoutAt && Date.now() >= logoutAt) {
+
+            logout();
+
+        }
+
+    }
+
+});
+
+window.addEventListener("focus", () => {
+
+    const logoutAt = Number(localStorage.getItem("logoutAt"));
+
+    if (logoutAt && Date.now() >= logoutAt) {
+
+        logout();
+
+    }
+
+});
 }
