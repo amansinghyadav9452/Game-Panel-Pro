@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>Game Panel | Public Keys</title>
+<%- include("../partials/head") %>
+</head>
+
+<body>
+    <div id="overlay"></div>
+<div class="layout">
+
+<%- include("../partials/sidebar") %>
+
+    <main class="content">
+
+        <%- include("../partials/topbar") %>
+
+                <section class="table-section">
+
+            <div class="table-header">
+
+                <h2>Licenses</h2>
+
+<button
+    id="openCreateModal"
+    class="create-btn">
+
+    <i class="fa-solid fa-plus"></i>
+
+    Create Key
+
+</button>
+
+            </div>
+
+            <div class="filter-bar">
+
+    <button class="filter-btn active" data-filter="all">
+        All
+    </button>
+
+    <button class="filter-btn" data-filter="active">
+        Active
+    </button>
+
+    <button class="filter-btn" data-filter="banned">
+        Banned
+    </button>
+
+    <button class="filter-btn" data-filter="expired">
+        Expired
+    </button>
+
+    <button class="filter-btn" data-filter="public">
+        Public
+    </button>
+
+    <button class="filter-btn" data-filter="premium">
+        Premium
+    </button>
+
+</div>
+
+            <div class="table-responsive">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Key</th>
+
+                        <th>Status</th>
+
+                        <th>Expiry</th>
+
+                        <th>Devices</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="licenseTable">
+
+                </tbody>
+
+            </table>
+            </div>
+
+            <div
+    id="mobileLicenseList"
+    class="mobile-license-list">
+
+</div>
+
+        </section>
+
+        <%- include("../partials/modals") %>
+
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/license-manager.js"></script>
+<script src="/js/public-keys.js"></script>
+
+</body>
+
+</html>

@@ -6,7 +6,23 @@ const router = express.Router();
 
 router.get("/panel", (req, res) => {
 
-    res.render("dashboard");
+    res.render("dashboard", {
+
+        activePage: "dashboard",
+        pageTitle: "Dashboard"
+
+    });
+
+});
+
+router.get("/public-keys", (req, res) => {
+
+    res.render("public-keys", {
+
+        activePage: "public-keys",
+        pageTitle: "Public Keys"
+
+    });
 
 });
 
