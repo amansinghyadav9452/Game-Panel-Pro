@@ -1,7 +1,9 @@
 if (!localStorage.getItem("token")) {
     window.location.replace("/login");}
 
-initSidebar();
+if (typeof initSidebar === "function") {
+    initSidebar();
+}
 initAutoLogout();
 
 async function loadStats() {

@@ -12,6 +12,7 @@ const dashboardRoutes = require("./routes/dashboard");
 const publicRoutes = require("./routes/public");
 const connectRoutes = require("./routes/connect");
 const errorHandler = require("./middleware/errorHandler");
+const activityRoutes = require("./routes/activity");
 
 const app = express();
 app.set("view engine","ejs");
@@ -34,6 +35,7 @@ app.use(dashboardRoutes);
 app.use(publicRoutes);
 app.use(connectRoutes);
 app.use(errorHandler);
+app.use(activityRoutes);
 
 app.get("/", (req, res) => {
     res.redirect("/login");

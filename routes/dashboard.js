@@ -3,6 +3,7 @@ const auth = require("../middleware/auth");
 const License = require("../models/License");
 
 const router = express.Router();
+const logActivity = require("../services/activityLogger")
 
 router.get("/panel", (req, res) => {
 

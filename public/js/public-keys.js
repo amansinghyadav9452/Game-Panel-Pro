@@ -4,7 +4,9 @@ if (!localStorage.getItem("token")) {
 
 }
 
-initSidebar();
+if (typeof initSidebar === "function") {
+    initSidebar();
+}
 initAutoLogout();
 
 initLicenseManager("/dashboard/licenses");
