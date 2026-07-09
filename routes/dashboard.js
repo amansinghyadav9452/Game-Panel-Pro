@@ -27,6 +27,17 @@ router.get("/public-keys", (req, res) => {
 
 });
 
+router.get("/activity", (req, res) => {
+
+    res.render("activity", {
+
+        activePage: "activity",
+        pageTitle: "Activity Logs"
+
+    });
+
+});
+
 router.get("/dashboard", auth, async (req, res) => {
 
     try {

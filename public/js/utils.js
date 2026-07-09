@@ -58,6 +58,26 @@ function closeSidebar() {
 
 }
 
+    function initSidebar() {
+
+    const menuBtn = document.getElementById("menuBtn");
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("closeSidebar");
+
+    if (menuBtn) {
+        menuBtn.addEventListener("click", openSidebar);
+    }
+
+    if (overlay) {
+        overlay.addEventListener("click", closeSidebar);
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeSidebar);
+    }
+
+}
+
 function initAutoLogout(timeout = 15 * 60 * 1000) {
 
     let timer;
@@ -77,6 +97,7 @@ function initAutoLogout(timeout = 15 * 60 * 1000) {
         }, 1000);
 
     }
+
 
     function resetTimer() {
 

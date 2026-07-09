@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | Activity Logs</title>
+
+<%- include("../partials/head") %>
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+    <%- include("../partials/sidebar") %>
+
+    <main class="content">
+
+        <%- include("../partials/topbar") %>
+
+        <section class="overview-section">
+
+            <h2>Activity Logs</h2>
+
+            <div id="activityLogsContainer">
+
+                <p style="color:#94A3B8">
+
+                    Loading...
+
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/activity.js"></script>
+
+</body>
+
+</html>
