@@ -17,6 +17,10 @@ let allLicenses = [];
 
 let currentFilter = "all";
 
+const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 Minutes
+
+let logoutTimer;
+
 const searchInput = document.querySelector(".search-box input");
 
 const filterButtons =
@@ -52,31 +56,19 @@ document.addEventListener("keydown", (e) => {
 
 async function loadStats() {
 
-    const token = localStorage.getItem("token");
-
     try {
 
-        const response = await fetch("/dashboard", {
-
-            headers: {
-
-                Authorization: `Bearer ${token}`
-
-            }
-
-        });
+const response = await apiFetch("/dashboard");
 
         const data = await response.json();
 
-        if (!data.success) {
+if (!data.success) {
 
-            localStorage.removeItem("token");
+    handleUnauthorized();
 
-            window.location.replace("/login");
+    return;
 
-            return;
-
-        }
+}
 
         document.getElementById("totalKeys").textContent =
             data.stats.totalKeys;
@@ -102,23 +94,19 @@ loadStats();
 
 async function loadLicenses() {
 
-    const token = localStorage.getItem("token");
-
     try {
 
-        const response = await fetch("/dashboard/licenses", {
-
-            headers: {
-
-                Authorization: `Bearer ${token}`
-
-            }
-
-        });
+const response = await apiFetch("/dashboard/licenses");
 
         const data = await response.json();
 
-        if (!data.success) return;
+if (!data.success) {
+
+    handleUnauthorized();
+
+    return;
+
+}
 
         allLicenses = data.licenses;
 
@@ -325,7 +313,13 @@ async function openLicenseModal(key){
 
         const data = await response.json();
 
-        if(!data.success) return;
+if (!data.success) {
+
+    handleUnauthorized();
+
+    return;
+
+}
 
         const license = data.license;
         currentLicenseKey = license.key;
@@ -401,11 +395,14 @@ closeModal.addEventListener("click",()=>{
 document.getElementById("banLicenseBtn")
 .addEventListener("click",banLicense);
 
-document.getElementById("logoutBtn").addEventListener("click", () => {
+document.getElementById("sidebarLogout")
+.addEventListener("click", (e) => {
+
+    e.preventDefault();
 
     localStorage.removeItem("token");
 
-    window.location.href = "/login";
+    window.location.replace("/login");
 
 });
 
@@ -426,6 +423,50 @@ function showToast(message,type="success"){
         toast.classList.remove("show");
         
     },2500);
+}
+
+function handleUnauthorized() {
+
+    showToast("Session Expired! Redirecting...", "error");
+
+    setTimeout(() => {
+
+        localStorage.removeItem("token");
+
+        window.location.replace("/login");
+
+    }, 1800);
+
+}
+
+async function apiFetch(url, options = {}) {
+
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(url, {
+
+        ...options,
+
+        headers: {
+
+            ...(options.headers || {}),
+
+            Authorization: `Bearer ${token}`
+
+        }
+
+    });
+
+    if (response.status === 401) {
+
+        handleUnauthorized();
+
+        throw new Error("Unauthorized");
+
+    }
+
+    return response;
+
 }
 
 async function banLicense(){
@@ -851,3 +892,45 @@ async function deleteLicense() {
     }
 
 }
+
+function startLogoutTimer() {
+
+    clearTimeout(logoutTimer);
+
+    logoutTimer = setTimeout(() => {
+
+showToast("Session Expired! Redirecting...", "error");
+
+setTimeout(() => {
+
+    localStorage.removeItem("token");
+
+    window.location.replace("/login");
+
+}, 1800);
+
+    }, SESSION_TIMEOUT);
+
+}
+
+function resetLogoutTimer() {
+
+    startLogoutTimer();
+
+}
+[
+    "click",
+    "mousemove",
+    "keydown",
+    "scroll",
+    "touchstart"
+].forEach((event) => {
+
+    document.addEventListener(
+        event,
+        resetLogoutTimer
+    );
+
+});
+
+startLogoutTimer();
