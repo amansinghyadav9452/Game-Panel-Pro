@@ -121,15 +121,29 @@ function renderLicenses(licenses) {
 
             </p>
 
-            <button
-                class="action-btn view-btn"
-                data-key="${license.key}">
+<div class="card-actions">
 
-                <i class="fa-solid fa-eye"></i>
+    <button
+        class="action-btn view-btn"
+        data-key="${license.key}">
 
-                View
+        <i class="fa-solid fa-eye"></i>
 
-            </button>
+        View
+
+    </button>
+
+    <button
+        class="action-btn copy-btn"
+        data-key="${license.key}">
+
+        <i class="fa-regular fa-copy"></i>
+
+        Copy
+
+    </button>
+
+</div>
 
         </div>
 
@@ -286,14 +300,25 @@ if (license.status === "banned") {
 const modal = document.getElementById("licenseModal");
 
 const closeModal = document.getElementById("closeModal");
+document.addEventListener("click", (e) => {
 
-document.addEventListener("click",(e)=>{
+    const viewBtn = e.target.closest(".view-btn");
 
-    const btn = e.target.closest(".view-btn");
+    if (viewBtn) {
 
-    if(!btn) return;
+        openLicenseModal(viewBtn.dataset.key);
 
-    openLicenseModal(btn.dataset.key);
+        return;
+
+    }
+
+    const copyBtn = e.target.closest(".copy-btn");
+
+    if (copyBtn) {
+
+        copyText(copyBtn.dataset.key);
+
+    }
 
 });
 

@@ -998,6 +998,34 @@ table{
     display: none;
 }
 
+.card-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:10px;
+
+}
+
+.card-actions .action-btn{
+
+    flex:1;
+
+}
+
+.copy-btn{
+
+    background:#334155;
+
+}
+
+.copy-btn:hover{
+
+    background:#475569;
+
+}
+
 @media(max-width:768px){
 
     .layout{
