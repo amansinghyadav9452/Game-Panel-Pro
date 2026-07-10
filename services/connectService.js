@@ -4,6 +4,13 @@ require("dotenv").config();
 
 async function verifyLicense(body, req, expectedType = "public") {
 
+    console.log({
+    game: body.game,
+    user_key: body.user_key,
+    serial: body.serial,
+    type: expectedType
+});
+
     const { game, user_key, serial } = body;
 
     if (!process.env.TOKEN_SECRET) {
@@ -12,6 +19,10 @@ async function verifyLicense(body, req, expectedType = "public") {
 
 }
 
+console.log("Searching:", {
+    key: user_key,
+    type: expectedType
+});
     const license = await License.findOne({
         key: user_key,
         type: expectedType
