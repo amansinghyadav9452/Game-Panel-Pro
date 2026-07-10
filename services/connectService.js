@@ -127,14 +127,14 @@ return {
 };
 
 }
+async function verifyPremiumLicense(body, req) {
+    return verifyLicense(body, req, "premium");
+}
 
 async function verifyPublicLicense(body, req) {
     return verifyLicense(body, req, "public");
 }
 
-async function verifyPremiumLicense(body, req) {
-    return verifyLicense(body, req, "premium");
-}
 
 module.exports = {
     verifyPublicLicense,
