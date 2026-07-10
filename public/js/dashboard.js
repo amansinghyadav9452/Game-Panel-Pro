@@ -117,6 +117,17 @@ data.activities.forEach((activity) => {
             text: activity.action
         };
 
+        let actionText = action.text;
+
+if (activity.action === "CREATE") {
+
+    actionText =
+        activity.licenseType === "premium"
+            ? "Premium Key Created"
+            : "Public Key Created";
+
+}
+
     container.innerHTML += `
 
         <div class="activity-item">
@@ -124,7 +135,7 @@ data.activities.forEach((activity) => {
             <div class="activity-title">
 
                 ${action.icon}
-                <strong>${action.text}</strong>
+                <strong>${actionText}</strong>
 
             </div>
 

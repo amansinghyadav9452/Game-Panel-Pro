@@ -42,22 +42,18 @@ router.get("/dashboard", auth, async (req, res) => {
 
     try {
 
-        const totalKeys = await License.countDocuments({
-            type: "public"
-        });
+const totalKeys =
+await License.countDocuments();
 
         const activeKeys = await License.countDocuments({
-            type: "public",
             status: "active"
         });
 
         const expiredKeys = await License.countDocuments({
-            type: "public",
             status: "expired"
         });
 
         const bannedKeys = await License.countDocuments({
-            type: "public",
             status: "banned"
         });
 

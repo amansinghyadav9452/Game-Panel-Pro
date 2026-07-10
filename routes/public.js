@@ -1,21 +1,18 @@
-const {
-
-    createLicense,
-
-    listLicenses,
-
-    searchLicense,
-
-    deleteLicense
-
-} = require("../services/licenseService");
-
 const express = require("express");
 const auth = require("../middleware/auth");
 const logActivity = require("../services/activityLogger");
 
 const License = require("../models/License");
 const generateKey = require("../services/keyGenerator");
+
+const {
+
+    createLicense,
+    listLicenses,
+    searchLicense,
+    deleteLicense
+
+} = require("../services/licenseService");
 
 const router = express.Router();
 
@@ -27,8 +24,6 @@ router.post("/public/create", auth, async (req, res) => {
 
     key,
 
-    type = "public",
-
     expiryDays,
 
     maxUses
@@ -39,7 +34,7 @@ const license = await createLicense(
 
     key,
 
-    type,
+    "public",
 
     expiryDays,
 
@@ -105,7 +100,7 @@ router.get("/public/list", auth, async (req, res) => {
 
     try {
 
-        const licences = await listLicenses("public");
+        const licenses = await listLicenses("public");
 
         res.json({
             success: true,
@@ -174,6 +169,10 @@ const license = await deleteLicense(
     req.params.key
 );
 
+/*remove krna h*/
+console.log("Deleted License:", license);
+console.log("Admin:", req.admin);
+
         if (!license) {
 
             return res.status(404).json({
@@ -210,6 +209,8 @@ const license = await deleteLicense(
 
     } catch (err) {
 
+        console.log(err);
+
         res.status(500).json({
 
             success: false,
@@ -219,6 +220,17 @@ const license = await deleteLicense(
         });
 
     }
+
+});
+
+router.get("/premium-keys", (req, res) => {
+
+    res.render("premium-keys", {
+
+        activePage: "premium-keys",
+        pageTitle: "Premium Keys"
+
+    });
 
 });
 

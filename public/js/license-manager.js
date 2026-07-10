@@ -1,4 +1,5 @@
 let currentLicenseKey = "";
+let currentEndpoint = "/dashboard/licenses";
 
 let allLicenses = [];
 
@@ -9,7 +10,7 @@ const searchInput = document.querySelector(".search-box input");
 const filterButtons =
 document.querySelectorAll(".filter-btn");
 
-async function loadLicenses(endpoint = "/dashboard/licenses") {
+async function loadLicenses(endpoint = currentEndpoint) {
 
     try {
 
@@ -31,9 +32,12 @@ async function loadLicenses(endpoint = "/dashboard/licenses") {
 
 }
 
+
 function initLicenseManager(endpoint) {
 
-    loadLicenses(endpoint);
+    currentEndpoint = endpoint;
+
+    loadLicenses(currentEndpoint);
 
 }
 
@@ -189,15 +193,6 @@ new Date(license.expiry)
 
         }
 
-        if (
-            currentFilter === "public" ||
-            currentFilter === "premium"
-        ) {
-
-            return license.type === currentFilter;
-
-        }
-
         return license.status === currentFilter;
 
     });
@@ -236,7 +231,13 @@ async function openLicenseModal(key){
 
     try{
 
-const response = await apiFetch(`/dashboard/license/${key}`);
+const endpoint =
+    window.LICENSE_DETAILS_ENDPOINT ||
+    "/dashboard/license";
+
+const response = await apiFetch(
+    `${endpoint}/${key}`
+);
 
         const data = await response.json();
 
@@ -357,15 +358,17 @@ const banBtn = document.getElementById("banLicenseBtn");
 
 const endpoint =
     banBtn.textContent.trim() === "Unban"
-        ? "unban"
-        : "ban";
+        ? window.UNBAN_LICENSE_ENDPOINT
+        : window.BAN_LICENSE_ENDPOINT;
 
 const response = await apiFetch(
 
-    `/dashboard/${endpoint}/${currentLicenseKey}`,
+    `${endpoint}/${currentLicenseKey}`,
+
     {
         method: "PUT"
     }
+
 );
 
         const data = await response.json();
@@ -524,7 +527,11 @@ async function createCustomLicense() {
 
         generateBtn.textContent = "Generating...";
 
-const response = await apiFetch("/public/create", {
+const endpoint =
+    window.CREATE_LICENSE_ENDPOINT ||
+    "/public/create";
+
+const response = await apiFetch(endpoint, {
 
     method: "POST",
 
@@ -537,8 +544,6 @@ const response = await apiFetch("/public/create", {
     body: JSON.stringify({
 
         key,
-
-        type: document.getElementById("licenseType").value,
 
         expiryDays,
 
@@ -606,26 +611,19 @@ async function extendLicense() {
 
     try {
 
+const endpoint =
+    window.EXTEND_LICENSE_ENDPOINT;
+
 const response = await apiFetch(
 
-    `/dashboard/extend/${currentLicenseKey}`,
+    `${endpoint}/${currentLicenseKey}`,
 
     {
-
         method: "PUT",
-
         headers: {
-
             "Content-Type": "application/json"
-
         },
-
-        body: JSON.stringify({
-
-            days
-
-        })
-
+        body: JSON.stringify({ days })
     }
 
 );
@@ -666,12 +664,17 @@ async function resetDevice() {
 
     try {
 
+const endpoint =
+    window.RESET_DEVICE_ENDPOINT;
+
 const response = await apiFetch(
 
-    `/dashboard/reset-device/${currentLicenseKey}`,
+    `${endpoint}/${currentLicenseKey}`,
+
     {
         method: "PUT"
     }
+
 );
 
         const data = await response.json();
@@ -708,9 +711,13 @@ async function deleteLicense() {
 
     try {
 
+const endpoint =
+    window.DELETE_LICENSE_ENDPOINT ||
+    "/public/delete";
+
 const response = await apiFetch(
 
-    `/public/delete/${currentLicenseKey}`,
+    `${endpoint}/${currentLicenseKey}`,
 
     {
 

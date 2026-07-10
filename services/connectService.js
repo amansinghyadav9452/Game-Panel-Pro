@@ -2,7 +2,7 @@ const License = require("../models/License");
 const md5 = require("md5");
 require("dotenv").config();
 
-async function verifyLicense(body, req) {
+async function verifyLicense(body, req, expectedType = "public") {
 
     const { game, user_key, serial } = body;
 
@@ -14,13 +14,21 @@ async function verifyLicense(body, req) {
 
     const license = await License.findOne({
         key: user_key,
-        type: "public"
+        type: expectedType
     });
 if (!license) {
+
     return {
+
         status: false,
-        reason: "Invalid Key"
+
+        reason:
+            expectedType === "premium"
+                ? "Invalid Premium Key"
+                : "Invalid Public Key"
+
     };
+
 }
 
 if (license.expiry < new Date()) {
@@ -68,26 +76,22 @@ if (!alreadyRegistered) {
     if (license.devices.length >= license.maxUses) {
 
         return {
-
             status: false,
-
             reason: "Device Limit Reached"
-
         };
 
     }
 
     license.devices.push(serial);
-    
+
     license.usedCount = license.devices.length;
 
-    license.lastDevice = serial;
-    
-    license.lastUsed = new Date();
-    
-    await license.save();
-
 }
+
+license.lastDevice = serial;
+license.lastUsed = new Date();
+
+await license.save();
 
 const rng = Math.floor(Date.now() / 1000);
 
