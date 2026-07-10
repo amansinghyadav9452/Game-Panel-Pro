@@ -14,6 +14,8 @@ router.post("/connect", async (req, res) => {
         const result =
             await verifyPublicLicense(req.body, req);
 
+            console.log(JSON.stringify(result,null,2));
+
         res.json(result);
 
     } catch (err) {
@@ -31,12 +33,18 @@ router.post("/connect", async (req, res) => {
 
 });
 
+
 router.post("/connect-premium", async (req, res) => {
+    console.log("Premium License called");
 
     try {
 
+        console.log("Premium route hit");
+
         const result =
             await verifyPremiumLicense(req.body, req);
+
+            console.log(JSON.stringify(result,null,2));
 
         res.json(result);
 
