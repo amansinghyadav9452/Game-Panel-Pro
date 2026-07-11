@@ -5,12 +5,51 @@ const Admin = require("../models/Admin");
 const generateToken = require("../services/tokenGenerator");
 
 const router = express.Router();
+const fetch = global.fetch
 
 router.post("/login", async (req, res) => {
 
     try {
 
-        const { username, password } = req.body;
+        const { username, password, turnstileToken } = req.body;
+
+        const response = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body: new URLSearchParams({
+
+            secret:
+            process.env.TURNSTILE_SECRET_KEY,
+
+            response:
+            turnstileToken
+
+        })
+
+    }
+);
+
+const result = await response.json();
+
+if (!result.success) {
+
+    return res.json({
+
+        success: false,
+
+        message: "Captcha verification failed"
+
+    });
+
+}
 
 const admin = await Admin.findOne({ username });
 

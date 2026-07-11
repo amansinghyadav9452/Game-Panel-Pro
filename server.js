@@ -29,7 +29,40 @@ connectDB().then(() => {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
-app.use(helmet());
+
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+
+                scriptSrc: [
+                    "'self'",
+                    "https://challenges.cloudflare.com"
+                ],
+
+                frameSrc: [
+                    "'self'",
+                    "https://challenges.cloudflare.com"
+                ],
+
+                styleSrc: [
+                    "'self'",
+                    "'unsafe-inline'",
+                    "https://fonts.googleapis.com",
+                    "https://cdnjs.cloudflare.com"
+                ],
+
+                fontSrc: [
+                    "'self'",
+                    "https://fonts.gstatic.com",
+                    "https://cdnjs.cloudflare.com"
+                ]
+            }
+        }
+    })
+);
+
 app.use(morgan("dev"));
 app.use(authRoutes);
 app.use(dashboardRoutes);

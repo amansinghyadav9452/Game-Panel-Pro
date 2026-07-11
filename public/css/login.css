@@ -26,7 +26,7 @@
 
 *{
 
-    margin: -2px;
+    margin: 0;
 
     padding:0;
 
@@ -400,7 +400,7 @@ body{
 
     display:flex;
 
-    justify-content:space-between;
+    justify-content:center;
 
     margin-top:35px;
 
@@ -412,12 +412,16 @@ body{
 
 .footer div{
 
-    display:flex;
+    display: inline-block;
 
     align-items:center;
 
-    gap:6px;
+}
 
+.cf-turnstile {
+    display: flex;
+    justify-content: center;
+    margin: 18px 0;
 }
 
 /* ==========================

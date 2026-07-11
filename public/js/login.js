@@ -68,13 +68,18 @@ form.addEventListener("submit", async (e) => {
 
             },
 
-            body: JSON.stringify({
+body: JSON.stringify({
 
-                username: username.value.trim(),
+    username: username.value.trim(),
 
-                password: password.value
+    password: password.value,
 
-            })
+    turnstileToken:
+    document.querySelector(
+        "[name='cf-turnstile-response']"
+    )?.value
+
+})
 
         });
 
