@@ -2,9 +2,15 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/settings", (req, res) => {
+const Admin = require("../models/Admin");
 
-    res.render("settings");
+router.get("/settings", async (req, res) => {
+
+    const admin = await Admin.findOne();
+
+    res.render("settings", {
+        admin
+    });
 
 });
 

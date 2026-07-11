@@ -5,13 +5,18 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Settings | Game Panel</title>
 
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="/css/settings.css">
 
@@ -21,163 +26,812 @@
 
 <div class="container">
 
-    <h1>
-        <i class="fa-solid fa-gear"></i>
-        Settings
-    </h1>
+    <!-- Sidebar -->
 
-    <div class="settings-grid">
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>GAME PANEL</span>
+
+        </div>
+
+        <nav>
+
+            <a href="/panel">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                Dashboard
+
+            </a>
+
+            <a href="/public">
+
+                <i class="fa-solid fa-earth-asia"></i>
+
+                Public Keys
+
+            </a>
+
+            <a href="/premium">
+
+                <i class="fa-solid fa-crown"></i>
+
+                Premium Keys
+
+            </a>
+
+            <a href="/activity">
+
+                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                Activity
+
+            </a>
+
+            <a
+                class="active"
+                href="/settings">
+
+                <i class="fa-solid fa-gear"></i>
+
+                Settings
+
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <!-- Main -->
+
+    <main class="content">
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+
+                    Settings
+
+                </h1>
+
+                <p>
+
+                    Manage Panel Configuration
+
+                </p>
+
+            </div>
+
+            <button
+                id="saveSettings"
+                class="saveBtn">
+
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                Save Changes
+
+            </button>
+
+        </div>
 
         <!-- Account -->
 
-        <div class="card">
+        <section class="setting-card">
 
-            <h2>
-                <i class="fa-solid fa-user"></i>
-                Account
-            </h2>
+            <div class="card-header">
 
-            <div class="field">
+                <h2>
 
-                <label>Username</label>
+                    <i class="fa-solid fa-user"></i>
 
-                <input
-                    type="text"
-                    id="username"
-                    value="Admin"
-                    readonly>
+                    Account
 
-                <button id="changeUsername">
-                    Change Username
-                </button>
+                </h2>
+
+                <i class="fa-solid fa-chevron-down toggle"></i>
 
             </div>
 
-            <div class="field">
+            <div class="card-body">
 
-                <label>Password</label>
+                <div class="setting-row">
 
-                <input
-                    type="password"
-                    value="********"
-                    readonly>
+                    <label>
 
-                <button id="changePassword">
-                    Change Password
-                </button>
+                        Username
+
+                    </label>
+
+                    <div>
+
+                        <input
+                            type="text"
+                            value="<%= admin.username %>"
+                            readonly>
+
+                        <button>
+
+                            Change
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>
+
+                        Password
+
+                    </label>
+
+                    <div>
+
+                        <input
+                            type="password"
+                            value="********"
+                            readonly>
+
+                        <button>
+
+                            Change
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>
+
+                        Email
+
+                    </label>
+
+                    <div>
+
+                        <input
+                            type="email"
+                            placeholder="Coming Soon"
+                            disabled>
+
+                    </div>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>
+
+                        Logout All Sessions
+
+                    </label>
+
+                    <button
+                        class="danger">
+
+                        Logout
+
+                    </button>
+
+                </div>
 
             </div>
 
-        </div>
+        </section>
 
         <!-- Security -->
 
-        <div class="card">
+        <section class="setting-card">
 
-            <h2>
-                <i class="fa-solid fa-shield-halved"></i>
-                Security
-            </h2>
+            <div class="card-header">
 
-            <div class="toggle">
+                <h2>
 
-                <span>Cloudflare Turnstile</span>
+                    <i class="fa-solid fa-shield-halved"></i>
 
-                <label class="switch">
+                    Security
 
-                    <input
-                        type="checkbox"
-                        checked
-                        disabled>
+                </h2>
 
-                    <span class="slider"></span>
-
-                </label>
+                <i class="fa-solid fa-chevron-down toggle"></i>
 
             </div>
 
-            <div class="field">
+            <div class="card-body">
 
-                <label>Session Timeout</label>
+                <div class="setting-row">
 
-                <select disabled>
+                    <label>
 
-                    <option>15 Minutes</option>
-                    <option>30 Minutes</option>
-                    <option>1 Hour</option>
+                        Cloudflare Turnstile
 
-                </select>
+                    </label>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>
+
+                        Session Timeout
+
+                    </label>
+
+                    <select>
+
+                        <option>15 Minutes</option>
+
+                        <option>30 Minutes</option>
+
+                        <option>1 Hour</option>
+
+                        <option>Never</option>
+
+                    </select>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>
+
+                        Login Lock Rules
+
+                    </label>
+
+                    <button>
+
+                        Configure
+
+                    </button>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>
+
+                        Force Single Login
+
+                    </label>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>
+
+                        JWT Expiry
+
+                    </label>
+
+                    <select>
+
+                        <option>15 Minutes</option>
+
+                        <option>30 Minutes</option>
+
+                        <option>1 Hour</option>
+
+                    </select>
+
+                </div>
 
             </div>
 
-        </div>
+        </section>
 
         <!-- License -->
 
-        <div class="card">
+        <section class="setting-card">
 
-            <h2>
-                <i class="fa-solid fa-key"></i>
-                License Defaults
-            </h2>
+            <div class="card-header">
 
-            <div class="field">
+                <h2>
 
-                <label>Public Expiry</label>
+                    <i class="fa-solid fa-key"></i>
 
-                <input
-                    type="text"
-                    value="30 Days"
-                    readonly>
+                    License
+
+                </h2>
+
+                <i class="fa-solid fa-chevron-down toggle"></i>
 
             </div>
 
-            <div class="field">
+            <div class="card-body">
 
-                <label>Premium Expiry</label>
+                <div class="setting-row">
 
-                <input
-                    type="text"
-                    value="30 Days"
-                    readonly>
+                    <label>Default Public Expiry</label>
+
+                    <input type="number" value="30">
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Default Premium Expiry</label>
+
+                    <input type="number" value="30">
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Default Max Devices</label>
+
+                    <input type="number" value="1">
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Public Prefix</label>
+
+                    <input type="text" value="PUB-">
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Premium Prefix</label>
+
+                    <input type="text" value="PREM-">
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Key Length</label>
+
+                    <input type="number" value="16">
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Auto Uppercase</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox" checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
 
             </div>
 
-            <div class="field">
+        </section>
 
-                <label>Max Devices</label>
+        <!-- API -->
 
-                <input
-                    type="number"
-                    value="1"
-                    readonly>
+        <section class="setting-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-server"></i>
+
+                    API
+
+                </h2>
+
+                <i class="fa-solid fa-chevron-down toggle"></i>
 
             </div>
 
-        </div>
+            <div class="card-body">
+
+                <div class="setting-row">
+
+                    <label>Public API</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox" checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Premium API</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox" checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Maintenance Mode</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Rate Limit</label>
+
+                    <input type="number" value="100">
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Database -->
+
+        <section class="setting-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-database"></i>
+
+                    Database
+
+                </h2>
+
+                <i class="fa-solid fa-chevron-down toggle"></i>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="setting-row">
+
+                    <label>Status</label>
+
+                    <span class="status online">
+
+                        Connected
+
+                    </span>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <button>
+
+                        Backup Database
+
+                    </button>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <button>
+
+                        Restore Backup
+
+                    </button>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <button class="danger">
+
+                        Clear Cache
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Logs -->
+
+        <section class="setting-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-clipboard-list"></i>
+
+                    Logs
+
+                </h2>
+
+                <i class="fa-solid fa-chevron-down toggle"></i>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="setting-row">
+
+                    <label>Retention</label>
+
+                    <select>
+
+                        <option>7 Days</option>
+
+                        <option selected>30 Days</option>
+
+                        <option>90 Days</option>
+
+                    </select>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <button>
+
+                        Export Logs
+
+                    </button>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <button class="danger">
+
+                        Clear Logs
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Appearance -->
+
+        <section class="setting-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-palette"></i>
+
+                    Appearance
+
+                </h2>
+
+                <i class="fa-solid fa-chevron-down toggle"></i>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="setting-row">
+
+                    <label>Dark Mode</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox" checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Accent Color</label>
+
+                    <select>
+
+                        <option>Blue</option>
+
+                        <option>Green</option>
+
+                        <option>Purple</option>
+
+                    </select>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Sidebar Collapse</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Notifications -->
+
+        <section class="setting-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-bell"></i>
+
+                    Notifications
+
+                </h2>
+
+                <i class="fa-solid fa-chevron-down toggle"></i>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="setting-row">
+
+                    <label>Telegram Alerts</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Discord Webhook</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Email Alerts</label>
+
+                    <label class="switch">
+
+                        <input type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
 
         <!-- About -->
 
-        <div class="card">
+        <section class="setting-card">
 
-            <h2>
-                <i class="fa-solid fa-circle-info"></i>
-                About
-            </h2>
+            <div class="card-header">
 
-            <p><strong>Panel:</strong> Game Panel</p>
+                <h2>
 
-            <p><strong>Version:</strong> v1.0.0</p>
+                    <i class="fa-solid fa-circle-info"></i>
 
-            <p><strong>Backend:</strong> Node.js + Express</p>
+                    About
 
-            <p><strong>Database:</strong> MongoDB</p>
+                </h2>
 
-            <p><strong>Security:</strong> JWT + Turnstile</p>
+                <i class="fa-solid fa-chevron-down toggle"></i>
 
-        </div>
+            </div>
 
-    </div>
+            <div class="card-body">
+
+                <div class="setting-row">
+
+                    <label>Panel Version</label>
+
+                    <span>v1.0.0</span>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Node.js</label>
+
+                    <span>v22.x</span>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>MongoDB</label>
+
+                    <span class="status online">
+
+                        Connected
+
+                    </span>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Server Uptime</label>
+
+                    <span>Loading...</span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </div>
 
