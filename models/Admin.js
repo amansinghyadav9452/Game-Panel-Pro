@@ -17,7 +17,17 @@ const adminSchema = new mongoose.Schema({
     role: {
         type: String,
         default: "admin"
-    }
+    },
+
+failedAttempts: {
+    type: Number,
+    default: 0
+},
+
+lockUntil: {
+    type: Date,
+    default: null
+}
 
 }, {
     timestamps: true
