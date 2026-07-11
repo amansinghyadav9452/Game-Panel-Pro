@@ -15,15 +15,18 @@ const errorHandler = require("./middleware/errorHandler");
 const activityRoutes = require("./routes/activity");
 const premiumRoutes = require("./routes/premium");
 const settingsRoutes = require("./routes/settings");
+const createSettings = require("./services/createSettings");
 
 const app = express();
 app.set("view engine","ejs");
 app.set("views","./views/pages");
 app.use(express.static("public"));
 
-connectDB().then(() => {
+connectDB().then(async () => {
 
-    createAdmin();
+    await createAdmin();
+
+    await createSettings();
 
 });
 
@@ -69,11 +72,12 @@ app.use(authRoutes);
 app.use(dashboardRoutes);
 app.use(publicRoutes);
 app.use(connectRoutes);
-app.use(errorHandler);
+
 app.use(activityRoutes);
 app.use(premiumRoutes);
 app.use(settingsRoutes);
 
+app.use(errorHandler);
 app.get("/", (req, res) => {
     res.redirect("/login");
 });
