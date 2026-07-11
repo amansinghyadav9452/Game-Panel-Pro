@@ -39,9 +39,6 @@ router.post("/login", async (req, res) => {
 
 const result = await response.json();
 
-console.log("Turnstile Token:", turnstileToken);
-console.log("Cloudflare Response:", result);
-
 if (!result.success) {
 
     return res.json({
