@@ -20,109 +20,26 @@
 
     <link rel="stylesheet" href="/css/settings.css">
 
-</head>
+        
+        <%- include("../partials/head") %>
+    </head>
 
 <body>
 
-<div class="container">
+<div class="dashboard-container">
 
     <!-- Sidebar -->
+    <%- include("../partials/sidebar") %>
 
-    <aside class="sidebar">
+    <!-- Main Content -->
+    <div class="main-content">
 
-        <div class="logo">
+        <!-- Topbar -->
+        <%- include("../partials/topbar") %>
 
-            <i class="fa-solid fa-shield-halved"></i>
+        <!-- Settings Content -->
 
-            <span>GAME PANEL</span>
-
-        </div>
-
-        <nav>
-
-            <a href="/panel">
-
-                <i class="fa-solid fa-chart-line"></i>
-
-                Dashboard
-
-            </a>
-
-            <a href="/public">
-
-                <i class="fa-solid fa-earth-asia"></i>
-
-                Public Keys
-
-            </a>
-
-            <a href="/premium">
-
-                <i class="fa-solid fa-crown"></i>
-
-                Premium Keys
-
-            </a>
-
-            <a href="/activity">
-
-                <i class="fa-solid fa-clock-rotate-left"></i>
-
-                Activity
-
-            </a>
-
-            <a
-                class="active"
-                href="/settings">
-
-                <i class="fa-solid fa-gear"></i>
-
-                Settings
-
-            </a>
-
-        </nav>
-
-    </aside>
-
-    <!-- Main -->
-
-    <main class="content">
-
-        <div class="topbar">
-
-            <div>
-
-                <h1>
-
-                    Settings
-
-                </h1>
-
-                <p>
-
-                    Manage Panel Configuration
-
-                </p>
-
-            </div>
-
-            <button
-                id="saveSettings"
-                class="saveBtn">
-
-                <i class="fa-solid fa-floppy-disk"></i>
-
-                Save Changes
-
-            </button>
-
-        </div>
-
-        <!-- Account -->
-
-        <section class="setting-card">
+        <section class="settings-card">
 
             <div class="card-header">
 
@@ -838,5 +755,4 @@
 <script src="/js/settings.js"></script>
 
 </body>
-
 </html>
