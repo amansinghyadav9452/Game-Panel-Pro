@@ -46,12 +46,15 @@ form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
+    let data;
+
     loginBtn.disabled = true;
 
     loginBtn.innerHTML =
         `<i class="fa-solid fa-spinner fa-spin"></i> Signing In...`;
 
     message.innerHTML = "";
+    
 
     try {
 
@@ -75,30 +78,41 @@ form.addEventListener("submit", async (e) => {
 
         });
 
-        const data = await response.json();
+        data = await response.json();
 
-        if (data.success) {
+if (data.success) {
 
-            localStorage.setItem("token", data.token);
+    localStorage.setItem("token", data.token);
 
-            localStorage.setItem(
-    "logoutAt",Date.now() + 15 * 60 * 1000
-);
+    localStorage.setItem(
+        "logoutAt",
+        Date.now() + 15 * 60 * 1000
+    );
 
-            loginBtn.innerHTML =
-                `<i class="fa-solid fa-check"></i> Success`;
+    loginBtn.innerHTML =
+        `<i class="fa-solid fa-check"></i> Success`;
 
-            setTimeout(() => {
+    setTimeout(() => {
 
-                window.location.href = "/panel";
+        window.location.href = "/panel";
 
-            }, 700);
+    }, 700);
 
-        } else {
+} else {
 
-            showMessage(data.message, false);
+if (data.remaining) {
 
-        }
+    showMessage(data.message, false);
+
+    startLockCountdown(data.remaining);
+
+} else {
+
+    showMessage(data.message, false);
+
+}
+
+}
 
     } catch (err) {
 
@@ -106,12 +120,16 @@ form.addEventListener("submit", async (e) => {
 
     }
 
+    
+if (!data || !data.remaining) {
+
     loginBtn.disabled = false;
 
     loginBtn.innerHTML =
         `<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
 
-});
+}}
+);
 
 /* -------------------------
    Message
@@ -128,5 +146,42 @@ function showMessage(text, success) {
     message.style.fontWeight = "500";
 
     message.style.color = success ? "#22C55E" : "#EF4444";
+
+}
+
+function startLockCountdown(seconds) {
+
+    const loginBtn = document.getElementById("loginBtn");
+    const error = document.getElementById("message");
+
+    loginBtn.disabled = true;
+
+    const timer = setInterval(() => {
+
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+
+loginBtn.innerHTML =
+`<i class="fa-solid fa-lock"></i> Locked (${minutes}m ${secs}s)`;
+
+        error.innerHTML =
+            `Too many failed login attempts.`;
+
+        seconds--;
+
+        if (seconds < 0) {
+
+            clearInterval(timer);
+
+            loginBtn.disabled = false;
+
+            loginBtn.innerHTML =
+`<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
+
+            error.innerHTML = "";
+
+        }
+
+    }, 1000);
 
 }

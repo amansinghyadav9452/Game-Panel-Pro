@@ -12,50 +12,30 @@ router.post("/login", async (req, res) => {
 
         const { username, password } = req.body;
 
-        const admin = await Admin.findOne({ username });
+const admin = await Admin.findOne({ username });
 
-        if (admin.lockUntil && admin.lockUntil > new Date()) {
+if (!admin) {
 
-const remaining = Math.ceil(
-    (admin.lockUntil - Date.now()) / 1000
-);
-
-const minutes = Math.floor(remaining / 60);
-const seconds = remaining % 60;
-
-let timeText = "";
-
-if (minutes > 0) {
-
-    timeText = `${minutes} minute${minutes > 1 ? "s" : ""} ${seconds} second${seconds !== 1 ? "s" : ""}`;
-
-} else {
-
-    timeText = `${seconds} second${seconds !== 1 ? "s" : ""}`;
+    return res.json({
+        success: false,
+        message: "Invalid Username or Password"
+    });
 
 }
 
-return res.json({
+if (admin.lockUntil && admin.lockUntil > Date.now()) {
 
-    success: false,
+    const remaining = Math.ceil(
+        (admin.lockUntil - Date.now()) / 1000
+    );
 
-    message: `Too many failed login attempts.\nTry again in ${timeText}.`
-
-});
+    return res.json({
+        success: false,
+        message: "Too many failed login attempts.",
+        remaining
+    });
 
 }
-
-        if (!admin) {
-
-            return res.json({
-
-                success: false,
-
-                message: "Invalid Username or Password"
-
-            });
-
-        }
 
         const match = await bcrypt.compare(
 
