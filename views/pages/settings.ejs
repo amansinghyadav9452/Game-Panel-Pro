@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Settings | Game Panel</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet" href="/css/settings.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>
+        <i class="fa-solid fa-gear"></i>
+        Settings
+    </h1>
+
+    <div class="settings-grid">
+
+        <!-- Account -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-user"></i>
+                Account
+            </h2>
+
+            <div class="field">
+
+                <label>Username</label>
+
+                <input
+                    type="text"
+                    id="username"
+                    value="Admin"
+                    readonly>
+
+                <button id="changeUsername">
+                    Change Username
+                </button>
+
+            </div>
+
+            <div class="field">
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    value="********"
+                    readonly>
+
+                <button id="changePassword">
+                    Change Password
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Security -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-shield-halved"></i>
+                Security
+            </h2>
+
+            <div class="toggle">
+
+                <span>Cloudflare Turnstile</span>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        checked
+                        disabled>
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+            <div class="field">
+
+                <label>Session Timeout</label>
+
+                <select disabled>
+
+                    <option>15 Minutes</option>
+                    <option>30 Minutes</option>
+                    <option>1 Hour</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <!-- License -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-key"></i>
+                License Defaults
+            </h2>
+
+            <div class="field">
+
+                <label>Public Expiry</label>
+
+                <input
+                    type="text"
+                    value="30 Days"
+                    readonly>
+
+            </div>
+
+            <div class="field">
+
+                <label>Premium Expiry</label>
+
+                <input
+                    type="text"
+                    value="30 Days"
+                    readonly>
+
+            </div>
+
+            <div class="field">
+
+                <label>Max Devices</label>
+
+                <input
+                    type="number"
+                    value="1"
+                    readonly>
+
+            </div>
+
+        </div>
+
+        <!-- About -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-circle-info"></i>
+                About
+            </h2>
+
+            <p><strong>Panel:</strong> Game Panel</p>
+
+            <p><strong>Version:</strong> v1.0.0</p>
+
+            <p><strong>Backend:</strong> Node.js + Express</p>
+
+            <p><strong>Database:</strong> MongoDB</p>
+
+            <p><strong>Security:</strong> JWT + Turnstile</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/js/settings.js"></script>
+
+</body>
+
+</html>

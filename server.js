@@ -14,6 +14,7 @@ const connectRoutes = require("./routes/connect");
 const errorHandler = require("./middleware/errorHandler");
 const activityRoutes = require("./routes/activity");
 const premiumRoutes = require("./routes/premium");
+const settingsRoutes = require("./routes/settings");
 
 const app = express();
 app.set("view engine","ejs");
@@ -71,6 +72,7 @@ app.use(connectRoutes);
 app.use(errorHandler);
 app.use(activityRoutes);
 app.use(premiumRoutes);
+app.use(settingsRoutes);
 
 app.get("/", (req, res) => {
     res.redirect("/login");
