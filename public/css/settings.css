@@ -363,6 +363,8 @@
 
     gap:10px;
 
+    flex-wrap: wrap;
+
     color:#fff;
 
     font-size:22px;
@@ -375,17 +377,7 @@
 
 }
 
-.status-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(4,1fr);
-
-    gap:20px;
-
-}
-
-.status-grid div{
+.status-grid > .status-card{
 
     background:#0f172a;
 
@@ -397,7 +389,7 @@
 
 }
 
-.status-grid span{
+.status-grid > .status-card span{
 
     display:block;
 
@@ -409,7 +401,7 @@
 
 }
 
-.status-grid strong{
+.status-grid > .status-card strong{
 
     font-size:28px;
 
@@ -535,7 +527,7 @@
       Status Cards
 ========================= */
 
-.status-grid div{
+.status-grid > .status-card{
 
     transition:.25s;
 
@@ -703,6 +695,300 @@
 
 }
 
+/* ===== Security & Protection ===== */
+
+.system-status{
+
+    margin-top:32px;
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:24px;
+
+    padding:24px;
+
+    backdrop-filter:blur(18px);
+
+}
+
+.system-status h3{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#fff;
+
+    font-size:1.2rem;
+
+    margin-bottom:22px;
+
+}
+
+.system-status h3 i{
+
+    color:#4ade80;
+
+}
+
+.status-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:18px;
+}
+
+.status-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    padding:18px;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    border-radius:18px;
+
+    transition:.25s;
+
+    width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+}
+
+.status-card:hover{
+
+    transform:translateY(-4px);
+
+    border-color:#7c3aed;
+
+    box-shadow:0 0 18px rgba(124,58,237,.25);
+
+}
+
+.status-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:10px;
+
+    margin-bottom:10px;
+
+    flex-wrap:wrap;
+
+}
+
+.status-top span:first-child{
+
+    color:#fff;
+
+    font-weight:700;
+
+}
+
+.status-card small{
+
+    color:#9ca3af;
+
+    font-size:.9rem;
+
+}
+
+.badge{
+
+    padding:4px 10px;
+
+    border-radius:999px;
+
+    font-size:.75rem;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+    flex-shrink:0;
+
+}
+
+.badge.active{
+
+    background:rgba(34,197,94,.15);
+
+    color:#4ade80;
+
+    border:1px solid rgba(34,197,94,.25);
+
+}
+
+.badge.warning{
+
+    background:rgba(245,158,11,.15);
+
+    color:#fbbf24;
+
+    border:1px solid rgba(245,158,11,.25);
+
+}
+
+.badge.danger{
+
+    background:rgba(239,68,68,.18);
+
+    color:#f87171;
+
+}
+
+.status-icon{
+
+    width:56px;
+
+    height:56px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-shrink:0;
+
+    background:linear-gradient(135deg,#7c3aed,#9333ea);
+
+    color:#fff;
+
+    font-size:22px;
+
+}
+
+.status-content{
+
+    flex:1;
+
+    min-width: 0;
+
+}
+
+/* =========================
+      Status Icons Colors
+========================= */
+
+.status-card:nth-child(1) .status-icon{
+
+    background:linear-gradient(135deg,#7c3aed,#9333ea);
+
+}
+
+.status-card:nth-child(2) .status-icon{
+
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+
+}
+
+.status-card:nth-child(3) .status-icon{
+
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+
+}
+
+.status-card:nth-child(4) .status-icon{
+
+    background:linear-gradient(135deg,#0f766e,#14b8a6);
+
+}
+
+.status-card:nth-child(5) .status-icon{
+
+    background:linear-gradient(135deg,#ea580c,#f97316);
+
+}
+
+.status-card:nth-child(6) .status-icon{
+
+    background:linear-gradient(135deg,#ca8a04,#eab308);
+
+}
+
+.status-card:nth-child(7) .status-icon{
+
+    background:linear-gradient(135deg,#ec4899,#f472b6);
+
+}
+
+.status-card:nth-child(8) .status-icon{
+
+    background:linear-gradient(135deg,#475569,#64748b);
+
+}
+
+/* =========================
+      Status Card Hover
+========================= */
+
+.status-card:hover .status-icon{
+
+    transform:scale(1.08) rotate(6deg);
+
+}
+
+.status-icon{
+
+    transition:.3s ease;
+
+}
+
+/* =========================
+      Status Text
+========================= */
+
+.status-content .status-top span:first-child{
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:#fff;
+
+    line-height:1.35;
+
+    flex:1;
+
+}
+
+.status-content small{
+
+    display:block;
+
+    margin-top:6px;
+
+    color:#94a3b8;
+
+    font-size:13px;
+
+    line-height:1.5;
+
+    word-break: break-word;
+
+}
+
 /* =========================
         Stats
 ========================= */
@@ -743,7 +1029,7 @@
 
     .status-grid{
 
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns: 1fr;
 
     }
 
@@ -752,6 +1038,51 @@
         padding:18px;
 
     }
+
+    .status-card{
+
+    display:flex;
+    align-items:center;
+    gap:16px;
+
+    width:100%;
+    min-width:0;
+
+    box-sizing: border-box;
+    overflow:hidden;
+
+    flex-direction: row;
+
+}
+
+.status-icon{
+
+    width: 52px;
+    height: 52px;
+
+}
+.status-content{
+
+    flex:1;
+    min-width:0;
+
+}
+
+.badge{
+    font-size: 11px;
+}
+
+.status-content small{
+
+    word-break:break-word;
+
+}
+
+.system-status h3{
+
+    flex-wrap:wrap;
+
+}
 
 }
 
