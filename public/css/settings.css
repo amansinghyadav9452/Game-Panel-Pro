@@ -22,8 +22,15 @@
 
     justify-content:space-between;
 
-    align-items:center;
+    align-items: flex-start;
 
+    gap: 20px;
+
+}
+
+.settings-header > div{
+
+    flex: 1;
 }
 
 .page-heading{
@@ -618,9 +625,9 @@
 
 .menu-btn{
 
-    width:58px;
+    width:64px;
 
-    height:58px;
+    height:64px;
 
     flex-shrink:0;
 
@@ -684,7 +691,11 @@
 
 .page-subtitle{
 
-    margin-top:8px;
+    margin-top:10px;
+
+    max-width: 240px;
+
+    line-height: 1.4;
 
     color:#9ca3af;
 
