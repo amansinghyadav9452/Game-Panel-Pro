@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | Database</title>
+
+<%- include("../../partials/head") %>
+
+<link rel="stylesheet" href="/css/security-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+<%- include("../../partials/sidebar") %>
+
+<main class="content">
+
+<section class="settings-page">
+
+<div class="settings-header">
+
+<a href="/settings" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</a>
+
+<div>
+
+<h1 class="page-heading">
+Database
+</h1>
+
+<p class="page-subtitle">
+Manage database configuration
+</p>
+
+</div>
+
+</div>
+
+<div class="account-card">
+
+<div class="setting-group">
+
+<label>Database Status</label>
+
+<input
+type="text"
+value="Connected"
+readonly>
+
+</div>
+
+<div class="setting-group">
+
+<label>Backup Database</label>
+
+<button class="action-btn">
+
+<i class="fa-solid fa-download"></i>
+
+Create Backup
+
+</button>
+
+</div>
+
+<div class="setting-group">
+
+<label>Restore Database</label>
+
+<button class="action-btn">
+
+<i class="fa-solid fa-upload"></i>
+
+Restore Backup
+
+</button>
+
+</div>
+
+<div class="setting-group">
+
+<label>Clear Cache</label>
+
+<button class="danger-btn">
+
+<i class="fa-solid fa-trash"></i>
+
+Clear Cache
+
+</button>
+
+</div>
+
+<button class="save-btn">
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+Save Changes
+
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/database-settings.js"></script>
+
+</body>
+
+</html>

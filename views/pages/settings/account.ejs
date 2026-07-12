@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title>Game Panel | Account</title>
+
+    <%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/css/account-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+    <%- include("../../partials/sidebar") %>
+
+    <main class="content">
+
+        <section class="settings-page">
+
+<div class="settings-header">
+
+    <a href="/settings" class="back-btn">
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+    </a>
+
+    <div>
+
+        <h1 class="page-heading">
+            Account
+        </h1>
+
+        <p class="page-subtitle">
+            Manage your administrator account
+        </p>
+
+    </div>
+
+</div>
+
+            <div class="account-card">
+
+                <div class="setting-group">
+
+                    <label>Username</label>
+
+                    <input
+                        type="text"
+                        value="<%= admin.username %>"
+                        readonly>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Email</label>
+
+                    <input
+                        type="email"
+                        placeholder="Coming Soon"
+                        disabled>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Administrator Password</label>
+
+                    <button class="action-btn">
+
+                        <i class="fa-solid fa-key"></i>
+
+                        Change Password
+
+                    </button>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Two Factor Authentication (2FA)</label>
+
+                    <button class="action-btn">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        Enable 2FA
+
+                    </button>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Active Sessions</label>
+
+                    <button class="danger-btn">
+
+                        <i class="fa-solid fa-right-from-bracket"></i>
+
+                        Logout All Devices
+
+                    </button>
+
+                </div>
+
+                <button
+                    id="saveSettings"
+                    class="save-btn">
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/account-settings.js"></script>
+
+</body>
+
+</html>

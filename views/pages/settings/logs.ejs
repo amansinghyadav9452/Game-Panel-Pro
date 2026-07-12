@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | Logs</title>
+
+<%- include("../../partials/head") %>
+
+<link rel="stylesheet" href="/css/security-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+<%- include("../../partials/sidebar") %>
+
+<main class="content">
+
+<section class="settings-page">
+
+<div class="settings-header">
+
+<a href="/settings" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</a>
+
+<div>
+
+<h1 class="page-heading">
+Logs
+</h1>
+
+<p class="page-subtitle">
+Manage log storage and exports
+</p>
+
+</div>
+
+</div>
+
+<div class="account-card">
+
+<div class="setting-group">
+
+<label>Log Retention</label>
+
+<select>
+
+<option>7 Days</option>
+
+<option selected>30 Days</option>
+
+<option>90 Days</option>
+
+<option>365 Days</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Export Logs</label>
+
+<button class="action-btn">
+
+<i class="fa-solid fa-file-export"></i>
+
+Export Logs
+
+</button>
+
+</div>
+
+<div class="setting-group">
+
+<label>Download Error Logs</label>
+
+<button class="action-btn">
+
+<i class="fa-solid fa-bug"></i>
+
+Download Errors
+
+</button>
+
+</div>
+
+<div class="setting-group">
+
+<label>Clear All Logs</label>
+
+<button class="danger-btn">
+
+<i class="fa-solid fa-trash"></i>
+
+Delete Logs
+
+</button>
+
+</div>
+
+<button class="save-btn">
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+Save Changes
+
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/logs-settings.js"></script>
+
+</body>
+
+</html>

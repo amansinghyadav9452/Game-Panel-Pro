@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | Notifications</title>
+
+<%- include("../../partials/head") %>
+
+<link rel="stylesheet" href="/css/security-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+<%- include("../../partials/sidebar") %>
+
+<main class="content">
+
+<section class="settings-page">
+
+<div class="settings-header">
+
+<a href="/settings" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</a>
+
+<div>
+
+<h1 class="page-heading">
+Notifications
+</h1>
+
+<p class="page-subtitle">
+Configure notification preferences
+</p>
+
+</div>
+
+</div>
+
+<div class="account-card">
+
+<div class="setting-group">
+
+<label>Telegram Alerts</label>
+
+<select>
+
+<option selected>Enabled</option>
+
+<option>Disabled</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Discord Webhook</label>
+
+<input
+type="text"
+placeholder="https://discord.com/api/webhooks/...">
+
+</div>
+
+<div class="setting-group">
+
+<label>Email Notifications</label>
+
+<select>
+
+<option>Enabled</option>
+
+<option selected>Disabled</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Critical Alerts Only</label>
+
+<select>
+
+<option>Enabled</option>
+
+<option selected>Disabled</option>
+
+</select>
+
+</div>
+
+<button class="save-btn">
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+Save Changes
+
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/notifications-settings.js"></script>
+
+</body>
+</html>

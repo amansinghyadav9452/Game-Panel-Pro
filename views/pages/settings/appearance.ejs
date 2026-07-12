@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | Appearance</title>
+
+<%- include("../../partials/head") %>
+
+<link rel="stylesheet" href="/css/security-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+<%- include("../../partials/sidebar") %>
+
+<main class="content">
+
+<section class="settings-page">
+
+<div class="settings-header">
+
+<a href="/settings" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</a>
+
+<div>
+
+<h1 class="page-heading">
+Appearance
+</h1>
+
+<p class="page-subtitle">
+Customize the panel interface
+</p>
+
+</div>
+
+</div>
+
+<div class="account-card">
+
+<div class="setting-group">
+
+<label>Theme</label>
+
+<select>
+
+<option selected>Dark</option>
+
+<option>Light</option>
+
+<option>System Default</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Accent Color</label>
+
+<select>
+
+<option selected>Blue</option>
+
+<option>Purple</option>
+
+<option>Green</option>
+
+<option>Orange</option>
+
+<option>Red</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Sidebar Style</label>
+
+<select>
+
+<option selected>Expanded</option>
+
+<option>Collapsed</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Animations</label>
+
+<select>
+
+<option selected>Enabled</option>
+
+<option>Disabled</option>
+
+</select>
+
+</div>
+
+<button class="save-btn">
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+Save Changes
+
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/appearance-settings.js"></script>
+
+</body>
+
+</html>

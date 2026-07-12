@@ -1,752 +1,838 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:"Poppins",sans-serif;
-}
-
-:root{
-
-    --bg:#0f172a;
-    --card:#1e293b;
-    --card2:#172033;
-    --border:rgba(255,255,255,.08);
-
-    --primary:#3b82f6;
-    --primaryHover:#2563eb;
-
-    --text:#ffffff;
-    --muted:#94a3b8;
-
-    --danger:#ef4444;
-    --success:#22c55e;
-
-}
-
-body{
-
-    background:var(--bg);
-    color:var(--text);
-
-}
-
-.container{
-
-    display:flex;
-    min-height:100vh;
-
-}
-
 /* =========================
-        Sidebar
+        Settings Page
 ========================= */
 
-.sidebar{
+.settings-page{
 
-    width:260px;
-    background:#111827;
-    border-right:1px solid var(--border);
+    width:100%;
 
-    position:fixed;
-
-    top:0;
-    left:0;
-    bottom:0;
-
-    overflow:auto;
-
-}
-
-.logo{
-
-    height:80px;
+    padding:30px;
 
     display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
 
-    font-size:22px;
-    font-weight:700;
+    flex-direction:column;
 
-    border-bottom:1px solid var(--border);
+    gap:24px;
 
 }
 
-.logo i{
-
-    color:var(--primary);
-
-}
-
-.sidebar nav{
-
-    padding:20px;
-
-}
-
-.sidebar nav a{
+.settings-header{
 
     display:flex;
-    align-items:center;
-    gap:14px;
 
-    color:#cbd5e1;
-
-    text-decoration:none;
-
-    padding:14px 16px;
-
-    border-radius:12px;
-
-    transition:.25s;
-
-    margin-bottom:10px;
-
-}
-
-.sidebar nav a:hover{
-
-    background:#1e293b;
-
-    color:white;
-
-}
-
-.sidebar nav a.active{
-
-    background:var(--primary);
-
-    color:white;
-
-}
-
-.sidebar nav a i{
-
-    width:20px;
-    text-align:center;
-
-}
-
-/* =========================
-        Main
-========================= */
-
-.content{
-
-    flex:1;
-
-    margin-left:260px;
-
-    padding:35px;
-
-}
-
-/* =========================
-        Topbar
-========================= */
-
-.topbar{
-
-    display:flex;
     justify-content:space-between;
+
     align-items:center;
 
-    margin-bottom:30px;
+}
+
+.page-heading{
+
+    font-size:38px;
+
+    font-weight:800;
+
+    color:#fff;
+
+    margin:0;
 
 }
 
-.topbar h1{
+.page-subtitle{
 
-    font-size:32px;
-    font-weight:700;
+    margin-top:8px;
 
-}
-
-.topbar p{
-
-    color:var(--muted);
-    margin-top:6px;
-
-}
-
-.saveBtn{
-
-    border:none;
-
-    background:var(--primary);
-
-    color:white;
-
-    padding:13px 24px;
-
-    border-radius:12px;
-
-    cursor:pointer;
-
-    transition:.25s;
+    color:#9ca3af;
 
     font-size:15px;
 
-    font-weight:600;
+}
+
+/* =========================
+        Search Box
+========================= */
+
+.settings-search{
+
+    width:100%;
+
+    max-width:450px;
+
+    height:58px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    padding:0 20px;
+
+    border-radius:18px;
+
+    background:#141b2d;
+
+    border:1px solid rgba(255,255,255,.05);
 
 }
 
-.saveBtn:hover{
+.settings-search i{
 
-    background:var(--primaryHover);
+    color:#8b5cf6;
 
-    transform:translateY(-2px);
+    font-size:18px;
+
+}
+
+.settings-search input{
+
+    flex:1;
+
+    border:none;
+
+    outline:none;
+
+    background:transparent;
+
+    color:#fff;
+
+    font-size:15px;
+
+}
+
+.settings-search input::placeholder{
+
+    color:#6b7280;
 
 }
 
 /* =========================
-        Cards
+        Settings Grid
 ========================= */
 
-.setting-card{
+.settings-grid{
 
-    background:var(--card);
+    display:grid;
 
-    border:1px solid var(--border);
+    grid-template-columns:
+    repeat(3,1fr);
 
-    border-radius:18px;
+    gap:22px;
 
-    margin-bottom:25px;
+}
+
+/* =========================
+        Setting Card
+========================= */
+
+.setting-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    padding:22px;
+
+    border-radius:22px;
+
+    text-decoration:none;
+
+    background:#141b2d;
+
+    border:1px solid
+    rgba(255,255,255,.05);
+
+    transition:.25s ease;
+
+    position:relative;
 
     overflow:hidden;
 
 }
 
-.card-header{
+.setting-item:hover{
 
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+    transform:translateY(-4px);
 
-    padding:20px 24px;
+    border-color:#7c3aed;
 
-    cursor:pointer;
-
-    background:rgba(255,255,255,.03);
+    box-shadow:
+    0 12px 35px
+    rgba(124,58,237,.22);
 
 }
 
-.card-header h2{
-
-    font-size:19px;
-    font-weight:600;
-
-    display:flex;
-    align-items:center;
-    gap:12px;
-
-}
-
-.card-header i:first-child{
-
-    color:var(--primary);
-
-}
-
-.toggle{
-
-    transition:.3s;
-
-}
-
-/* =========================
-        Card Body
-========================= */
-
-.card-body{
-
-    padding:22px;
-
-}
-
-.setting-row{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    gap:25px;
-
-    padding:18px 0;
-
-    border-bottom:1px solid rgba(255,255,255,.05);
-
-}
-
-.setting-row:last-child{
-
-    border-bottom:none;
-
-}
-
-.setting-row label{
-
-    font-size:15px;
-    color:#dbe4ef;
-
-}
-
-/* =========================
-        Inputs
-========================= */
-
-input,
-select{
-
-    width:280px;
-
-    padding:12px 14px;
-
-    background:var(--card2);
-
-    color:white;
-
-    border:1px solid var(--border);
-
-    border-radius:10px;
-
-    outline:none;
-
-    transition:.25s;
-
-}
-
-input:focus,
-select:focus{
-
-    border-color:var(--primary);
-
-}
-
-input:disabled{
-
-    opacity:.6;
-
-}
-
-/* =========================
-        Buttons
-========================= */
-
-button{
-
-    border:none;
-
-    cursor:pointer;
-
-    border-radius:10px;
-
-    padding:11px 18px;
-
-    background:var(--primary);
-
-    color:white;
-
-    transition:.25s;
-
-    font-weight:600;
-
-}
-
-button:hover{
-
-    background:var(--primaryHover);
-
-}
-
-button.danger{
-
-    background:var(--danger);
-
-}
-
-button.danger:hover{
-
-    filter:brightness(.92);
-
-}
-
-/* =========================
-        Toggle Switch
-========================= */
-
-.switch{
-
-    position:relative;
-
-    display:inline-block;
-
-    width:56px;
-
-    height:30px;
-
-}
-
-.switch input{
-
-    display:none;
-
-}
-
-.slider{
-
-    position:absolute;
-
-    inset:0;
-
-    cursor:pointer;
-
-    background:#475569;
-
-    border-radius:50px;
-
-    transition:.3s;
-
-}
-
-.slider::before{
+.setting-item::before{
 
     content:"";
 
     position:absolute;
 
-    width:22px;
+    inset:0;
 
-    height:22px;
+    background:
 
-    left:4px;
+    linear-gradient(
 
-    top:4px;
+    135deg,
 
-    background:white;
+    rgba(124,58,237,.08),
 
-    border-radius:50%;
+    transparent
 
-    transition:.3s;
+    );
 
-}
-
-.switch input:checked + .slider{
-
-    background:var(--success);
-
-}
-
-.switch input:checked + .slider::before{
-
-    transform:translateX(26px);
-
-}
-
-/* =========================
-        Status Badge
-========================= */
-
-.status{
-
-    padding:8px 14px;
-
-    border-radius:50px;
-
-    font-size:13px;
-
-    font-weight:600;
-
-}
-
-.status.online{
-
-    background:rgba(34,197,94,.15);
-
-    color:#22c55e;
-
-}
-
-.status.offline{
-
-    background:rgba(239,68,68,.15);
-
-    color:#ef4444;
-
-}
-
-/* =========================
-      Hover Effects
-========================= */
-
-.setting-card{
+    opacity:0;
 
     transition:.25s;
 
 }
 
-.setting-card:hover{
-
-    transform:translateY(-3px);
-
-    box-shadow:
-
-    0 10px 35px rgba(59,130,246,.18);
-
-}
-
-/* =========================
-      Card Collapse
-========================= */
-
-.card-body{
-
-    transition:
-
-    max-height .35s ease,
-
-    padding .35s ease,
-
-    opacity .25s;
-
-    overflow:hidden;
-
-}
-
-.setting-card.collapsed .card-body{
-
-    max-height:0;
-
-    padding:0 22px;
-
-    opacity:0;
-
-}
-
-.setting-card.collapsed .toggle{
-
-    transform:rotate(-90deg);
-
-}
-
-/* =========================
-      Scrollbar
-========================= */
-
-::-webkit-scrollbar{
-
-    width:10px;
-
-}
-
-::-webkit-scrollbar-track{
-
-    background:#111827;
-
-}
-
-::-webkit-scrollbar-thumb{
-
-    background:#334155;
-
-    border-radius:20px;
-
-}
-
-::-webkit-scrollbar-thumb:hover{
-
-    background:#475569;
-
-}
-
-/* =========================
-      Selection
-========================= */
-
-::selection{
-
-    background:#2563eb;
-
-    color:white;
-
-}
-
-/* =========================
-      Focus
-========================= */
-
-button:focus,
-input:focus,
-select:focus{
-
-    outline:none;
-
-}
-
-/* =========================
-      Mobile
-========================= */
-
-@media(max-width:992px){
-
-.sidebar{
-
-    width:90px;
-
-}
-
-.logo span{
-
-    display:none;
-
-}
-
-.sidebar nav a{
-
-    justify-content:center;
-
-}
-
-.sidebar nav a span{
-
-    display:none;
-
-}
-
-.content{
-
-    margin-left:90px;
-
-}
-
-}
-
-@media(max-width:768px){
-
-.content{
-
-    margin-left:0;
-
-    padding:20px;
-
-}
-
-.sidebar{
-
-    display:none;
-
-}
-
-.topbar{
-
-    flex-direction:column;
-
-    align-items:flex-start;
-
-    gap:20px;
-
-}
-
-.setting-row{
-
-    flex-direction:column;
-
-    align-items:flex-start;
-
-}
-
-input,
-select{
-
-    width:100%;
-
-}
-
-button{
-
-    width:100%;
-
-}
-
-}
-
-/* =========================
-      Small Animations
-========================= */
-
-button{
-
-    transition:
-
-    background .25s,
-
-    transform .18s;
-
-}
-
-button:active{
-
-    transform:scale(.97);
-
-}
-
-.setting-row{
-
-    animation:fadeIn .35s ease;
-
-}
-
-@keyframes fadeIn{
-
-from{
-
-    opacity:0;
-
-    transform:translateY(10px);
-
-}
-
-to{
+.setting-item:hover::before{
 
     opacity:1;
 
-    transform:translateY(0);
+}
+
+/* =========================
+        Icon
+========================= */
+
+.setting-icon{
+
+    width:62px;
+
+    height:62px;
+
+    border-radius:18px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-shrink:0;
 
 }
+
+.setting-icon i{
+
+    color:#fff;
+
+    font-size:24px;
+
+}
+
+.setting-info{
+
+    flex:1;
+
+}
+
+.setting-info h3{
+
+    margin:0;
+
+    color:#fff;
+
+    font-size:20px;
+
+    font-weight:700;
+
+}
+
+.setting-info p{
+
+    margin-top:6px;
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+    line-height:1.5;
+
+}
+
+.setting-item .fa-chevron-right{
+
+    color:#7c3aed;
+
+    font-size:18px;
+
+    transition:.25s;
+
+}
+
+.setting-item:hover .fa-chevron-right{
+
+    transform:translateX(5px);
 
 }
 
 /* =========================
-      Utilities
+        Icon Colors
 ========================= */
 
-.text-danger{
+.purple{
 
-    color:#ef4444;
+    background:#6d28d9;
 
 }
 
-.text-success{
+.green{
+
+    background:#059669;
+
+}
+
+.yellow{
+
+    background:#ca8a04;
+
+}
+
+.blue{
+
+    background:#2563eb;
+
+}
+
+.violet{
+
+    background:#7c3aed;
+
+}
+
+.orange{
+
+    background:#ea580c;
+
+}
+
+.pink{
+
+    background:#db2777;
+
+}
+
+.cyan{
+
+    background:#0891b2;
+
+}
+
+.indigo{
+
+    background:#4338ca;
+
+}
+
+/* =========================
+        System Status
+========================= */
+
+.system-status{
+
+    background:#141b2d;
+
+    border:1px solid rgba(255,255,255,.05);
+
+    border-radius:22px;
+
+    padding:24px;
+
+}
+
+.system-status h3{
+
+    margin:0 0 20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#fff;
+
+    font-size:22px;
+
+}
+
+.system-status h3 i{
 
     color:#22c55e;
 
 }
 
-.mt-20{
+.status-grid{
 
-    margin-top:20px;
+    display:grid;
 
-}
+    grid-template-columns:repeat(4,1fr);
 
-.mb-20{
-
-    margin-bottom:20px;
+    gap:20px;
 
 }
 
-.hidden{
+.status-grid div{
 
-    display:none;
+    background:#0f172a;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    border:1px solid rgba(255,255,255,.05);
 
 }
+
+.status-grid span{
+
+    display:block;
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+    margin-bottom:10px;
+
+}
+
+.status-grid strong{
+
+    font-size:28px;
+
+    color:#fff;
+
+    font-weight:700;
+
+}
+
+/* =========================
+        Premium Effects
+========================= */
+
+.setting-item{
+
+    backdrop-filter:blur(18px);
+
+    -webkit-backdrop-filter:blur(18px);
+
+}
+
+.setting-item::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:-80%;
+
+    left:-150%;
+
+    width:70%;
+
+    height:260%;
+
+    background:
+
+    linear-gradient(
+
+        90deg,
+
+        transparent,
+
+        rgba(255,255,255,.15),
+
+        transparent
+
+    );
+
+    transform:rotate(20deg);
+
+    transition:.7s;
+
+}
+
+.setting-item:hover::after{
+
+    left:170%;
+
+}
+
+.setting-item:hover{
+
+    background:#18233c;
+
+}
+
+.setting-icon{
+
+    box-shadow:
+
+    inset 0 1px 2px rgba(255,255,255,.12),
+
+    0 8px 22px rgba(0,0,0,.35);
+
+}
+
+.setting-item:hover .setting-icon{
+
+    transform:scale(1.08);
+
+}
+
+.setting-icon{
+
+    transition:.25s;
+
+}
+
+/* =========================
+      Premium Search
+========================= */
+
+.settings-search{
+
+    transition:.25s;
+
+}
+
+.settings-search:focus-within{
+
+    border-color:#7c3aed;
+
+    box-shadow:
+
+    0 0 0 3px
+
+    rgba(124,58,237,.18),
+
+    0 12px 30px
+
+    rgba(124,58,237,.22);
+
+}
+
+.settings-search input{
+
+    caret-color:#8b5cf6;
+
+}
+
+/* =========================
+      Status Cards
+========================= */
+
+.status-grid div{
+
+    transition:.25s;
+
+}
+
+.status-grid div:hover{
+
+    transform:translateY(-4px);
+
+    border-color:#7c3aed;
+
+    box-shadow:
+
+    0 12px 30px
+
+    rgba(124,58,237,.18);
+
+}
+
+.status-grid strong{
+
+    display:block;
+
+    margin-top:4px;
+
+}
+
+/* =========================
+        Animations
+========================= */
+
+.settings-page{
+
+    animation:fadeUp .35s ease;
+
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(18px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+    }
+
+}
+
+/* =========================
+      Settings Header
+========================= */
+
+.settings-top{
+
+    margin-top: 0;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    margin-bottom:22px;
+
+}
+
+.settings-title{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    margin-top:2px;
+
+}
+
+.menu-btn{
+
+    width:58px;
+
+    height:58px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:#1b2d4b;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:22px;
+
+    transition:.25s;
+
+    box-shadow:
+
+        0 10px 25px rgba(0,0,0,.25);
+
+}
+
+.menu-btn:hover{
+
+    transform:translateY(-2px);
+
+    background:#243b66;
+
+}
+
+.settings-title{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+
+.page-heading{
+
+    margin:0;
+
+    font-size:44px;
+
+    font-weight:800;
+
+    line-height:1;
+
+    color:#fff;
+
+}
+
+.page-subtitle{
+
+    margin-top:8px;
+
+    color:#9ca3af;
+
+    font-size:15px;
+
+}
+
+/* =========================
+        Stats
+========================= */
+
+/* =========================
+        Responsive
+========================= */
+
+@media(max-width:1200px){
+
+    .settings-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .settings-page{
+
+        padding:20px;
+
+    }
+
+    .page-heading{
+
+        font-size:30px;
+
+    }
+
+    .settings-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .status-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .setting-item{
+
+        padding:18px;
+
+    }
+
+}
+
+/* =========================
+      Empty Search
+========================= */
+
+.empty-search{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:12px;
+
+    padding:70px 20px;
+
+    text-align:center;
+
+    color:#94a3b8;
+
+}
+
+.empty-search i{
+
+    font-size:46px;
+
+    color:#64748b;
+
+}
+
+.empty-search h3{
+
+    margin:0;
+
+    color:#fff;
+
+}
+
+.empty-search p{
+
+    margin:0;
+
+}
+
+@media(max-width:480px){
+
+    .status-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .settings-search{
+
+        max-width:100%;
+
+        height:54px;
+
+        margin-bottom: 8px;
+
+    }
+
+    .setting-icon{
+
+        width:54px;
+
+        height:54px;
+
+    }
+
+    .setting-icon i{
+
+        font-size:20px;
+
+    }
+
+    .setting-info h3{
+
+        font-size:18px;
+
+    }
+
+    .setting-info p{
+
+        font-size:13px;
+
+    }
+
+}
+

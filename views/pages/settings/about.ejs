@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | About</title>
+
+<%- include("../../partials/head") %>
+
+<link rel="stylesheet" href="/css/security-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+    <%- include("../../partials/sidebar") %>
+
+    <main class="content">
+
+        <section class="settings-page">
+
+            <div class="settings-header">
+
+                <a href="/settings" class="back-btn">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                </a>
+
+                <div>
+
+                    <h1 class="page-heading">
+                        About
+                    </h1>
+
+                    <p class="page-subtitle">
+                        Panel information and system details
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="account-card">
+
+                <div class="setting-group">
+
+                    <label>Panel Version</label>
+
+                    <input
+                        type="text"
+                        value="v1.0.0"
+                        readonly>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Node.js Version</label>
+
+                    <input
+                        type="text"
+                        value="v22.x"
+                        readonly>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Database</label>
+
+                    <input
+                        type="text"
+                        value="Connected"
+                        readonly>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Environment</label>
+
+                    <input
+                        type="text"
+                        value="Production"
+                        readonly>
+
+                </div>
+
+                <div class="setting-group">
+
+                    <label>Server Uptime</label>
+
+                    <input
+                        type="text"
+                        value="Loading..."
+                        readonly>
+
+                </div>
+
+                <button class="save-btn" disabled>
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    Information Only
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/about-settings.js"></script>
+
+</body>
+
+</html>

@@ -15,7 +15,6 @@ const errorHandler = require("./middleware/errorHandler");
 const activityRoutes = require("./routes/activity");
 const premiumRoutes = require("./routes/premium");
 const settingsRoutes = require("./routes/settings");
-const createSettings = require("./services/createSettings");
 
 const app = express();
 app.set("view engine","ejs");
@@ -26,7 +25,6 @@ connectDB().then(async () => {
 
     await createAdmin();
 
-    await createSettings();
 
 });
 
@@ -75,7 +73,7 @@ app.use(connectRoutes);
 
 app.use(activityRoutes);
 app.use(premiumRoutes);
-app.use(settingsRoutes);
+app.use("/settings", settingsRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | API</title>
+
+<%- include("../../partials/head") %>
+
+<link rel="stylesheet" href="/css/security-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+<%- include("../../partials/sidebar") %>
+
+<main class="content">
+
+<section class="settings-page">
+
+<div class="settings-header">
+
+<a href="/settings" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</a>
+
+<div>
+
+<h1 class="page-heading">
+API
+</h1>
+
+<p class="page-subtitle">
+Configure API behaviour
+</p>
+
+</div>
+
+</div>
+
+<div class="account-card">
+
+<div class="setting-group">
+
+<label>Public API</label>
+
+<select>
+
+<option>Enabled</option>
+
+<option>Disabled</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Premium API</label>
+
+<select>
+
+<option>Enabled</option>
+
+<option>Disabled</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Maintenance Mode</label>
+
+<select>
+
+<option>Disabled</option>
+
+<option>Enabled</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Requests Per Minute</label>
+
+<input
+type="number"
+value="100">
+
+</div>
+
+<div class="setting-group">
+
+<label>API Version</label>
+
+<input
+type="text"
+value="v1"
+readonly>
+
+</div>
+
+<button class="save-btn">
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+Save Changes
+
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/api-settings.js"></script>
+
+</body>
+
+</html>

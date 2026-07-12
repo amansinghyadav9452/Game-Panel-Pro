@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | License</title>
+
+<%- include("../../partials/head") %>
+
+<link rel="stylesheet" href="/css/security-settings.css">
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<div class="layout">
+
+<%- include("../../partials/sidebar") %>
+
+<main class="content">
+
+<section class="settings-page">
+
+<div class="settings-header">
+
+<a href="/settings" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</a>
+
+<div>
+
+<h1 class="page-heading">
+License
+</h1>
+
+<p class="page-subtitle">
+Configure license generation settings
+</p>
+
+</div>
+
+</div>
+
+<div class="account-card">
+
+<div class="setting-group">
+
+<label>Public Key Prefix</label>
+
+<input
+type="text"
+value="PUB-">
+
+</div>
+
+<div class="setting-group">
+
+<label>Premium Key Prefix</label>
+
+<input
+type="text"
+value="PREM-">
+
+</div>
+
+<div class="setting-group">
+
+<label>Default Expiry (Days)</label>
+
+<input
+type="number"
+value="30">
+
+</div>
+
+<div class="setting-group">
+
+<label>Maximum Devices</label>
+
+<input
+type="number"
+value="1">
+
+</div>
+
+<div class="setting-group">
+
+<label>License Length</label>
+
+<input
+type="number"
+value="16">
+
+</div>
+
+<div class="setting-group">
+
+<label>Auto Uppercase</label>
+
+<select>
+
+<option>Enabled</option>
+
+<option>Disabled</option>
+
+</select>
+
+</div>
+
+<button class="save-btn">
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+Save Changes
+
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/license-settings.js"></script>
+
+</body>
+
+</html>
