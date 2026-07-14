@@ -190,3 +190,30 @@ loginBtn.innerHTML =
     }, 1000);
 
 }
+
+const card =
+document.querySelector(".login-card");
+
+const light =
+document.querySelector(".mouse-light");
+
+card.addEventListener("mousemove",(e)=>{
+
+    const rect =
+    card.getBoundingClientRect();
+
+    light.style.left =
+    (e.clientX-rect.left)+"px";
+
+    light.style.top =
+    (e.clientY-rect.top)+"px";
+
+});
+
+card.addEventListener("mouseleave",()=>{
+
+    light.style.left="50%";
+
+    light.style.top="50%";
+
+});
