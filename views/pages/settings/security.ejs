@@ -15,7 +15,10 @@
 
 <div id="overlay"></div>
 
-<div class="layout">
+<%- include("../../partials/toast") %>
+<%- include("../../partials/confirm-modal") %>
+
+<div class="layout">  
 
 <%- include("../../partials/sidebar") %>
 
@@ -51,11 +54,23 @@ Manage your security settings
 
 <label>Cloudflare Turnstile</label>
 
-<select>
+<select id="turnstileEnabled">
 
-<option>Enabled</option>
+<option
+value="true"
+<%= settings.security.turnstileEnabled ? "selected" : "" %>>
 
-<option>Disabled</option>
+Enabled
+
+</option>
+
+<option
+value="false"
+<%= !settings.security.turnstileEnabled ? "selected" : "" %>>
+
+Disabled
+
+</option>
 
 </select>
 
@@ -65,11 +80,23 @@ Manage your security settings
 
 <label>Force Single Login</label>
 
-<select>
+<select id="forceSingleLogin">
 
-<option>Enabled</option>
+<option
+value="true"
+<%= settings.security.forceSingleLogin ? "selected" : "" %>>
 
-<option>Disabled</option>
+Enabled
+
+</option>
+
+<option
+value="false"
+<%= !settings.security.forceSingleLogin ? "selected" : "" %>>
+
+Disabled
+
+</option>
 
 </select>
 
@@ -79,13 +106,31 @@ Manage your security settings
 
 <label>Session Timeout</label>
 
-<select>
+<select id="sessionTimeout">
 
-<option>15 Minutes</option>
+<option
+value="15"
+<%= settings.security.sessionTimeout == 15 ? "selected" : "" %>>
 
-<option>30 Minutes</option>
+15 Minutes
 
-<option>1 Hour</option>
+</option>
+
+<option
+value="30"
+<%= settings.security.sessionTimeout == 30 ? "selected" : "" %>>
+
+30 Minutes
+
+</option>
+
+<option
+value="60"
+<%= settings.security.sessionTimeout == 60 ? "selected" : "" %>>
+
+1 Hour
+
+</option>
 
 </select>
 
@@ -95,13 +140,31 @@ Manage your security settings
 
 <label>JWT Expiry</label>
 
-<select>
+<select id="jwtExpiry">
 
-<option>1 Hour</option>
+<option
+value="1h"
+<%= settings.security.jwtExpiry === "1h" ? "selected" : "" %>>
 
-<option>6 Hours</option>
+1 Hour
 
-<option>24 Hours</option>
+</option>
+
+<option
+value="6h"
+<%= settings.security.jwtExpiry === "6h" ? "selected" : "" %>>
+
+6 Hours
+
+</option>
+
+<option
+value="24h"
+<%= settings.security.jwtExpiry === "24h" ? "selected" : "" %>>
+
+24 Hours
+
+</option>
 
 </select>
 
@@ -112,13 +175,15 @@ Manage your security settings
 <label>Rate Limit</label>
 
 <input
+id="rateLimit"
 type="number"
-value="100">
+value="<%= settings.api.rateLimit %>">
 
 </div>
 
 <button
-class="save-btn">
+    id="saveSecurityBtn"
+    class="save-btn">
 
 <i class="fa-solid fa-floppy-disk"></i>
 
@@ -135,6 +200,9 @@ Save Changes
 </div>
 
 <script src="/js/utils.js"></script>
+
+<script src="/js/toast.js"></script>
+
 <script src="/js/security-settings.js"></script>
 
 </body>

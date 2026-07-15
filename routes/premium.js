@@ -2,6 +2,7 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const logActivity = require("../services/activityLogger");
 const License = require("../models/License")
+const apiAccess = require("../middleware/apiAccess");
 
 const {
     createLicense,
@@ -12,7 +13,7 @@ const {
 
 const router = express.Router();
 
-router.get("/premium/list", auth, async (req, res) => {
+router.get("/premium/list", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 
@@ -36,7 +37,7 @@ router.get("/premium/list", auth, async (req, res) => {
 
 });
 
-router.post("/premium/create", auth, async (req, res) => {
+router.post("/premium/create", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 
@@ -96,7 +97,7 @@ router.post("/premium/create", auth, async (req, res) => {
 
 });
 
-router.get("/premium/search/:key", auth, async (req, res) => {
+router.get("/premium/search/:key", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 
@@ -132,7 +133,7 @@ router.get("/premium/search/:key", auth, async (req, res) => {
 
 });
 
-router.delete("/premium/delete/:key", auth, async (req, res) => {
+router.delete("/premium/delete/:key", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 
@@ -190,7 +191,7 @@ router.delete("/premium/delete/:key", auth, async (req, res) => {
 
 });
 
-router.put("/premium/ban/:key", auth, async (req, res) => {
+router.put("/premium/ban/:key", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 
@@ -250,7 +251,7 @@ router.put("/premium/ban/:key", auth, async (req, res) => {
 
 });
 
-router.put("/premium/unban/:key", auth, async (req, res) => {
+router.put("/premium/unban/:key", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 
@@ -310,7 +311,7 @@ router.put("/premium/unban/:key", auth, async (req, res) => {
 
 });
 
-router.put("/premium/extend/:key", auth, async (req, res) => {
+router.put("/premium/extend/:key", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 
@@ -383,7 +384,7 @@ router.put("/premium/extend/:key", auth, async (req, res) => {
 
 });
 
-router.put("/premium/reset-device/:key", auth, async (req, res) => {
+router.put("/premium/reset-device/:key", auth, apiAccess("premium"), async (req, res) => {
 
     try {
 

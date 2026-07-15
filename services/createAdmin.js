@@ -20,15 +20,17 @@ async function createAdmin() {
     }
 
     const hashedPassword =
-        await bcrypt.hash(password, 10);
+        await bcrypt.hash(password, 12);
 
-    await Admin.create({
+await Admin.create({
 
-        username,
+    username,
 
-        password: hashedPassword
+    password: hashedPassword,
 
-    });
+    sessionVersion:0
+
+});
 
     console.log("✅ Default Admin Created");
 

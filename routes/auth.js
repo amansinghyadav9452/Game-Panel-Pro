@@ -113,7 +113,7 @@ admin.lockUntil = null;
 
 await admin.save();
 
-        const token = generateToken(admin);
+        const token = await generateToken(admin);
 
         res.json({
 

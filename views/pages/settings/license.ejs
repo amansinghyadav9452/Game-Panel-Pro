@@ -15,6 +15,9 @@
 
 <div id="overlay"></div>
 
+<%- include("../../partials/toast") %>
+<%- include("../../partials/confirm-modal") %>
+
 <div class="layout">
 
 <%- include("../../partials/sidebar") %>
@@ -52,8 +55,9 @@ Configure license generation settings
 <label>Public Key Prefix</label>
 
 <input
+id="publicPrefix"
 type="text"
-value="PUB-">
+value="<%= settings.license.publicPrefix %>">
 
 </div>
 
@@ -62,18 +66,50 @@ value="PUB-">
 <label>Premium Key Prefix</label>
 
 <input
+id="premiumPrefix"
 type="text"
-value="PREM-">
+value="<%= settings.license.premiumPrefix %>">
 
 </div>
 
 <div class="setting-group">
 
-<label>Default Expiry (Days)</label>
+<div class="setting-group">
+
+<label>Public Default Expiry (Days)</label>
 
 <input
+id="publicExpiry"
 type="number"
-value="30">
+value="<%= settings.license.publicExpiry %>">
+
+</div>
+
+<div class="setting-group">
+
+<div class="setting-group">
+
+<label>Public Default Expiry (Days)</label>
+
+<input
+id="publicExpiry"
+type="number"
+value="<%= settings.license.publicExpiry %>">
+
+</div>
+
+<div class="setting-group">
+
+<label>Premium Default Expiry (Days)</label>
+
+<input
+id="premiumExpiry"
+type="number"
+value="<%= settings.license.premiumExpiry %>">
+
+</div>
+
+</div>
 
 </div>
 
@@ -82,8 +118,9 @@ value="30">
 <label>Maximum Devices</label>
 
 <input
+id="maxDevices"
 type="number"
-value="1">
+value="<%= settings.license.maxDevices %>">
 
 </div>
 
@@ -92,8 +129,9 @@ value="1">
 <label>License Length</label>
 
 <input
+id="licenseLength"
 type="number"
-value="16">
+value="<%= settings.license.licenseLength %>">
 
 </div>
 
@@ -101,17 +139,29 @@ value="16">
 
 <label>Auto Uppercase</label>
 
-<select>
+<select id="autoUppercase">
 
-<option>Enabled</option>
+<option
+value="true"
+<%= settings.license.autoUppercase ? "selected" : "" %>>
 
-<option>Disabled</option>
+Enabled
+
+</option>
+
+<option
+value="false"
+<%= !settings.license.autoUppercase ? "selected" : "" %>>
+
+Disabled
+
+</option>
 
 </select>
 
 </div>
 
-<button class="save-btn">
+<button id="saveLicenseBtn" class="save-btn">
 
 <i class="fa-solid fa-floppy-disk"></i>
 

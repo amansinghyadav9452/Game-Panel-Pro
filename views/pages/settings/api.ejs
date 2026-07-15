@@ -15,6 +15,9 @@
 
 <div id="overlay"></div>
 
+<%- include("../../partials/toast") %>
+<%- include("../../partials/confirm-modal") %>
+
 <div class="layout">
 
 <%- include("../../partials/sidebar") %>
@@ -51,11 +54,21 @@ Configure API behaviour
 
 <label>Public API</label>
 
-<select>
+<select id="publicApiEnabled">
 
-<option>Enabled</option>
+<option value="true"
+<%= settings.api.publicApiEnabled ? "selected" : "" %>>
 
-<option>Disabled</option>
+Enabled
+
+</option>
+
+<option value="false"
+<%= !settings.api.publicApiEnabled ? "selected" : "" %>>
+
+Disabled
+
+</option>
 
 </select>
 
@@ -65,11 +78,21 @@ Configure API behaviour
 
 <label>Premium API</label>
 
-<select>
+<select id="premiumApiEnabled">
 
-<option>Enabled</option>
+<option value="true"
+<%= settings.api.premiumApiEnabled ? "selected" : "" %>>
 
-<option>Disabled</option>
+Enabled
+
+</option>
+
+<option value="false"
+<%= !settings.api.premiumApiEnabled ? "selected" : "" %>>
+
+Disabled
+
+</option>
 
 </select>
 
@@ -79,11 +102,21 @@ Configure API behaviour
 
 <label>Maintenance Mode</label>
 
-<select>
+<select id="maintenanceMode">
 
-<option>Disabled</option>
+<option value="false"
+<%= !settings.api.maintenanceMode ? "selected" : "" %>>
 
-<option>Enabled</option>
+Disabled
+
+</option>
+
+<option value="true"
+<%= settings.api.maintenanceMode ? "selected" : "" %>>
+
+Enabled
+
+</option>
 
 </select>
 
@@ -94,8 +127,9 @@ Configure API behaviour
 <label>Requests Per Minute</label>
 
 <input
+id="rateLimit"
 type="number"
-value="100">
+value="<%= settings.api.rateLimit %>">
 
 </div>
 
@@ -104,13 +138,14 @@ value="100">
 <label>API Version</label>
 
 <input
+id="apiVersion"
 type="text"
-value="v1"
+value="<%= settings.api.version %>"
 readonly>
 
 </div>
 
-<button class="save-btn">
+<button id="saveApiBtn" class="save-btn">
 
 <i class="fa-solid fa-floppy-disk"></i>
 

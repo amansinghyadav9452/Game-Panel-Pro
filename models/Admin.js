@@ -9,10 +9,34 @@ const adminSchema = new mongoose.Schema({
         trim: true
     },
 
+    twoFactorEnabled:{
+
+    type:Boolean,
+
+    default:false
+
+},
+
+twoFactorSecret:{
+
+    type:String,
+
+    default:""
+
+},
+
     password: {
         type: String,
         required: true
     },
+
+    sessionVersion:{
+
+    type:Number,
+
+    default:0
+
+},
 
     role: {
         type: String,

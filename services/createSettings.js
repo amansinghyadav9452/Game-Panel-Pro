@@ -8,7 +8,7 @@ async function createSettings() {
 
         if (settings) {
 
-            console.log("✅ Settings already exist");
+            console.log("⚙️ Settings already exist.");
 
             return;
 
@@ -16,14 +16,15 @@ async function createSettings() {
 
         await Settings.create({});
 
-        console.log("✅ Default settings created");
+        console.log("✅ Default settings created.");
 
-    } catch (err) {
+    }
 
-        console.error(
-            "Settings Initialization Failed:",
-            err
-        );
+    catch (error) {
+
+        console.error("❌ Settings creation failed:");
+
+        console.error(error);
 
     }
 

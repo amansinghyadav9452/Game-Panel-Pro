@@ -4,6 +4,7 @@ const logActivity = require("../services/activityLogger");
 
 const License = require("../models/License");
 const generateKey = require("../services/keyGenerator");
+const apiAccess = require("../middleware/apiAccess");
 
 const {
 
@@ -16,7 +17,15 @@ const {
 
 const router = express.Router();
 
-router.post("/public/create", auth, async (req, res) => {
+router.post(
+
+    "/public/create",
+
+    auth,
+
+    apiAccess("public"),
+
+    async (req, res) => {
 
     try {
 
@@ -96,7 +105,7 @@ await logActivity({
 
 });
 
-router.get("/public/list", auth, async (req, res) => {
+router.get("/public/list", auth, apiAccess("public"), async (req, res) => {
 
     try {
 
@@ -118,7 +127,7 @@ router.get("/public/list", auth, async (req, res) => {
 
 });
 
-router.get("/public/search/:key", auth, async (req, res) => {
+router.get("/public/search/:key", auth, apiAccess("public"), async (req, res) => {
 
     try {
 
@@ -161,17 +170,13 @@ router.get("/public/search/:key", auth, async (req, res) => {
 
 });
 
-router.delete("/public/delete/:key", auth, async (req, res) => {
+router.delete("/public/delete/:key", auth, apiAccess("public"), async (req, res) => {
 
     try {
 
 const license = await deleteLicense(
     req.params.key
 );
-
-/*remove krna h*/
-console.log("Deleted License:", license);
-console.log("Admin:", req.admin);
 
         if (!license) {
 

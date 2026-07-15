@@ -1,22 +1,34 @@
 const jwt = require("jsonwebtoken");
+const Settings = require("../models/Settings");
 
-function generateToken(admin) {
+async function generateToken(admin) {
 
-    return jwt.sign(
+const settings = await Settings.findOne();
 
-        {
-            id: admin._id,
-            username: admin.username,
-            role: admin.role
-        },
+const jwtExpiry =
+    settings?.security?.jwtExpiry || "1h";
 
-        process.env.JWT_SECRET,
+return jwt.sign(
 
-        {
-            expiresIn: "7d"
-        }
+    {
 
-    );
+        id: admin._id,
+
+        username: admin.username,
+
+        sessionVersion: admin.sessionVersion
+
+    },
+
+    process.env.JWT_SECRET,
+
+    {
+
+        expiresIn: jwtExpiry
+
+    }
+
+);
 
 }
 

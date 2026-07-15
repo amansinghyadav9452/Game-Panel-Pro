@@ -15,6 +15,9 @@
 
 <div id="overlay"></div>
 
+<%- include("../../partials/toast") %>
+<%- include("../../partials/confirm-modal") %>
+
 <div class="layout">
 
     <%- include("../../partials/sidebar") %>
@@ -73,7 +76,8 @@
 
                     <label>Administrator Password</label>
 
-                    <button class="action-btn">
+                    <button class="action-btn"
+                    id="changePasswordBtn">
 
                         <i class="fa-solid fa-key"></i>
 
@@ -124,6 +128,95 @@
             </div>
 
         </section>
+
+        <div id="passwordModal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>
+
+                Change Password
+
+            </h2>
+
+            <button
+                id="closePasswordModal">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div class="input-group">
+
+                <label>
+
+                    Current Password
+
+                </label>
+
+                <input
+                    type="password"
+                    id="currentPassword">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>
+
+                    New Password
+
+                </label>
+
+                <input
+                    type="password"
+                    id="newPassword">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>
+
+                    Confirm Password
+
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmPassword">
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                id="cancelPassword">
+
+                Cancel
+
+            </button>
+
+            <button
+                id="savePassword">
+
+                Change Password
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
     </main>
 
