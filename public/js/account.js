@@ -20,7 +20,7 @@ if (saveBtn) {
 
         try {
 
-            const response = await fetch("/account", {
+            const response = await fetch("/settings/account", {
 
                 method: "PUT",
 
