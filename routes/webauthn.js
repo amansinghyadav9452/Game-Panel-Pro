@@ -2,6 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 
+const { TextEncoder } = require("util");
+
 const {
     generateAuthenticationOptions,
     generateRegistrationOptions,
@@ -118,7 +120,7 @@ router.post(
 
                     userName: admin.username,
 
-                    userID: admin._id.toString(),
+                    userID: new TextEncoder().encode(admin._id.toString()),
 
                     userDisplayName: admin.username,
 
