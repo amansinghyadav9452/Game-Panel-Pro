@@ -3,7 +3,8 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    generateAuthenticationOptions
+    generateAuthenticationOptions,
+    generateRegistrationOptions
 } = require("@simplewebauthn/server");
 
 const Admin = require("../models/Admin");
@@ -77,6 +78,74 @@ router.post(
                 success: false,
 
                 message: "Failed to generate authentication options."
+
+            });
+
+        }
+
+    }
+);
+
+router.post(
+    "/register/options",
+    async (req, res) => {
+
+        try {
+
+            const { username } = req.body;
+
+            const admin = await Admin.findOne({ username });
+
+            if (!admin) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message: "Admin not found."
+
+                });
+
+            }
+
+            const options =
+                await generateRegistrationOptions({
+
+                    rpName: webAuthnConfig.rpName,
+
+                    rpID: webAuthnConfig.rpID,
+
+                    userName: admin.username,
+
+                    userID: admin._id.toString(),
+
+                    userDisplayName: admin.username,
+
+                    authenticatorSelection: {
+
+                        residentKey: "preferred",
+
+                        userVerification: "preferred"
+
+                    }
+
+                });
+
+            console.log(options);
+
+            res.json(options);
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+            res.status(500).json({
+
+                success: false,
+
+                message: "Failed to generate registration options."
 
             });
 
