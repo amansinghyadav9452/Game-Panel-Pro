@@ -51,6 +51,30 @@ failedAttempts: {
 lockUntil: {
     type: Date,
     default: null
+},
+
+webauthn: {
+
+    credentialID: {
+        type: Buffer,
+        default: null
+    },
+
+    publicKey: {
+        type: Buffer,
+        default: null
+    },
+
+    counter: {
+        type: Number,
+        default: 0
+    },
+
+    transports: {
+        type: [String],
+        default: []
+    }
+
 }
 
 }, {

@@ -1229,6 +1229,241 @@ font-size:8px;
 
 }
 
+/* =========================
+   Fingerprint Authentication
+========================= */
+
+.fingerprint-auth{
+
+    width:100%;
+
+    margin:22px 0;
+
+}
+
+.fp-divider{
+
+    width:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:18px;
+
+}
+
+.fp-divider::before,
+.fp-divider::after{
+
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    background:rgba(255,255,255,.08);
+
+}
+
+.fp-divider span{
+
+    padding:0 14px;
+
+    color:#9ca3af;
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+    font-weight:600;
+
+}
+
+.fingerprint-btn{
+
+    width:100%;
+
+    background:transparent;
+
+    border:none;
+
+    cursor:pointer;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.fp-circle{
+
+    width:74px;
+
+    height:74px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:rgba(40,170,255,.08);
+
+    border:2px solid rgba(70,180,255,.28);
+
+    box-shadow:
+        0 0 18px rgba(0,180,255,.20);
+
+    transition:.35s;
+
+}
+
+.fp-circle i{
+
+    font-size:38px;
+
+    color:#53b8ff;
+
+}
+
+.fingerprint-btn:hover .fp-circle{
+
+    transform:scale(1.06);
+
+    box-shadow:
+        0 0 30px rgba(0,180,255,.45);
+
+}
+
+.fp-text{
+
+    color:#d7e8ff;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:.8px;
+
+}
+
+/* =========================
+      Fingerprint Glow
+========================= */
+
+.fp-circle::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:170%;
+
+    height:170%;
+
+    background:conic-gradient(
+        transparent,
+        rgba(0,183,255,.55),
+        transparent,
+        transparent
+    );
+
+    animation:fpRotate 4s linear infinite;
+
+}
+
+.fp-circle::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:3px;
+
+    border-radius:50%;
+
+    background:#121826;
+
+}
+
+.fp-circle i{
+
+    position:relative;
+
+    z-index:2;
+
+}
+
+@keyframes fpRotate{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+/* =========================
+      Scanning Effect
+========================= */
+
+.scanning{
+
+    animation:scanPulse .8s infinite;
+
+}
+
+@keyframes scanPulse{
+
+    0%{
+
+        transform:scale(1);
+
+        box-shadow:
+        0 0 15px rgba(0,183,255,.30);
+
+    }
+
+    50%{
+
+        transform:scale(1.08);
+
+        box-shadow:
+        0 0 35px rgba(0,183,255,.90);
+
+    }
+
+    100%{
+
+        transform:scale(1);
+
+        box-shadow:
+        0 0 15px rgba(0,183,255,.30);
+
+    }
+
+}
+
 /* ==========================
         RESPONSIVE
 ========================== */

@@ -217,3 +217,89 @@ card.addEventListener("mouseleave",()=>{
     light.style.top="50%";
 
 });
+
+const fingerprintButton =
+document.getElementById("fingerprintLogin");
+
+fingerprintButton.addEventListener("click", async () => {
+
+    const circle =
+    fingerprintButton.querySelector(".fp-circle");
+
+    circle.classList.add("scanning");
+
+    try{
+
+        if(
+            !window.PublicKeyCredential
+        ){
+
+            throw new Error(
+                "WebAuthn is not supported on this device."
+            );
+
+        }
+
+const username =
+document.getElementById("username").value.trim();
+
+if (!username) {
+
+    alert("Enter username first.");
+
+    circle.classList.remove("scanning");
+
+    return;
+
+}
+
+const response = await fetch(
+    "/api/webauthn/login/options",
+    {
+
+        method: "POST",
+
+        headers: {
+
+            "Content-Type": "application/json"
+
+        },
+
+        body: JSON.stringify({
+
+            username
+
+        })
+
+    }
+
+);
+
+const options = await response.json();
+
+const authenticationResponse =
+await SimpleWebAuthnBrowser.startAuthentication({
+
+    optionsJSON: options
+
+});
+
+console.log(authenticationResponse);
+
+console.log(options);
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+    finally{
+
+        circle.classList.remove("scanning");
+
+    }
+
+});

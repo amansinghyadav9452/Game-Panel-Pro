@@ -163,6 +163,33 @@
     data-sitekey="0x4AAAAAADz59UgKdhvFUXRc">
     </div>
 
+    <!-- Fingerprint Authentication -->
+
+<div class="fingerprint-auth">
+
+    <div class="fp-divider">
+        <span>OR</span>
+    </div>
+
+    <button
+        type="button"
+        id="fingerprintLogin"
+        class="fingerprint-btn">
+
+        <div class="fp-circle">
+
+            <i class="fas fa-fingerprint"></i>
+
+        </div>
+
+        <span class="fp-text">
+            Touch to Authenticate
+        </span>
+
+    </button>
+
+</div>
+
                 <button
                     class="login-btn"
                     id="loginBtn"
@@ -195,8 +222,8 @@ Protected by Cloudflare Turnstile • JWT • MongoDB
     </main>
 
     <script src="/js/login.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer>
-</script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
 
 </body>
 

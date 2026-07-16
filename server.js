@@ -9,6 +9,7 @@ const connectDB = require("./config/database");
 const createAdmin = require("./services/createAdmin");
 const authRoutes = require("./routes/auth");
 const dashboardRoutes = require("./routes/dashboard");
+const webauthnRoutes = require("./routes/webauthn");
 const publicRoutes = require("./routes/public");
 const connectRoutes = require("./routes/connect");
 const errorHandler = require("./middleware/errorHandler");
@@ -70,6 +71,7 @@ app.use(
 app.use(morgan("dev"));
 app.use(authRoutes);
 app.use(dashboardRoutes);
+app.use("/api/webauthn", webauthnRoutes);
 app.use(publicRoutes);
 app.use(connectRoutes);
 

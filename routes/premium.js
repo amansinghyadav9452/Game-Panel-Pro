@@ -13,7 +13,7 @@ const {
 
 const router = express.Router();
 
-router.get("/premium/list", auth, apiAccess("premium"), async (req, res) => {
+router.get("/premium/list", auth, async (req, res) => {
 
     try {
 
