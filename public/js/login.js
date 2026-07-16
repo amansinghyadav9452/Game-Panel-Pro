@@ -276,12 +276,16 @@ const response = await fetch(
 
 const options = await response.json();
 
+console.log("Before Registration");
+
 const registrationResponse =
 await SimpleWebAuthnBrowser.startRegistration({
 
     optionsJSON: options
 
 });
+
+console.log("After Registration");
 
 console.log(registrationResponse);
 
