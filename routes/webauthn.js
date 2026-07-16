@@ -63,7 +63,7 @@ router.post(
                     userVerification: "preferred"
 
                 });
-
+                console.log(options);
             res.json(options);
 
         }

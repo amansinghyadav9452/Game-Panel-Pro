@@ -1,12 +1,12 @@
-/*module.exports = {
+// module.exports = {
 
-    rpName: "GAME PANEL",
+//     rpName: "GAME PANEL",
 
-    rpID: "premium-game-panel.onrender.com",
+//     rpID: "localhost",
 
-    origin: "https://premium-game-panel.onrender.com"
+//     origin: "http://localhost:3000"
 
-};*/
+// };
 
 module.exports = {
 
