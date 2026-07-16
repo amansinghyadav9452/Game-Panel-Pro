@@ -4,7 +4,8 @@ const router = express.Router();
 
 const {
     generateAuthenticationOptions,
-    generateRegistrationOptions
+    generateRegistrationOptions,
+    verifyRegistrationResponse
 } = require("@simplewebauthn/server");
 
 const Admin = require("../models/Admin");
@@ -147,6 +148,41 @@ console.log(options);
                 success: false,
 
                 message: "Failed to generate registration options."
+
+            });
+
+        }
+
+    }
+);
+
+router.post(
+    "/register/verify",
+    async (req, res) => {
+
+        try {
+
+            res.json({
+
+                success: true,
+
+                message: "Verify route reached.",
+
+                body: req.body
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+            res.status(500).json({
+
+                success: false,
+
+                message: "Verification failed."
 
             });
 

@@ -252,9 +252,8 @@ if (!username) {
     return;
 
 }
-
 const response = await fetch(
-    "/api/webauthn/login/options",
+    "/api/webauthn/register/options",
     {
 
         method: "POST",
@@ -277,12 +276,42 @@ const response = await fetch(
 
 const options = await response.json();
 
-const authenticationResponse =
-await SimpleWebAuthnBrowser.startAuthentication({
+const registrationResponse =
+await SimpleWebAuthnBrowser.startRegistration({
 
     optionsJSON: options
 
 });
+
+console.log(registrationResponse);
+
+const verifyResponse = await fetch(
+    "/api/webauthn/register/verify",
+    {
+
+        method: "POST",
+
+        headers: {
+
+            "Content-Type": "application/json"
+
+        },
+
+        body: JSON.stringify({
+
+            username,
+
+            registrationResponse
+
+        })
+
+    }
+
+);
+
+const result = await verifyResponse.json();
+
+console.log(result);
 
 console.log(authenticationResponse);
 
