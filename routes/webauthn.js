@@ -14,6 +14,8 @@ const {
 
 const Admin = require("../models/Admin");
 
+const { isoBase64URL } = require("@simplewebauthn/server/helpers");
+
 const webAuthnConfig = require("../config/webauthn");
 
 router.get(
@@ -135,6 +137,10 @@ router.post(
 
                 });
 
+admin.currentRegistrationChallenge = options.challenge;
+
+await admin.save();
+
 console.log("REGISTER OPTIONS");
 console.log(options);
 
@@ -161,17 +167,106 @@ res.json(options);
 
 router.post(
     "/register/verify",
+    auth,
     async (req, res) => {
 
         try {
+
+            const admin = req.admin;
+
+            const verification = await verifyRegistrationResponse({
+
+                response: req.body,
+
+                expectedChallenge:
+                    admin.currentRegistrationChallenge,
+
+                expectedOrigin:
+                    webAuthnConfig.origin,
+
+                expectedRPID:
+                    webAuthnConfig.rpID
+
+            });
+
+            const {
+                verified,
+                registrationInfo
+            } = verification;
+
+            if (!verified || !registrationInfo) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message: "Registration verification failed."
+
+                });
+
+            }
+
+            const {
+                credential,
+                credentialDeviceType,
+                credentialBackedUp
+            } = registrationInfo;
+
+            const alreadyExists =
+                admin.biometricCredentials.some(item =>
+                    item.credentialID.equals(
+                        Buffer.from(
+                            isoBase64URL.toBuffer(credential.id)
+                        )
+                    )
+                );
+
+            if (alreadyExists) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message: "This biometric is already registered."
+
+                });
+
+            }
+
+            admin.biometricCredentials.push({
+
+                credentialID:
+                    Buffer.from(
+                        isoBase64URL.toBuffer(credential.id)
+                    ),
+
+                publicKey:
+                    Buffer.from(credential.publicKey),
+
+                counter:
+                    credential.counter,
+
+                transports:
+                    req.body.response.transports || [],
+
+                deviceName:
+                    credentialDeviceType +
+                    (credentialBackedUp
+                        ? " (Backed Up)"
+                        : "")
+
+            });
+
+            admin.currentRegistrationChallenge = "";
+
+            await admin.save();
 
             res.json({
 
                 success: true,
 
-                message: "Verify route reached.",
-
-                body: req.body
+                message:
+                    "Biometric registered successfully."
 
             });
 
@@ -185,7 +280,8 @@ router.post(
 
                 success: false,
 
-                message: "Verification failed."
+                message:
+                    "Verification failed."
 
             });
 

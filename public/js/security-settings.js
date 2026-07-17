@@ -113,6 +113,41 @@ await SimpleWebAuthnBrowser.startRegistration({
 
             console.log(registrationResponse);
 
+            const verifyResponse = await fetch(
+    "/api/webauthn/register/verify",
+    {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        },
+
+        body: JSON.stringify(registrationResponse)
+    }
+);
+
+const result = await verifyResponse.json();
+
+console.log(result);
+
+if (!verifyResponse.ok || !result.success) {
+
+    showToast(
+        "Error",
+        result.message || "Biometric registration failed.",
+        "error"
+    );
+
+    return;
+}
+
+showToast(
+    "Success",
+    "Biometric enabled successfully.",
+    "success"
+);
+
         } catch (err) {
 
             console.error(err);

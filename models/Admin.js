@@ -84,7 +84,12 @@ biometricCredentials: [
         createdAt: {
             type: Date,
             default: Date.now
-        }
+        },
+        
+        currentRegistrationChallenge: {
+    type: String,
+    default: ""
+},
     }
 ],
 
