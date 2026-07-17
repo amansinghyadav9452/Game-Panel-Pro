@@ -65,7 +65,7 @@ router.post(
                     rpID: webAuthnConfig.rpID,
 
 allowCredentials: admin.biometricCredentials.map(credential => ({
-    id: credential.credentialID,
+    id: isoBase64URL.fromBuffer(credential.credentialID),
     type: "public-key",
     transports: credential.transports
 })),
