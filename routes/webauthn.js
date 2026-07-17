@@ -141,6 +141,8 @@ admin.currentRegistrationChallenge = options.challenge;
 
 await admin.save();
 
+console.log("Saved Challenge:", admin.currentRegistrationChallenge);
+
 console.log("REGISTER OPTIONS");
 console.log(options);
 
@@ -173,6 +175,8 @@ router.post(
         try {
 
             const admin = req.admin;
+
+            console.log("Challenge From DB:", admin.currentRegistrationChallenge);
 
             const verification = await verifyRegistrationResponse({
 
