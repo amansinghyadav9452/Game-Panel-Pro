@@ -218,125 +218,6 @@ card.addEventListener("mouseleave",()=>{
 
 });
 
-const fingerprintButton =
-document.getElementById("fingerprintLogin");
-
-fingerprintButton.addEventListener("click", async () => {
-
-    const circle =
-    fingerprintButton.querySelector(".fp-circle");
-
-    circle.classList.add("scanning");
-
-    try{
-
-        if(
-            !window.PublicKeyCredential
-        ){
-
-            throw new Error(
-                "WebAuthn is not supported on this device."
-            );
-
-        }
-
-const username =
-document.getElementById("username").value.trim();
-
-if (!username) {
-
-    alert("Enter username first.");
-
-    circle.classList.remove("scanning");
-
-    return;
-
-}
-const response = await fetch(
-    "/api/webauthn/register/options",
-    {
-
-        method: "POST",
-
-        headers: {
-
-            "Content-Type": "application/json"
-
-        },
-
-        body: JSON.stringify({
-
-            username
-
-        })
-
-    }
-
-);
-
-const options = await response.json();
-
-console.log("Before Registration");
-
-const registrationResponse =
-await SimpleWebAuthnBrowser.startRegistration({
-
-    optionsJSON: options
-
-});
-
-console.log("After Registration");
-
-console.log(registrationResponse);
-
-const verifyResponse = await fetch(
-    "/api/webauthn/register/verify",
-    {
-
-        method: "POST",
-
-        headers: {
-
-            "Content-Type": "application/json"
-
-        },
-
-        body: JSON.stringify({
-
-            username,
-
-            registrationResponse
-
-        })
-
-    }
-
-);
-
-const result = await verifyResponse.json();
-
-console.log(result);
-
-console.log(authenticationResponse);
-
-console.log(options);
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-    }
-
-    finally{
-
-        circle.classList.remove("scanning");
-
-    }
-
-});
-
 const biometricBtn =
     document.getElementById("fingerprintLogin");
 
@@ -440,7 +321,7 @@ if (biometricBtn) {
 
             );
 
-            window.location.href = "/dashboard";
+            window.location.href = "/panel";
 
         }
 
