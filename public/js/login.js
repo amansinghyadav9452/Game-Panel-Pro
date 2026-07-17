@@ -336,3 +336,130 @@ console.log(options);
     }
 
 });
+
+const biometricBtn =
+    document.getElementById("biometricLoginBtn");
+
+if (biometricBtn) {
+
+    biometricBtn.addEventListener("click", async () => {
+
+        try {
+
+            const username =
+                document.getElementById("username").value.trim();
+
+            if (!username) {
+
+                showToast(
+                    "Error",
+                    "Enter username first.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+            const optionsResponse =
+                await fetch(
+                    "/api/webauthn/login/options",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            username
+                        })
+
+                    }
+                );
+
+            const options =
+                await optionsResponse.json();
+
+            const authenticationResponse =
+                await SimpleWebAuthnBrowser.startAuthentication({
+
+                    optionsJSON: options
+
+                });
+
+            const verifyResponse =
+                await fetch(
+                    "/api/webauthn/login/verify",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            username,
+
+                            authenticationResponse
+
+                        })
+
+                    }
+                );
+
+            const result =
+                await verifyResponse.json();
+
+            if (!result.success) {
+
+                showToast(
+
+                    "Error",
+
+                    result.message,
+
+                    "error"
+
+                );
+
+                return;
+
+            }
+
+            localStorage.setItem(
+
+                "token",
+
+                result.token
+
+            );
+
+            window.location.href = "/dashboard";
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+            showToast(
+
+                "Error",
+
+                "Biometric authentication cancelled.",
+
+                "error"
+
+            );
+
+        }
+
+    });
+
+}

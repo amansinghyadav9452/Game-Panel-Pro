@@ -93,6 +93,11 @@ currentRegistrationChallenge: {
     default: ""
 },
 
+currentAuthenticationChallenge: {
+    type: String,
+    default: ""
+},
+
 }, {
     timestamps: true
 });

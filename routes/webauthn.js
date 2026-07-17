@@ -2,14 +2,18 @@ const express = require("express");
 
 const router = express.Router();
 
+const generateToken = require("../services/tokenGenerator");
+
 const { TextEncoder } = require("util");
 
 const auth = require("../middleware/auth");
 
+
 const {
     generateAuthenticationOptions,
     generateRegistrationOptions,
-    verifyRegistrationResponse
+    verifyRegistrationResponse,
+    verifyAuthenticationResponse
 } = require("@simplewebauthn/server");
 
 const Admin = require("../models/Admin");
@@ -60,13 +64,11 @@ router.post(
 
                     rpID: webAuthnConfig.rpID,
 
-                    allowCredentials: admin.webauthn?.credentialID
-                        ? [{
-                            id: admin.webauthn.credentialID,
-                            type: "public-key",
-                            transports: admin.webauthn.transports
-                        }]
-                        : [],
+allowCredentials: admin.biometricCredentials.map(credential => ({
+    id: credential.credentialID,
+    type: "public-key",
+    transports: credential.transports
+})),
 
                     userVerification: "preferred"
 
@@ -144,7 +146,17 @@ await admin.save();
 console.log("Saved Challenge:", admin.currentRegistrationChallenge);
 
 console.log("REGISTER OPTIONS");
+admin.currentAuthenticationChallenge = options.challenge;
+
+await admin.save();
+
+console.log("LOGIN OPTIONS");
 console.log(options);
+
+console.log(
+    "Saved Login Challenge:",
+    admin.currentAuthenticationChallenge
+);
 
 res.json(options);
 
@@ -286,6 +298,124 @@ router.post(
 
                 message:
                     "Verification failed."
+
+            });
+
+        }
+
+    }
+);
+
+router.post(
+    "/login/verify",
+    async (req, res) => {
+
+        try {
+
+            const { username, authenticationResponse } = req.body;
+
+            const admin = await Admin.findOne({ username });
+
+            if (!admin) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message: "Admin not found."
+
+                });
+
+            }
+
+            const passkey = admin.biometricCredentials.find(item =>
+                isoBase64URL.fromBuffer(item.credentialID) === authenticationResponse.id
+            );
+
+            if (!passkey) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message: "Passkey not found."
+
+                });
+
+            }
+
+            const verification =
+                await verifyAuthenticationResponse({
+
+                    response: authenticationResponse,
+
+                    expectedChallenge:
+                        admin.currentAuthenticationChallenge,
+
+                    expectedOrigin:
+                        webAuthnConfig.origin,
+
+                    expectedRPID:
+                        webAuthnConfig.rpID,
+
+                    credential: {
+
+                        id: authenticationResponse.id,
+
+                        publicKey:
+                            new Uint8Array(passkey.publicKey),
+
+                        counter:
+                            passkey.counter,
+
+                        transports:
+                            passkey.transports
+
+                    }
+
+                });
+
+            const { verified, authenticationInfo } = verification;
+
+            if (!verified) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message: "Authentication failed."
+
+                });
+
+            }
+
+            passkey.counter = authenticationInfo.newCounter;
+
+            admin.currentAuthenticationChallenge = "";
+
+            await admin.save();
+
+            const token = await generateToken(admin);
+
+            res.json({
+
+                success: true,
+
+                token
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+            res.status(500).json({
+
+                success: false,
+
+                message: "Authentication failed."
 
             });
 
