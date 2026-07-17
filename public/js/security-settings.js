@@ -104,19 +104,12 @@ const optionsResponse = await fetch(
     }
 );
 
-            const options = await optionsResponse.json();
+const options = await optionsResponse.json();
 
-            if (!options.success) {
-
-                showToast(options.message || "Unable to start biometric registration", "error");
-                return;
-
-            }
-
-            const registrationResponse =
-                await SimpleWebAuthnBrowser.startRegistration({
-                    optionsJSON: options.options
-                });
+const registrationResponse =
+await SimpleWebAuthnBrowser.startRegistration({
+    optionsJSON: options
+});
 
             console.log(registrationResponse);
 

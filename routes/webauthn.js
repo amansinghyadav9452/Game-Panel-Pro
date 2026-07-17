@@ -138,7 +138,7 @@ router.post(
 console.log("REGISTER OPTIONS");
 console.log(options);
 
-            res.json(options);
+res.json(options);
 
         }
 
