@@ -4,6 +4,8 @@ const router = express.Router();
 
 const { TextEncoder } = require("util");
 
+const auth = require("../middleware/auth");
+
 const {
     generateAuthenticationOptions,
     generateRegistrationOptions,
@@ -91,13 +93,12 @@ router.post(
 
 router.post(
     "/register/options",
+    auth,
     async (req, res) => {
 
         try {
 
-            const { username } = req.body;
-
-            const admin = await Admin.findOne({ username });
+            const admin = req.admin;
 
             if (!admin) {
 

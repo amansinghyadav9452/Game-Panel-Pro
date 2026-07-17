@@ -47,7 +47,7 @@ if (decoded.sessionVersion !== admin.sessionVersion) {
 
 }
 
-        req.admin = decoded;
+        req.admin = admin;
 
         next();
 

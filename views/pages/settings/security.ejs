@@ -52,6 +52,39 @@ Manage your security settings
 
 <div class="setting-group">
 
+    <label>Biometric Login</label>
+
+    <div class="setting-description">
+
+        Secure your account using Fingerprint, Face ID or Windows Hello.
+
+    </div>
+
+    <div class="biometric-status">
+
+        <span class="badge warning">
+
+            Disabled
+
+        </span>
+
+    </div>
+
+    <button
+        id="enableBiometricBtn"
+        type="button"
+        class="save-btn">
+
+        <i class="fa-solid fa-fingerprint"></i>
+
+        Enable Biometric
+
+    </button>
+
+</div>
+
+<div class="setting-group">
+
 <label>Cloudflare Turnstile</label>
 
 <select id="turnstileEnabled">
@@ -201,7 +234,7 @@ Save Changes
 
 <script src="/js/utils.js"></script>
 
-<script src="/js/toast.js"></script>
+<script src="/vendor/simplewebauthn.js"></script>
 
 <script src="/js/security-settings.js"></script>
 

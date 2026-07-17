@@ -82,3 +82,52 @@ showToast(
     }
 
 });
+
+const enableBiometricBtn = document.getElementById("enableBiometricBtn");
+
+if (enableBiometricBtn) {
+
+    enableBiometricBtn.addEventListener("click", async () => {
+
+        try {
+
+const token = localStorage.getItem("token");
+
+const optionsResponse = await fetch(
+    "/api/webauthn/register/options",
+    {
+        method: "POST",
+
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+);
+
+            const options = await optionsResponse.json();
+
+            if (!options.success) {
+
+                showToast(options.message || "Unable to start biometric registration", "error");
+                return;
+
+            }
+
+            const registrationResponse =
+                await SimpleWebAuthnBrowser.startRegistration({
+                    optionsJSON: options.options
+                });
+
+            console.log(registrationResponse);
+
+        } catch (err) {
+
+            console.error(err);
+
+            showToast("Biometric registration cancelled.", "error");
+
+        }
+
+    });
+
+}

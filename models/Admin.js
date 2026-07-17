@@ -53,29 +53,40 @@ lockUntil: {
     default: null
 },
 
-webauthn: {
+biometricCredentials: [
+    {
+        credentialID: {
+            type: Buffer,
+            required: true,
+            unique: true
+        },
 
-    credentialID: {
-        type: Buffer,
-        default: null
-    },
+        publicKey: {
+            type: Buffer,
+            required: true
+        },
 
-    publicKey: {
-        type: Buffer,
-        default: null
-    },
+        counter: {
+            type: Number,
+            default: 0
+        },
 
-    counter: {
-        type: Number,
-        default: 0
-    },
+        transports: {
+            type: [String],
+            default: []
+        },
 
-    transports: {
-        type: [String],
-        default: []
+        deviceName: {
+            type: String,
+            default: "Unknown Device"
+        },
+
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
     }
-
-}
+],
 
 }, {
     timestamps: true
