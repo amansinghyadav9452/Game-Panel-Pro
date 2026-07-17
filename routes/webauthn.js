@@ -322,24 +322,21 @@ router.post(
 
             const { username, authenticationResponse } = req.body;
 
-            const admin = await Admin.findOne({ username });
+const admin = await Admin.findOne({ username });
 
-            console.log(
+if (!admin) {
+
+    return res.status(404).json({
+        success: false,
+        message: "Admin not found."
+    });
+
+}
+
+console.log(
     "Challenge From DB:",
     admin.currentAuthenticationChallenge
 );
-
-            if (!admin) {
-
-                return res.status(404).json({
-
-                    success: false,
-
-                    message: "Admin not found."
-
-                });
-
-            }
 
             const passkey = admin.biometricCredentials.find(item =>
                 isoBase64URL.fromBuffer(item.credentialID) === authenticationResponse.id
