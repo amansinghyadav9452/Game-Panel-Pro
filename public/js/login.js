@@ -338,7 +338,7 @@ console.log(options);
 });
 
 const biometricBtn =
-    document.getElementById("biometricLoginBtn");
+    document.getElementById("fingerprintLogin");
 
 if (biometricBtn) {
 

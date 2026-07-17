@@ -59,22 +59,39 @@ router.post(
 
             }
 
-            const options =
-                await generateAuthenticationOptions({
+const options =
+    await generateAuthenticationOptions({
 
-                    rpID: webAuthnConfig.rpID,
+        rpID: webAuthnConfig.rpID,
 
-allowCredentials: admin.biometricCredentials.map(credential => ({
-    id: isoBase64URL.fromBuffer(credential.credentialID),
-    type: "public-key",
-    transports: credential.transports
-})),
+        allowCredentials:
+            admin.biometricCredentials.map(credential => ({
 
-                    userVerification: "preferred"
+                id: isoBase64URL.fromBuffer(credential.credentialID),
 
-                });
-                console.log(options);
-            res.json(options);
+                type: "public-key",
+
+                transports: credential.transports
+
+            })),
+
+        userVerification: "preferred"
+
+    });
+
+admin.currentAuthenticationChallenge = options.challenge;
+
+await admin.save();
+
+console.log("LOGIN OPTIONS");
+console.log(options);
+
+console.log(
+    "Saved Login Challenge:",
+    admin.currentAuthenticationChallenge
+);
+
+res.json(options);
 
         }
 
@@ -146,17 +163,8 @@ await admin.save();
 console.log("Saved Challenge:", admin.currentRegistrationChallenge);
 
 console.log("REGISTER OPTIONS");
-admin.currentAuthenticationChallenge = options.challenge;
 
-await admin.save();
-
-console.log("LOGIN OPTIONS");
 console.log(options);
-
-console.log(
-    "Saved Login Challenge:",
-    admin.currentAuthenticationChallenge
-);
 
 res.json(options);
 
@@ -315,6 +323,11 @@ router.post(
             const { username, authenticationResponse } = req.body;
 
             const admin = await Admin.findOne({ username });
+
+            console.log(
+    "Challenge From DB:",
+    admin.currentAuthenticationChallenge
+);
 
             if (!admin) {
 
