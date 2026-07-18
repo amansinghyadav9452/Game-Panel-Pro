@@ -140,7 +140,7 @@ if (savePassword) {
 
             const response = await fetch(
 
-                "/account/password",
+                "/settings/account/password",
 
                 {
 

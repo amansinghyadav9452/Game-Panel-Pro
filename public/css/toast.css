@@ -224,10 +224,13 @@
 
     }
 
-    .toast{
+.toast{
 
-        width:100%;
+    width:91%;
 
-    }
+    max-width:100%;
 
+    transform:translateY(-30px);
+
+}
 }

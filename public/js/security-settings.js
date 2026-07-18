@@ -19,7 +19,7 @@ saveBtn.addEventListener("click", async () => {
 
     try {
 
-        const response = await fetch("/security", {
+        const response = await fetch("/settings/security", {
 
             method: "PUT",
 

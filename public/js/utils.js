@@ -88,8 +88,6 @@ function initAutoLogout(timeout = 15 * 60 * 1000) {
 
         localStorage.removeItem("logoutAt");
 
-        showToast("Session Expired");
-
         setTimeout(() => {
 
             window.location.replace("/login");
