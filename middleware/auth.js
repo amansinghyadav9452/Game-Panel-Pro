@@ -3,18 +3,23 @@ const Admin = require("../models/Admin");
 
 async function auth(req, res, next) {
 
-    const header = req.headers.authorization;
+const header = req.headers.authorization;
 
-    if (!header) {
-        return res.status(401).json({
-            success: false,
-            message: "Access Denied"
-        });
-    }
+if (!header || !header.startsWith("Bearer ")) {
+
+    return res.status(401).json({
+
+        success: false,
+
+        message: "Authorization token missing."
+
+    });
+
+}
 
     try {
 
-        const token = header.split(" ")[1];
+        const token = header.substring(" ")[7];
 
         const decoded = jwt.verify(
             token,
@@ -47,18 +52,49 @@ if (decoded.sessionVersion !== admin.sessionVersion) {
 
 }
 
-        req.admin = admin;
+req.admin = admin;
 
-        next();
+Object.freeze(req.admin);
 
-    } catch (err) {
+next();
+
+} catch (err) {
+
+    if (err.name === "TokenExpiredError") {
 
         return res.status(401).json({
+
             success: false,
-            message: "Invalid Token"
+
+            message: "Session expired. Please login again."
+
         });
 
     }
+
+    if (err.name === "JsonWebTokenError") {
+
+        return res.status(401).json({
+
+            success: false,
+
+            message: "Invalid authentication token."
+
+        });
+
+    }
+
+    console.error(err);
+
+    return res.status(500).json({
+
+        success: false,
+
+        message: "Authentication failed."
+
+    });
+
+}
 
 }
 

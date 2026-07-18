@@ -6,7 +6,7 @@ const Settings = require("../models/Settings");
 const generateToken = require("../services/tokenGenerator");
 
 const router = express.Router();
-const fetch = global.fetch
+const fetch = global.fetch;
 
 router.post("/login", async (req, res) => {
 
@@ -58,26 +58,27 @@ if (settings?.security?.turnstileEnabled) {
 }
 
 const admin = await Admin.findOne({ username });
+if (admin && admin.lockUntil && admin.lockUntil > Date.now()) {
+
+    const remainingMinutes = Math.ceil(
+        (admin.lockUntil - Date.now()) / 60000
+    );
+
+    return res.status(423).json({
+
+        success: false,
+
+        message: `Account locked. Try again in ${remainingMinutes} minute(s).`
+
+    });
+
+}
 
 if (!admin) {
 
     return res.json({
         success: false,
         message: "Invalid Username or Password"
-    });
-
-}
-
-if (admin.lockUntil && admin.lockUntil > Date.now()) {
-
-    const remaining = Math.ceil(
-        (admin.lockUntil - Date.now()) / 1000
-    );
-
-    return res.json({
-        success: false,
-        message: "Too many failed login attempts.",
-        remaining
     });
 
 }
@@ -89,7 +90,6 @@ if (admin.lockUntil && admin.lockUntil > Date.now()) {
             admin.password
 
         );
-
 if (!match) {
 
     admin.failedAttempts++;
@@ -104,11 +104,11 @@ if (!match) {
 
     await admin.save();
 
-    return res.json({
+    return res.status(401).json({
 
         success: false,
 
-        message: "Invalid Username or Password"
+        message: "Invalid username or password."
 
     });
 
@@ -117,7 +117,13 @@ if (!match) {
         admin.failedAttempts = 0;
 admin.lockUntil = null;
 
-await admin.save();
+if (settings?.security?.forceSingleLogin) {
+
+    admin.sessionVersion++;
+
+    await admin.save();
+
+}
 
         const token = await generateToken(admin);
 
@@ -131,7 +137,7 @@ await admin.save();
 
     } catch (err) {
 
-        console.log(err);
+        console.error(err);
 
         res.status(500).json({
 
@@ -147,17 +153,17 @@ await admin.save();
 
 function getLockDuration(attempts) {
 
-    if (attempts >= 8) return 24 * 60 * 60 * 1000; // 24 Hours
+    if (attempts >= 8) return 24 * 60 * 60 * 1000;
 
-    if (attempts === 7) return 60 * 60 * 1000; // 1 Hour
+    if (attempts === 7) return 60 * 60 * 1000;
 
-    if (attempts === 6) return 30 * 60 * 1000; // 30 Minutes
+    if (attempts === 6) return 30 * 60 * 1000;
 
-    if (attempts === 5) return 10 * 60 * 1000; // 10 Minutes
+    if (attempts === 5) return 10 * 60 * 1000;
 
-    if (attempts === 4) return 5 * 60 * 1000; // 5 Minutes
+    if (attempts === 4) return 5 * 60 * 1000;
 
-    if (attempts === 3) return 2 * 60 * 1000; // 2 Minutes
+    if (attempts === 3) return 2 * 60 * 1000;
 
     return 0;
 

@@ -1,10 +1,11 @@
 const express = require("express");
+const auth = require("../middleware/auth");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
 
-router.get("/", (req, res) => {
+router.get("/", auth, (req, res) => {
 
     res.render("settings", {
 
@@ -20,11 +21,11 @@ router.get("/", (req, res) => {
 
 });
 
-router.get("/account", async (req, res) => {
+router.get("/account",auth, async (req, res) => {
 
     try {
 
-        const admin = await Admin.findOne();
+      const admin = req.admin;
 
         if (!admin) {
 
@@ -60,11 +61,11 @@ router.get("/account", async (req, res) => {
 
 });
 
-router.get("/security", async (req, res) => {
+router.get("/security", auth, async (req, res) => {
 
     try {
 
-        const admin = await Admin.findOne();
+      const admin = req.admin;
 
         const settings = await Settings.findOne();
 
@@ -98,11 +99,11 @@ router.get("/security", async (req, res) => {
 
 });
 
-router.get("/license", async (req, res) => {
+router.get("/license", auth, async (req, res) => {
 
     try {
 
-        const admin = await Admin.findOne();
+      const admin = req.admin;
 
         const settings = await Settings.findOne();
 
@@ -136,11 +137,11 @@ router.get("/license", async (req, res) => {
 
 });
 
-router.get("/api", async (req, res) => {
+router.get("/api", auth, async (req, res) => {
 
     try {
 
-        const admin = await Admin.findOne();
+      const admin = req.admin;
 
         const settings = await Settings.findOne();
 
@@ -174,7 +175,7 @@ router.get("/api", async (req, res) => {
 
 });
 
-router.get("/database", (req, res) => {
+router.get("/database", auth, (req, res) => {
 
     res.render("settings/database", {
 
@@ -189,7 +190,7 @@ router.get("/database", (req, res) => {
 
 });
 
-router.get("/logs", (req, res) => {
+router.get("/logs", auth, (req, res) => {
 
     res.render("settings/logs", {
 
@@ -204,7 +205,7 @@ router.get("/logs", (req, res) => {
 
 });
 
-router.get("/appearance", (req, res) => {
+router.get("/appearance", auth, (req, res) => {
 
     res.render("settings/appearance", {
 
@@ -219,7 +220,7 @@ router.get("/appearance", (req, res) => {
 
 });
 
-router.get("/notifications", (req, res) => {
+router.get("/notifications", auth, (req, res) => {
 
     res.render("settings/notifications", {
 
@@ -234,7 +235,7 @@ router.get("/notifications", (req, res) => {
 
 });
 
-router.get("/about", (req, res) => {
+router.get("/about", auth, (req, res) => {
 
     res.render("settings/about", {
 
@@ -249,11 +250,12 @@ router.get("/about", (req, res) => {
 
 });
 
-router.put("/account", async (req, res) => {
+router.put("/account",  auth, async (req, res) => {
 
     try{
 
         const { username } = req.body;
+        const usernameRegex = /^[A-Za-z0-9_]+$/;
 
         if(!username || username.trim() === ""){
 
@@ -266,8 +268,31 @@ router.put("/account", async (req, res) => {
             });
 
         }
+if (username.trim().length < 3 || username.trim().length > 30) {
 
-        const admin = await Admin.findOne();
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Username must be between 3 and 30 characters."
+
+    });
+
+}
+
+if (!usernameRegex.test(username.trim())) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Username can contain only letters, numbers and underscore."
+
+    });
+
+}
+
+      const admin = req.admin;
 
         admin.username = username.trim();
 
@@ -299,7 +324,7 @@ router.put("/account", async (req, res) => {
 
 });
 
-router.put("/account/password", async (req, res) => {
+router.put("/account/password",  auth, async (req, res) => {
 
     try {
 
@@ -337,7 +362,7 @@ router.put("/account/password", async (req, res) => {
 
         }
 
-        const admin = await Admin.findOne();
+        const admin = req.admin;
 
         if (!admin) {
 
@@ -350,6 +375,45 @@ router.put("/account/password", async (req, res) => {
             });
 
         }
+
+        if (newPassword.length < 8) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Password must be at least 8 characters."
+
+    });
+
+}
+
+    if (currentPassword === newPassword) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "New password must be different."
+
+    });
+
+}
+
+    const passwordRegex =
+/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,64}$/;
+
+if (!passwordRegex.test(newPassword)) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Password must contain uppercase, lowercase, number and special character."
+
+    });
+
+}
 
         const matched = await bcrypt.compare(
 
@@ -409,11 +473,11 @@ router.put("/account/password", async (req, res) => {
 
 });
 
-router.post("/account/logout-all", async (req, res) => {
+router.post("/account/logout-all",  auth, async (req, res) => {
 
-    const admin = await Admin.findOne();
+        const admin = req.admin;
 
-    admin.sessionVersion += 1;
+    admin.sessionVersion++;
 
     await admin.save();
 
@@ -427,9 +491,9 @@ router.post("/account/logout-all", async (req, res) => {
 
 });
 
-router.get("/account/2fa/setup", async (req, res) => {
+router.get("/account/2fa/setup",  auth, async (req, res) => {
 
-    const admin = await Admin.findOne();
+  const admin = req.admin;
 
     if (!admin) {
 
@@ -443,11 +507,13 @@ router.get("/account/2fa/setup", async (req, res) => {
 
 });
 
-router.put("/security", async (req, res) => {
+router.put("/security",  auth, async (req, res) => {
 
     try {
 
         const {
+
+            currentPassword,
 
             turnstileEnabled,
 
@@ -460,6 +526,38 @@ router.put("/security", async (req, res) => {
             rateLimit
 
         } = req.body;
+
+        if (!currentPassword) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Current password is required."
+
+    });
+
+}
+
+const matched = await bcrypt.compare(
+
+    currentPassword,
+
+    req.admin.password
+
+);
+
+if (!matched) {
+
+    return res.status(401).json({
+
+        success: false,
+
+        message: "Current password is incorrect."
+
+    });
+
+}
 
         const settings = await Settings.findOne();
 
@@ -484,6 +582,64 @@ router.put("/security", async (req, res) => {
         settings.security.jwtExpiry = jwtExpiry;
 
         settings.api.rateLimit = Number(rateLimit);
+
+        if (
+    sessionTimeout < 5 ||
+    sessionTimeout > 1440
+) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Session timeout must be between 5 and 1440 minutes."
+
+    });
+
+}
+
+if (
+    rateLimit < 1 ||
+    rateLimit > 1000
+) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Rate limit must be between 1 and 1000."
+
+    });
+
+}
+
+const allowedExpiry = [
+
+    "15m",
+
+    "30m",
+
+    "1h",
+
+    "12h",
+
+    "24h",
+
+    "7d"
+
+];
+
+if (!allowedExpiry.includes(jwtExpiry)) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message: "Invalid JWT expiry."
+
+    });
+
+}
 
         await settings.save();
 
@@ -513,7 +669,75 @@ router.put("/security", async (req, res) => {
 
 });
 
-router.put("/license", async (req, res) => {
+router.delete("/security/biometric", auth, async (req, res) => {
+
+    try {
+
+        const { currentPassword } = req.body;
+
+        if (!currentPassword) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Current password is required."
+
+            });
+
+        }
+
+        const matched = await bcrypt.compare(
+
+            currentPassword,
+
+            req.admin.password
+
+        );
+
+        if (!matched) {
+
+            return res.status(401).json({
+
+                success: false,
+
+                message: "Current password is incorrect."
+
+            });
+
+        }
+
+        req.admin.biometricCredentials = [];
+
+        await req.admin.save();
+
+        return res.json({
+
+            success: true,
+
+            message: "Biometric removed successfully."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.put("/license",  auth, async (req, res) => {
 
     try {
 
@@ -591,7 +815,7 @@ router.put("/license", async (req, res) => {
 
 });
 
-router.put("/api", async (req, res) => {
+router.put("/api",  auth, async (req, res) => {
 
     try {
 

@@ -81,6 +81,28 @@ Manage your security settings
 
     </button>
 
+    <div class="form-group">
+
+    <label>Current Password</label>
+
+    <input
+        type="password"
+        id="removeBiometricPassword"
+        placeholder="Enter current password"
+        autocomplete="current-password"
+    >
+
+</div>
+
+    <button
+    type="button"
+    id="removeBiometricBtn"
+    class="danger-btn">
+
+    Remove Biometric
+
+</button>
+
 </div>
 
 <div class="setting-group">
@@ -211,6 +233,19 @@ value="24h"
 id="rateLimit"
 type="number"
 value="<%= settings.api.rateLimit %>">
+
+</div>
+
+<div class="form-group">
+
+    <label>Current Password</label>
+
+    <input
+        type="password"
+        id="currentPassword"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+    >
 
 </div>
 

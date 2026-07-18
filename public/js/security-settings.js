@@ -17,31 +17,50 @@ saveBtn.addEventListener("click", async () => {
     const rateLimit =
         document.getElementById("rateLimit").value;
 
+const currentPassword =
+    document.getElementById("removeBiometricPassword").value.trim();
+
+if (!currentPassword) {
+
+    showToast(
+        "Error",
+        "Current password is required.",
+        "error"
+    );
+
+    return;
+
+}
+
     try {
 
         const response = await fetch("/settings/security", {
 
             method: "PUT",
 
-            headers: {
+headers: {
 
-                "Content-Type": "application/json"
+    "Content-Type": "application/json",
 
-            },
+    Authorization: `Bearer ${token}`
 
-            body: JSON.stringify({
+},
 
-                turnstileEnabled,
+body: JSON.stringify({
 
-                forceSingleLogin,
+    currentPassword,
 
-                sessionTimeout,
+    turnstileEnabled,
 
-                jwtExpiry,
+    forceSingleLogin,
 
-                rateLimit
+    sessionTimeout,
 
-            })
+    jwtExpiry,
+
+    rateLimit
+
+})
 
         });
 
@@ -153,6 +172,75 @@ showToast(
             console.error(err);
 
             showToast("Biometric registration cancelled.", "error");
+
+        }
+
+    });
+
+}
+
+const removeBiometricBtn =
+    document.getElementById("removeBiometricBtn");
+
+if (removeBiometricBtn) {
+
+    removeBiometricBtn.addEventListener("click", async () => {
+
+        try {
+
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+
+                "/settings/security/biometric",
+
+                {
+
+                    method: "DELETE",
+
+                    headers: {
+
+                        Authorization: `Bearer ${token}`
+
+                    }
+
+                }
+
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(result.message);
+
+            }
+
+            showToast(
+
+                "Success",
+
+                result.message,
+
+                "success"
+
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            showToast(
+
+                "Error",
+
+                "Unable to remove biometric.",
+
+                "error"
+
+            );
 
         }
 
