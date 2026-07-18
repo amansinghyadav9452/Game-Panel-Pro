@@ -294,7 +294,7 @@ body::before{
 
     );
 
-    bottom:-140px;
+    bottom:0px;
 
     left:-120px;
 
@@ -497,11 +497,11 @@ body::before{
 
     linear-gradient(
         145deg,
-        #2563eb,
-        #60a5fa
+        #eb255d,
+        #60faf7b6
     );
 
-    color:#fff;
+    color:#ffffff;
 
     font-size:46px;
 
@@ -1566,8 +1566,8 @@ font-size:8px;
 
     .login-wrapper{
 
-        padding:16px 12px;
-
+        padding:2px 2px;
+        
     }
 
     .login-card{
@@ -1613,6 +1613,8 @@ font-size:8px;
         transform:scale(.88);
 
         transform-origin:top center;
+
+        
 
     }
 
