@@ -26,6 +26,9 @@ if (!header || !header.startsWith("Bearer ")) {
             process.env.JWT_SECRET
         );
 
+        console.log("JWT Session:", decoded.sessionVersion);
+console.log("DB Session:", admin.sessionVersion);
+
         const admin = await Admin.findById(decoded.id);
 
 if (!admin) {
