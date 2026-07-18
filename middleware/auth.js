@@ -55,8 +55,6 @@ if (decoded.sessionVersion !== admin.sessionVersion) {
 
 req.admin = admin;
 
-Object.freeze(req.admin);
-
 next();
 
 } catch (err) {

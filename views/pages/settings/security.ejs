@@ -81,19 +81,6 @@ Manage your security settings
 
     </button>
 
-    <div class="form-group">
-
-    <label>Current Password</label>
-
-    <input
-        type="password"
-        id="removeBiometricPassword"
-        placeholder="Enter current password"
-        autocomplete="current-password"
-    >
-
-</div>
-
     <button
     type="button"
     id="removeBiometricBtn"
@@ -236,19 +223,6 @@ value="<%= settings.api.rateLimit %>">
 
 </div>
 
-<div class="form-group">
-
-    <label>Current Password</label>
-
-    <input
-        type="password"
-        id="currentPassword"
-        placeholder="Enter your password"
-        autocomplete="current-password"
-    >
-
-</div>
-
 <button
     id="saveSecurityBtn"
     class="save-btn">
@@ -267,9 +241,13 @@ Save Changes
 
 </div>
 
+<%- include("../../partials/password-modal") %>
+
 <script src="/js/utils.js"></script>
 
 <script src="/vendor/simplewebauthn.js"></script>
+
+<script src="/js/password-modal.js"></script>
 
 <script src="/js/security-settings.js"></script>
 

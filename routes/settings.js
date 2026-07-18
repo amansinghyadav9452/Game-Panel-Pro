@@ -5,13 +5,11 @@ const bcrypt = require("bcrypt");
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
 
-router.get("/", auth, (req, res) => {
+router.get("/", (req, res) => {
 
     res.render("settings", {
 
-        admin: {
-            username: "Admin"
-        },
+        admin: req.admin,
 
         activePage: "settings",
 
@@ -21,11 +19,12 @@ router.get("/", auth, (req, res) => {
 
 });
 
-router.get("/account",auth, async (req, res) => {
+router.get("/account", async (req, res) => {
 
     try {
 
-      const admin = req.admin;
+      const admin = {
+    username: "Admin"};
 
         if (!admin) {
 
@@ -61,11 +60,12 @@ router.get("/account",auth, async (req, res) => {
 
 });
 
-router.get("/security", auth, async (req, res) => {
+router.get("/security", async (req, res) => {
 
     try {
 
-      const admin = req.admin;
+      const admin = {
+    username: "Admin"};
 
         const settings = await Settings.findOne();
 
@@ -99,11 +99,12 @@ router.get("/security", auth, async (req, res) => {
 
 });
 
-router.get("/license", auth, async (req, res) => {
+router.get("/license", async (req, res) => {
 
     try {
 
-      const admin = req.admin;
+      const admin = {
+    username: "Admin"};
 
         const settings = await Settings.findOne();
 
@@ -137,11 +138,12 @@ router.get("/license", auth, async (req, res) => {
 
 });
 
-router.get("/api", auth, async (req, res) => {
+router.get("/api", async (req, res) => {
 
     try {
 
-      const admin = req.admin;
+      const admin = {
+    username: "Admin"};
 
         const settings = await Settings.findOne();
 
@@ -175,7 +177,7 @@ router.get("/api", auth, async (req, res) => {
 
 });
 
-router.get("/database", auth, (req, res) => {
+router.get("/database", (req, res) => {
 
     res.render("settings/database", {
 
@@ -205,7 +207,7 @@ router.get("/logs", auth, (req, res) => {
 
 });
 
-router.get("/appearance", auth, (req, res) => {
+router.get("/appearance", (req, res) => {
 
     res.render("settings/appearance", {
 
@@ -220,7 +222,7 @@ router.get("/appearance", auth, (req, res) => {
 
 });
 
-router.get("/notifications", auth, (req, res) => {
+router.get("/notifications", (req, res) => {
 
     res.render("settings/notifications", {
 
@@ -235,7 +237,7 @@ router.get("/notifications", auth, (req, res) => {
 
 });
 
-router.get("/about", auth, (req, res) => {
+router.get("/about", (req, res) => {
 
     res.render("settings/about", {
 
@@ -292,11 +294,9 @@ if (!usernameRegex.test(username.trim())) {
 
 }
 
-      const admin = req.admin;
+req.admin.username = username.trim();
 
-        admin.username = username.trim();
-
-        await admin.save();
+await req.admin.save();
 
         return res.json({
 
@@ -362,19 +362,7 @@ router.put("/account/password",  auth, async (req, res) => {
 
         }
 
-        const admin = req.admin;
-
-        if (!admin) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message: "Admin not found."
-
-            });
-
-        }
+const admin = req.admin;
 
         if (newPassword.length < 8) {
 
@@ -475,11 +463,9 @@ if (!passwordRegex.test(newPassword)) {
 
 router.post("/account/logout-all",  auth, async (req, res) => {
 
-        const admin = req.admin;
+req.admin.sessionVersion++;
 
-    admin.sessionVersion++;
-
-    await admin.save();
+await req.admin.save();
 
     res.json({
 
@@ -491,9 +477,10 @@ router.post("/account/logout-all",  auth, async (req, res) => {
 
 });
 
-router.get("/account/2fa/setup",  auth, async (req, res) => {
+router.get("/account/2fa/setup",  async (req, res) => {
 
-  const admin = req.admin;
+  const admin = {
+    username: "Admin"};
 
     if (!admin) {
 
@@ -573,13 +560,13 @@ if (!matched) {
 
         }
 
+        settings.security.jwtExpiry = jwtExpiry;
+
         settings.security.turnstileEnabled = turnstileEnabled;
 
         settings.security.forceSingleLogin = forceSingleLogin;
 
         settings.security.sessionTimeout = Number(sessionTimeout);
-
-        settings.security.jwtExpiry = jwtExpiry;
 
         settings.api.rateLimit = Number(rateLimit);
 

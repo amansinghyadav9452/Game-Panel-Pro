@@ -1,3 +1,8 @@
+if (!localStorage.getItem("token")) {
+
+    window.location.replace("/login");
+
+}
 document.addEventListener("DOMContentLoaded", () => {
 
     initSidebar();
@@ -14,7 +19,7 @@ const cards = document.querySelectorAll(".setting-item");
 
         searchInput.focus();
 
-    }
+    } 
 
     document.addEventListener("keydown", (e) => {
 

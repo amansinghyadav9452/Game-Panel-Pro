@@ -17,21 +17,14 @@ saveBtn.addEventListener("click", async () => {
     const rateLimit =
         document.getElementById("rateLimit").value;
 
-const currentPassword =
-    document.getElementById("removeBiometricPassword").value.trim();
+        const currentPassword = await requestPassword();
 
 if (!currentPassword) {
-
-    showToast(
-        "Error",
-        "Current password is required.",
-        "error"
-    );
 
     return;
 
 }
-
+    const token = localStorage.getItem("token");
     try {
 
         const response = await fetch("/settings/security", {
