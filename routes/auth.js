@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 
 const Admin = require("../models/Admin");
+const Settings = require("../models/Settings");
 const generateToken = require("../services/tokenGenerator");
 
 const router = express.Router();
@@ -12,42 +13,47 @@ router.post("/login", async (req, res) => {
     try {
 
         const { username, password, turnstileToken } = req.body;
+        const settings = await Settings.findOne();
 
-        const response = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
+if (settings?.security?.turnstileEnabled) {
 
-        method: "POST",
+    const response = await fetch(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        {
 
-        headers: {
-            "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
+            method: "POST",
 
-        body: new URLSearchParams({
+            headers: {
 
-            secret:
-            process.env.TURNSTILE_SECRET_KEY,
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
 
-            response:
-            turnstileToken
+            },
 
-        })
+            body: new URLSearchParams({
+
+                secret: process.env.TURNSTILE_SECRET_KEY,
+
+                response: turnstileToken
+
+            })
+
+        }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+
+        return res.json({
+
+            success: false,
+
+            message: "Captcha verification failed"
+
+        });
 
     }
-);
-
-const result = await response.json();
-
-if (!result.success) {
-
-    return res.json({
-
-        success: false,
-
-        message: "Captcha verification failed"
-
-    });
 
 }
 
@@ -156,9 +162,16 @@ function getLockDuration(attempts) {
     return 0;
 
 }
-router.get("/login", (req, res) => {
 
-    res.render("login");
+router.get("/login", async (req, res) => {
+
+    const settings = await Settings.findOne();
+
+    res.render("login", {
+
+        settings
+
+    });
 
 });
 module.exports = router;

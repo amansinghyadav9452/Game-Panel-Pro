@@ -313,15 +313,11 @@ if (biometricBtn) {
 
             }
 
-            localStorage.setItem(
+localStorage.setItem("token", result.token);
 
-                "token",
+await new Promise(resolve => setTimeout(resolve, 100));
 
-                result.token
-
-            );
-
-            window.location.href = "/panel";
+window.location.href = "/panel";
 
         }
 

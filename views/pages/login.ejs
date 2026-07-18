@@ -157,11 +157,27 @@
 
                     </label>
 
-                </div>
-                    <div
-    class="cf-turnstile"
-    data-sitekey="0x4AAAAAADz59UgKdhvFUXRc">
-    </div>
+<% if(settings.security.turnstileEnabled){ %>
+
+<div
+class="cf-turnstile"
+data-sitekey="0x4AAAAAADz59UgKdhvFUXRc">
+</div>
+
+<% } %>
+
+<% if (!settings?.security?.turnstileEnabled) { %>
+
+<div class="security-note">
+
+    <i class="fa-solid fa-flask"></i>
+
+    Development Mode
+    (Turnstile Disabled)
+
+</div>
+
+<% } %>
 
     <!-- Fingerprint Authentication -->
 
@@ -223,7 +239,16 @@ Protected by Cloudflare Turnstile • JWT • MongoDB
 
 <script src="/vendor/simplewebauthn.js"></script>
 <script src="/js/login.js"></script>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<% if (settings?.security?.turnstileEnabled) { %>
+
+<script
+src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+async
+defer>
+
+</script>
+
+<% } %>
 
 </body>
 
