@@ -1,36 +1,46 @@
 let confirmCallback = null;
 
-function showConfirm(title, message, callback){
+function showConfirm(title, message, callback) {
 
     document.getElementById("confirmTitle").textContent = title;
-
     document.getElementById("confirmMessage").textContent = message;
 
     document.getElementById("confirmOverlay")
         .classList.add("show");
 
     confirmCallback = callback;
+}
+
+const confirmCancel =
+    document.getElementById("confirmCancel");
+
+const confirmOk =
+    document.getElementById("confirmOk");
+
+if (confirmCancel) {
+
+    confirmCancel.addEventListener("click", () => {
+
+        document.getElementById("confirmOverlay")
+            .classList.remove("show");
+
+    });
 
 }
 
-document.getElementById("confirmCancel")
-.addEventListener("click",()=>{
+if (confirmOk) {
 
-    document.getElementById("confirmOverlay")
-        .classList.remove("show");
+    confirmOk.addEventListener("click", () => {
 
-});
+        document.getElementById("confirmOverlay")
+            .classList.remove("show");
 
-document.getElementById("confirmOk")
-.addEventListener("click",()=>{
+        if (confirmCallback) {
 
-    document.getElementById("confirmOverlay")
-        .classList.remove("show");
+            confirmCallback();
 
-    if(confirmCallback){
+        }
 
-        confirmCallback();
+    });
 
-    }
-
-});
+}

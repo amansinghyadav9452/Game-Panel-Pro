@@ -19,16 +19,14 @@ if (!header || !header.startsWith("Bearer ")) {
 
     try {
 
-        const token = header.substring(" ")[7];
+        const token = header.substring(7);
 
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET
         );
 
-        console.log("JWT Session:", decoded.sessionVersion);
-console.log("DB Session:", admin.sessionVersion);
-
+        
         const admin = await Admin.findById(decoded.id);
 
 if (!admin) {
