@@ -333,11 +333,6 @@ if (!admin) {
 
 }
 
-console.log(
-    "Challenge From DB:",
-    admin.currentAuthenticationChallenge
-);
-
             const passkey = admin.biometricCredentials.find(item =>
                 isoBase64URL.fromBuffer(item.credentialID) === authenticationResponse.id
             );

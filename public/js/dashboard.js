@@ -10,7 +10,7 @@ async function loadStats() {
 
     try {
 
-const response = await apiFetch("/dashboard");
+const response = await apiFetch("/panel");
 
         const data = await response.json();
 
