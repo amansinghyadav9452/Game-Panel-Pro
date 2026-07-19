@@ -1011,7 +1011,7 @@
 
     .settings-page{
 
-        padding:20px;
+        padding:3px 3px;
 
     }
 
@@ -1035,7 +1035,7 @@
 
     .setting-item{
 
-        padding:18px;
+        padding:10px;
 
     }
 
@@ -1102,7 +1102,7 @@
 
     gap:12px;
 
-    padding:70px 20px;
+    padding:50px 20px;
 
     text-align:center;
 
