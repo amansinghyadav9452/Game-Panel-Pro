@@ -1,6 +1,38 @@
 const License = require("../models/License");
 const generateKey = require("./keyGenerator");
 
+async function syncLicenseStatus(license) {
+
+    if (!license) {
+
+        return null;
+
+    }
+
+    if (license.status === "banned") {
+
+        return license;
+
+    }
+
+    const shouldExpire = license.expiry <= new Date();
+
+    if (shouldExpire && license.status !== "expired") {
+
+        license.status = "expired";
+        await license.save();
+
+    } else if (!shouldExpire && license.status === "expired") {
+
+        license.status = "active";
+        await license.save();
+
+    }
+
+    return license;
+
+}
+
 async function createLicense(key, type, expiryDays, maxUses, admin) {
 
     const exists = await License.findOne({ key });
@@ -35,27 +67,32 @@ if (exists) {
 
 async function listLicenses(type) {
 
-    return await License.find({
-
+    const licenses = await License.find({
         type
-
     }).sort({
-
         createdAt: -1
-
     });
+
+    for (const license of licenses) {
+
+        await syncLicenseStatus(license);
+
+    }
+
+    return licenses;
 
 }
 
 async function searchLicense(type, key) {
 
-    return await License.findOne({
+    const license = await License.findOne({
 
         type,
-
         key
 
     });
+
+    return await syncLicenseStatus(license);
 
 }
 
@@ -77,6 +114,8 @@ module.exports = {
 
     searchLicense,
 
-    deleteLicense
+    deleteLicense,
+
+    syncLicenseStatus
 
 };

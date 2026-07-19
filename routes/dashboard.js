@@ -1,9 +1,15 @@
 const express = require("express");
 const auth = require("../middleware/auth");
 const License = require("../models/License");
+const {
+    syncLicenseStatus
+} = require("../services/licenseService");
+const { listLicenses } = require("../services/licenseService");
 
 const router = express.Router();
-const logActivity = require("../services/activityLogger")
+const logActivity = require("../services/activityLogger");
+const deleteExpiredLicenses =
+require("../services/licenseCleanup");
 
 router.get("/panel", (req, res) => {
 
@@ -42,20 +48,32 @@ router.get("/dashboard", auth, async (req, res) => {
 
     try {
 
-const totalKeys =
-await License.countDocuments();
+        await deleteExpiredLicenses();
+        const licenses = await License.find();
 
-        const activeKeys = await License.countDocuments({
-            status: "active"
-        });
+        let activeKeys = 0;
+        let expiredKeys = 0;
+        let bannedKeys = 0;
 
-        const expiredKeys = await License.countDocuments({
-            status: "expired"
-        });
+for (const license of licenses) {
 
-        const bannedKeys = await License.countDocuments({
-            status: "banned"
-        });
+    await syncLicenseStatus(license);
+
+    if (license.status === "banned") {
+
+        bannedKeys++;
+
+    } else if (license.status === "expired") {
+
+        expiredKeys++;
+
+    } else {
+
+        activeKeys++;
+
+    }
+
+}
 
         res.json({
 
@@ -63,7 +81,7 @@ await License.countDocuments();
 
             stats: {
 
-                totalKeys,
+                totalKeys: licenses.length,
 
                 activeKeys,
 
@@ -95,18 +113,12 @@ router.get("/dashboard/licenses", auth, async (req, res) => {
 
     try {
 
-        const licenses = await License.find({
-            type: "public"
-        }).sort({
-            createdAt: -1
-        });
+        await deleteExpiredLicenses();
+        const licenses = await listLicenses("public");
 
         res.json({
-
             success: true,
-
             licenses
-
         });
 
     } catch (err) {
@@ -114,11 +126,8 @@ router.get("/dashboard/licenses", auth, async (req, res) => {
         console.error(err);
 
         res.status(500).json({
-
             success: false,
-
             message: "Server Error"
-
         });
 
     }
@@ -294,6 +303,11 @@ router.put("/dashboard/extend/:key", auth, async (req, res) => {
 
         const { days } = req.body;
 
+        console.log("=========== REQUEST DEBUG ===========");
+console.log("Request Body:", req.body);
+console.log("Days:", days);
+console.log("Expiry Before:", license.expiry);
+
         const license = await License.findOne({
             key: req.params.key
         });
@@ -307,21 +321,28 @@ router.put("/dashboard/extend/:key", auth, async (req, res) => {
 
         }
 
-        license.expiry = new Date(
-            license.expiry.getTime() + (days * 24 * 60 * 60 * 1000)
-        );
+const baseDate =
+    license.expiry > new Date()
+        ? license.expiry
+        : new Date();
 
-        if (license.status === "expired") {
-            license.status = "active";
-        }
+baseDate.setDate(
+    baseDate.getDate() + Number(days)
+);
 
-        await license.save();
+license.expiry = baseDate;
 
-        res.json({
-            success: true,
-            message: "License Extended Successfully",
-            expiry: license.expiry
-        });
+license.status = "active";
+
+await license.save();
+
+const updatedLicense = await License.findById(license._id);
+
+res.json({
+    success: true,
+    message: "License Extended Successfully",
+    expiry: license.expiry
+});
 
     } catch (err) {
 

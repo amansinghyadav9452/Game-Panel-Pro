@@ -5,6 +5,7 @@ const logActivity = require("../services/activityLogger");
 const License = require("../models/License");
 const generateKey = require("../services/keyGenerator");
 const apiAccess = require("../middleware/apiAccess");
+const deleteExpiredLicenses = require("../services/licenseCleanup");
 
 const {
 
@@ -109,6 +110,7 @@ router.get("/public/list", auth, apiAccess("public"), async (req, res) => {
 
     try {
 
+        await deleteExpiredLicenses();
         const licenses = await listLicenses("public");
 
         res.json({

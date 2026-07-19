@@ -3,6 +3,7 @@ const auth = require("../middleware/auth");
 const logActivity = require("../services/activityLogger");
 const License = require("../models/License")
 const apiAccess = require("../middleware/apiAccess");
+const deleteExpiredLicenses = require("../services/licenseCleanup");
 
 const {
     createLicense,
@@ -17,6 +18,7 @@ router.get("/premium/list", auth, async (req, res) => {
 
     try {
 
+        await deleteExpiredLicenses();
         const licenses = await listLicenses("premium");
 
         res.json({
@@ -331,16 +333,18 @@ router.put("/premium/extend/:key", auth, apiAccess("premium"), async (req, res) 
 
         }
 
-        license.expiry = new Date(
-            license.expiry.getTime() +
-            (days * 24 * 60 * 60 * 1000)
-        );
+const baseDate =
+    license.expiry > new Date()
+        ? license.expiry
+        : new Date();
 
-        if (license.status === "expired") {
+baseDate.setDate(
+    baseDate.getDate() + Number(days)
+);
 
-            license.status = "active";
+license.expiry = baseDate;
 
-        }
+license.status = "active";
 
         await license.save();
 
