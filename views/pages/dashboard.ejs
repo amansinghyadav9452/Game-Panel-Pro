@@ -23,39 +23,139 @@
 
 <%- include("../partials/topbar") %>
 
+<section class="dashboard-hero">
+
+    <div class="hero-left">
+
+        <h1>Welcome Back 👋</h1>
+
+        <p>
+            Manage licenses, monitor activity and keep your panel secure.
+        </p>
+
+    </div>
+
+    <div class="hero-right">
+
+        <div class="hero-chip online">
+
+            <span class="dot"></span>
+
+            System Online
+
+        </div>
+
+        <div class="hero-chip">
+
+            ⚡ Live Monitoring
+
+        </div>
+
+    </div>
+
+</section>
+
         <section class="cards">
 
             <div class="card">
+                <div class="top-accent blue"></div>
 
-                <h3>Total Keys</h3>
+                <div class="card-icon blue">
+    <i class="fa-solid fa-key"></i>
+</div>
+
+<h3>Total</h3>
 
                 <span id="totalKeys">0</span>
                 <small>Live Data</small>
+                <div class="mini-chart blue-chart">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<div class="trend-pill blue-pill">
+    <i class="fa-solid fa-arrow-up"></i>
+    +2 Today
+</div>
             </div>
 
             <div class="card">
-
+                <div class="top-accent green"></div>
+                
+                <div class="card-icon green">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                
                 <h3>Active</h3>
-
+                
                 <span id="activeKeys">0</span>
                 <small>Currently Active</small>
+                <div class="mini-chart green-chart">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<div class="trend-pill green-pill">
+    <i class="fa-solid fa-arrow-up"></i>
+    +3 Today
+</div>
             </div>
 
             <div class="card">
+                <div class="top-accent orange"></div>
 
-                <h3>Expired</h3>
+                <div class="card-icon orange">
+    <i class="fa-regular fa-clock"></i>
+</div>
+
+<h3>Expired</h3>
 
                 <span id="expiredKeys">0</span>
                 <small>Need Attention</small>
+                <div class="mini-chart orange-chart">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<div class="trend-pill orange-pill">
+    <i class="fa-solid fa-arrow-up"></i>
+    +1 Today
+</div>
 
             </div>
 
             <div class="card">
+                <div class="top-accent red"></div>
 
-                <h3>Banned</h3>
+                <div class="card-icon red">
+    <i class="fa-solid fa-shield-halved"></i>
+</div>
+
+<h3>Banned</h3>
 
                 <span id="bannedKeys">0</span>
                 <small>Blocked Keys</small>
+                <div class="mini-chart red-chart">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<div class="trend-pill red-pill">
+    <i class="fa-solid fa-minus"></i>
+    0 Today
+</div>
             </div>
 
         </section>

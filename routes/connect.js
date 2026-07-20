@@ -4,7 +4,8 @@ const router = express.Router();
 
 const {
     verifyPublicLicense,
-    verifyPremiumLicense
+    verifyPremiumLicense,
+    saveClientLog
 } = require("../services/connectService");
 
 router.post("/connect-premium", async (req, res) => {
@@ -54,6 +55,30 @@ router.post("/connect", async (req, res) => {
         res.status(500).json({
 
             status: false,
+            reason: "Internal Server Error"
+
+        });
+
+    }
+
+});
+
+router.post("/client-log", async (req, res) => {
+
+    try {
+
+        const result = await saveClientLog(req.body);
+
+        res.json(result);
+
+    } catch (err) {
+
+        console.error("Client Log API Error", err);
+
+        res.status(500).json({
+
+            status: false,
+
             reason: "Internal Server Error"
 
         });

@@ -1,4 +1,5 @@
 const License = require("../models/License");
+const UserLog = require("../models/UserLog");
 const md5 = require("md5");
 require("dotenv").config();
 
@@ -29,6 +30,19 @@ console.log("Searching:", {
     });
 if (!license) {
 
+    await UserLog.create({
+    licenseKey: user_key,
+    licenseType: expectedType,
+    serial,
+    deviceModel: body.device_model || "",
+    deviceBrand: body.device_brand || "",
+    androidVersion: body.android_version || "",
+    status: "failed",
+    reason: expectedType === "premium"
+        ? "Invalid Premium Key"
+        : "Invalid Public Key"
+});
+
     return {
 
         status: false,
@@ -43,6 +57,18 @@ if (!license) {
 }
 
 if (license.expiry < new Date()) {
+
+    await UserLog.create({
+    licenseKey: user_key,
+    licenseType: expectedType,
+    serial,
+    deviceModel: body.device_model || "",
+    deviceBrand: body.device_brand || "",
+    androidVersion: body.android_version || "",
+    status: "failed",
+    reason: "License Expired"
+});
+
     return {
         status: false,
         reason: "License Expired"
@@ -50,6 +76,18 @@ if (license.expiry < new Date()) {
 }
 
 if (license.status === "banned") {
+
+    await UserLog.create({
+    licenseKey: user_key,
+    licenseType: expectedType,
+    serial,
+    deviceModel: body.device_model || "",
+    deviceBrand: body.device_brand || "",
+    androidVersion: body.android_version || "",
+    status: "failed",
+    reason: "License Banned"
+});
+
     return {
         status: false,
         reason: "License Banned"
@@ -57,6 +95,17 @@ if (license.status === "banned") {
 } 
 
 if (!serial) {
+
+    await UserLog.create({
+    licenseKey: user_key,
+    licenseType: expectedType,
+    serial: "",
+    deviceModel: body.device_model || "",
+    deviceBrand: body.device_brand || "",
+    androidVersion: body.android_version || "",
+    status: "failed",
+    reason: "Serial Missing"
+});
 
     return {
 
@@ -69,6 +118,17 @@ if (!serial) {
 }
 
 if (!game || !user_key) {
+
+    await UserLog.create({
+    licenseKey: user_key || "",
+    licenseType: expectedType,
+    serial: serial || "",
+    deviceModel: body.device_model || "",
+    deviceBrand: body.device_brand || "",
+    androidVersion: body.android_version || "",
+    status: "failed",
+    reason: "Invalid Request"
+});
 
     return {
 
@@ -85,6 +145,17 @@ if (!game || !user_key) {
 if (!alreadyRegistered) {
 
     if (license.devices.length >= license.maxUses) {
+
+        await UserLog.create({
+    licenseKey: user_key,
+    licenseType: expectedType,
+    serial,
+    deviceModel: body.device_model || "",
+    deviceBrand: body.device_brand || "",
+    androidVersion: body.android_version || "",
+    status: "failed",
+    reason: "Device Limit Reached"
+});
 
         return {
             status: false,
@@ -103,6 +174,17 @@ license.lastDevice = serial;
 license.lastUsed = new Date();
 
 await license.save();
+
+await UserLog.create({
+    licenseKey: user_key,
+    licenseType: expectedType,
+    serial,
+    deviceModel: body.device_model || "",
+    deviceBrand: body.device_brand || "",
+    androidVersion: body.android_version || "",
+    status: "success",
+    reason: ""
+});
 
 const rng = Math.floor(Date.now() / 1000);
 
@@ -146,8 +228,40 @@ async function verifyPublicLicense(body, req) {
     return verifyLicense(body, req, "public");
 }
 
+async function saveClientLog(body) {
+
+    await UserLog.create({
+
+        licenseKey: body.user_key || "",
+
+        licenseType: body.license_type || "public",
+
+        serial: body.serial || "",
+
+        deviceModel: body.device_model || "",
+
+        deviceBrand: body.device_brand || "",
+
+        androidVersion: body.android_version || "",
+
+        status: body.status || "success",
+
+        reason: body.reason || ""
+
+    });
+
+    return {
+
+        status: true,
+
+        message: "Log Saved"
+
+    };
+
+}
 
 module.exports = {
     verifyPublicLicense,
-    verifyPremiumLicense
+    verifyPremiumLicense,
+    saveClientLog
 };

@@ -17,6 +17,7 @@ const rateLimiter = require("./middleware/rateLimiter");
 const activityRoutes = require("./routes/activity");
 const premiumRoutes = require("./routes/premium");
 const settingsRoutes = require("./routes/settings");
+const logsRoutes = require("./routes/logs");
 const createSettings = require("./services/createSettings");
 
 
@@ -79,6 +80,7 @@ app.use(connectRoutes);
 app.use(activityRoutes);
 app.use(premiumRoutes);
 app.use("/settings", settingsRoutes);
+app.use("/logs", logsRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {
