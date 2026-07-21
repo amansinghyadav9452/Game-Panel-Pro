@@ -184,8 +184,13 @@ window.addEventListener("focus", () => {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
     initSidebar();
+
     initAutoLogout();
+
+    loadProfilePhoto();
+
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -252,7 +257,7 @@ avatar.innerHTML = `
         hidden>
 `;
 
-window.location.reload();
+await loadProfilePhoto();
 
         } catch (err) {
 
@@ -265,3 +270,54 @@ window.location.reload();
     });
 
 });
+
+async function loadProfilePhoto() {
+
+    const avatar = document.getElementById("profileAvatar");
+
+    if (!avatar) return;
+
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    try {
+
+        const res = await fetch("/settings/account/me", {
+
+            headers: {
+
+                Authorization: `Bearer ${token}`
+
+            }
+
+        });
+
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        if (data.admin.profileImage) {
+
+            avatar.innerHTML = `
+                <img
+                    src="${data.admin.profileImage}?t=${Date.now()}"
+                    class="profile-photo"
+                    alt="Profile">
+
+                <input
+                    type="file"
+                    id="profileInput"
+                    accept="image/*"
+                    hidden>
+            `;
+
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+
+}

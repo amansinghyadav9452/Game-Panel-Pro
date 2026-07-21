@@ -918,4 +918,38 @@ router.post(
     }
 );
 
+router.get("/account/me", auth, async (req, res) => {
+
+    try {
+
+        res.json({
+
+            success: true,
+
+            admin: {
+
+                username: req.admin.username,
+
+                profileImage: req.admin.profileImage
+
+            }
+
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+});
+
 module.exports = router;
