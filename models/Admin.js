@@ -9,6 +9,11 @@ const adminSchema = new mongoose.Schema({
         trim: true
     },
 
+    displayName: {
+    type: String,
+    default: "Administrator"
+    },
+
     twoFactorEnabled:{
 
     type:Boolean,

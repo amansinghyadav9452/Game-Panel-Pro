@@ -1677,6 +1677,40 @@ table{
 
 }
 
+.display-name-row{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+.edit-display-btn{
+
+    border:none;
+
+    background:none;
+
+    color:#9CA3AF;
+
+    cursor:pointer;
+
+    font-size:12px;
+
+    transition:.2s;
+
+}
+
+.edit-display-btn:hover{
+
+    color:#60A5FA;
+
+    transform:scale(1.1);
+
+}
+
 @media(max-width:768px){
 
     .layout{

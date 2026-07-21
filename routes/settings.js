@@ -926,13 +926,61 @@ router.get("/account/me", auth, async (req, res) => {
 
             success: true,
 
-            admin: {
+        admin: {
 
-                username: req.admin.username,
+            username: req.admin.username,
 
-                profileImage: req.admin.profileImage
+            displayName: req.admin.displayName,
 
-            }
+            profileImage: req.admin.profileImage
+
+        }
+
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+});
+
+router.put("/display-name", auth, async (req, res) => {
+
+    try {
+
+        const { displayName } = req.body;
+
+        if (!displayName || !displayName.trim()) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Display name is required."
+
+            });
+
+        }
+
+        req.admin.displayName = displayName.trim();
+
+        await req.admin.save();
+
+        res.json({
+
+            success: true,
+
+            displayName: req.admin.displayName
 
         });
 

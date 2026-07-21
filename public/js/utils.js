@@ -191,6 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadProfilePhoto();
 
+    initDisplayNameEditor();
+
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -300,6 +302,7 @@ async function loadProfilePhoto() {
         if (data.admin.profileImage) {
 
             avatar.innerHTML = `
+            initDisplayNameEditor();
                 <img
                     src="${data.admin.profileImage}?t=${Date.now()}"
                     class="profile-photo"
@@ -314,10 +317,109 @@ async function loadProfilePhoto() {
 
         }
 
+        const displayName =
+    document.getElementById("adminDisplayName");
+
+if (displayName) {
+
+    displayName.textContent =
+        data.admin.displayName || "Administrator";
+
+}
+
     } catch (err) {
 
         console.error(err);
 
     }
+
+}
+
+function initDisplayNameEditor() {
+
+    const btn = document.getElementById("editDisplayName");
+    const title = document.getElementById("adminDisplayName");
+
+    if (!btn || !title) return;
+
+    btn.addEventListener("click", () => {
+
+        const currentName = title.textContent;
+
+        title.outerHTML = `
+            <input
+                id="displayNameInput"
+                type="text"
+                maxlength="30"
+                value="${currentName}">
+        `;
+
+        const input =
+            document.getElementById("displayNameInput");
+
+        input.focus();
+        input.select();
+
+        input.addEventListener("keydown", async (e) => {
+
+            if (e.key !== "Enter") return;
+
+            const token =
+                localStorage.getItem("token");
+
+            const res = await fetch(
+                "/settings/display-name",
+                {
+
+                    method: "PUT",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        Authorization:
+                            `Bearer ${token}`
+
+                    },
+
+                    body: JSON.stringify({
+
+                        displayName:
+                            input.value.trim()
+
+                    })
+
+                }
+            );
+
+            const data = await res.json();
+
+            if (!data.success) {
+
+                showToast(
+                    data.message,
+                    "error"
+                );
+
+                return;
+
+            }
+
+            input.outerHTML = `
+                <h4 id="adminDisplayName">
+                    ${data.displayName}
+                </h4>
+            `;
+
+            initDisplayNameEditor();
+
+            showToast(
+                "Display Name Updated"
+            );
+
+        });
+
+    });
 
 }
