@@ -302,8 +302,7 @@ async function loadProfilePhoto() {
         if (data.admin.profileImage) {
 
             avatar.innerHTML = `
-            initDisplayNameEditor();
-                <img
+            <img
                     src="${data.admin.profileImage}?t=${Date.now()}"
                     class="profile-photo"
                     alt="Profile">
@@ -316,6 +315,7 @@ async function loadProfilePhoto() {
             `;
 
         }
+            initDisplayNameEditor();
 
         const displayName =
     document.getElementById("adminDisplayName");
