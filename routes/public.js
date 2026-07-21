@@ -235,7 +235,8 @@ router.get("/premium-keys", (req, res) => {
     res.render("premium-keys", {
 
         activePage: "premium-keys",
-        pageTitle: "Premium Keys"
+        pageTitle: "Premium Keys",
+        admin: req.admin
 
     });
 

@@ -12,7 +12,7 @@
 
 <div class="avatar" id="profileAvatar">
 
-    <% if (admin && admin.profileImage) { %>
+    <% if (typeof admin !== "undefined" && admin.profileImage) { %>
 
         <img
             src="<%= admin.profileImage %>"
