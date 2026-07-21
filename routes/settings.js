@@ -6,7 +6,7 @@ const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
 const uploadProfile = require("../middleware/uploadProfile");
 
-router.get("/", auth, (req, res) => {
+router.get("/", (req, res) => {
 
     res.render("settings", {
 
@@ -20,7 +20,7 @@ router.get("/", auth, (req, res) => {
 
 });
 
-router.get("/account", auth, async (req, res) => {
+router.get("/account", async (req, res) => {
 
     try {
 
@@ -61,7 +61,7 @@ router.get("/account", auth, async (req, res) => {
 
 });
 
-router.get("/security",auth, async (req, res) => {
+router.get("/security", async (req, res) => {
 
     try {
 
@@ -100,7 +100,7 @@ router.get("/security",auth, async (req, res) => {
 
 });
 
-router.get("/license",auth, async (req, res) => {
+router.get("/license", async (req, res) => {
 
     try {
 
@@ -139,7 +139,7 @@ router.get("/license",auth, async (req, res) => {
 
 });
 
-router.get("/api", auth, async (req, res) => {
+router.get("/api", async (req, res) => {
 
     try {
 
@@ -178,7 +178,7 @@ router.get("/api", auth, async (req, res) => {
 
 });
 
-router.get("/database", auth, (req, res) => {
+router.get("/database", (req, res) => {
 
     res.render("settings/database", {
 
@@ -208,7 +208,7 @@ router.get("/logs", auth, (req, res) => {
 
 });
 
-router.get("/appearance", auth,(req, res) => {
+router.get("/appearance", (req, res) => {
 
     res.render("settings/appearance", {
 
@@ -223,7 +223,7 @@ router.get("/appearance", auth,(req, res) => {
 
 });
 
-router.get("/notifications", auth, (req, res) => {
+router.get("/notifications", (req, res) => {
 
     res.render("settings/notifications", {
 
@@ -238,7 +238,7 @@ router.get("/notifications", auth, (req, res) => {
 
 });
 
-router.get("/about", auth, (req, res) => {
+router.get("/about", (req, res) => {
 
     res.render("settings/about", {
 
