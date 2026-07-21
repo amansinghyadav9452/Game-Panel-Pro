@@ -30,6 +30,11 @@ twoFactorSecret:{
         required: true
     },
 
+    profileImage: {
+    type: String,
+    default: ""
+},
+
     sessionVersion:{
 
     type:Number,

@@ -68,3 +68,56 @@ cards.forEach(card => {
     }
 
 });
+
+const profileInput = document.getElementById("profileInput");
+const changeProfileBtn = document.getElementById("changeProfileBtn");
+
+if (changeProfileBtn && profileInput) {
+
+    changeProfileBtn.addEventListener("click", () => {
+
+        profileInput.click();
+
+    });
+
+    profileInput.addEventListener("change", async () => {
+
+        if (!profileInput.files.length) return;
+
+        const formData = new FormData();
+
+        formData.append("profile", profileInput.files[0]);
+
+        const token = localStorage.getItem("token");
+
+        const response = await fetch("/settings/profile/upload", {
+
+            method: "POST",
+
+            headers: {
+
+                Authorization: `Bearer ${token}`
+
+            },
+
+            body: formData
+
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            showToast("Profile photo updated successfully.");
+
+            location.reload();
+
+        } else {
+
+            showToast(data.message || "Upload failed.", "error");
+
+        }
+
+    });
+
+}

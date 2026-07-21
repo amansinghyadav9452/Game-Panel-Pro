@@ -182,3 +182,86 @@ window.addEventListener("focus", () => {
 
 });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    initSidebar();
+    initAutoLogout();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const avatar = document.getElementById("profileAvatar");
+    const input = document.getElementById("profileInput");
+
+    if (!avatar || !input) return;
+
+    avatar.addEventListener("click", () => {
+
+        input.click();
+
+    });
+
+    input.addEventListener("change", async () => {
+
+        if (!input.files.length) return;
+
+        const formData = new FormData();
+
+        formData.append("profile", input.files[0]);
+
+        const token = localStorage.getItem("token");
+
+        try {
+
+            const res = await fetch("/settings/profile/upload", {
+
+                method: "POST",
+
+                headers: {
+
+                    Authorization: `Bearer ${token}`
+
+                },
+
+                body: formData
+
+            });
+
+            const data = await res.json();
+
+            if (!data.success) {
+
+                alert(data.message);
+
+                return;
+
+            }
+
+            const img = avatar.querySelector("img");
+
+avatar.innerHTML = `
+    <img
+        src="${data.image}?t=${Date.now()}"
+        class="profile-photo"
+        alt="Profile">
+
+    <input
+        type="file"
+        id="profileInput"
+        accept="image/*"
+        hidden>
+`;
+
+window.location.reload();
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert("Upload Failed");
+
+        }
+
+    });
+
+});

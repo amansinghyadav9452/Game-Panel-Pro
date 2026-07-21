@@ -429,13 +429,11 @@ th,td{
 
 .avatar{
 
-    width:52px;
+    width:56px;
 
-    height:52px;
+    height:56px;
 
     border-radius:50%;
-
-    background:linear-gradient(135deg,#2563EB,#60A5FA);
 
     display:flex;
 
@@ -443,9 +441,23 @@ th,td{
 
     align-items:center;
 
-    font-weight:bold;
+    background:linear-gradient(135deg,#3B82F6,#7C3AED);
 
-    font-size:20px;
+    color:#fff;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    overflow:hidden;
+
+    position:relative;
+
+    transition:.25s ease;
+
+    user-select:none;
 
 }
 
@@ -1592,6 +1604,76 @@ table{
     filter:blur(30px);
 
     pointer-events:none;
+
+}
+
+.profile-photo{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+}
+
+.avatar:hover{
+
+    transform:scale(1.06);
+
+    box-shadow:0 0 18px rgba(59,130,246,.45);
+
+}
+
+.avatar::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    opacity:0;
+
+    transition:.25s;
+
+}
+
+.avatar:hover::after{
+
+    opacity:1;
+
+}
+
+.avatar::before{
+
+    content:"\f030";
+
+    font-family:"Font Awesome 6 Free";
+
+    font-weight:900;
+
+    position:absolute;
+
+    color:#fff;
+
+    font-size:18px;
+
+    opacity:0;
+
+    z-index:2;
+
+    transition:.25s;
+
+}
+
+.avatar:hover::before{
+
+    opacity:1;
 
 }
 

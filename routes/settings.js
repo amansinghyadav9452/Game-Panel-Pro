@@ -4,8 +4,9 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
+const uploadProfile = require("../middleware/uploadProfile");
 
-router.get("/", (req, res) => {
+router.get("/", auth, (req, res) => {
 
     res.render("settings", {
 
@@ -19,7 +20,7 @@ router.get("/", (req, res) => {
 
 });
 
-router.get("/account", async (req, res) => {
+router.get("/account", auth, async (req, res) => {
 
     try {
 
@@ -60,7 +61,7 @@ router.get("/account", async (req, res) => {
 
 });
 
-router.get("/security", async (req, res) => {
+router.get("/security",auth, async (req, res) => {
 
     try {
 
@@ -99,7 +100,7 @@ router.get("/security", async (req, res) => {
 
 });
 
-router.get("/license", async (req, res) => {
+router.get("/license",auth, async (req, res) => {
 
     try {
 
@@ -138,7 +139,7 @@ router.get("/license", async (req, res) => {
 
 });
 
-router.get("/api", async (req, res) => {
+router.get("/api", auth, async (req, res) => {
 
     try {
 
@@ -177,7 +178,7 @@ router.get("/api", async (req, res) => {
 
 });
 
-router.get("/database", (req, res) => {
+router.get("/database", auth, (req, res) => {
 
     res.render("settings/database", {
 
@@ -207,7 +208,7 @@ router.get("/logs", auth, (req, res) => {
 
 });
 
-router.get("/appearance", (req, res) => {
+router.get("/appearance", auth,(req, res) => {
 
     res.render("settings/appearance", {
 
@@ -222,7 +223,7 @@ router.get("/appearance", (req, res) => {
 
 });
 
-router.get("/notifications", (req, res) => {
+router.get("/notifications", auth, (req, res) => {
 
     res.render("settings/notifications", {
 
@@ -237,7 +238,7 @@ router.get("/notifications", (req, res) => {
 
 });
 
-router.get("/about", (req, res) => {
+router.get("/about", auth, (req, res) => {
 
     res.render("settings/about", {
 
@@ -867,5 +868,54 @@ router.put("/api",  auth, async (req, res) => {
     }
 
 });
+
+router.post(
+    "/profile/upload",
+    auth,
+    uploadProfile.single("profile"),
+    async (req, res) => {
+
+        try {
+
+            if (!req.file) {
+
+                return res.status(400).json({
+                    success: false,
+                    message: "No image uploaded."
+                });
+
+            }
+
+            req.admin.profileImage =
+                `/uploads/profile/${req.file.filename}`;
+
+            await req.admin.save();
+
+            return res.json({
+
+                success: true,
+
+                image: req.admin.profileImage,
+
+                message: "Profile photo updated successfully."
+
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            return res.status(500).json({
+
+                success: false,
+
+                message: "Internal server error."
+
+            });
+
+        }
+
+    }
+);
 
 module.exports = router;

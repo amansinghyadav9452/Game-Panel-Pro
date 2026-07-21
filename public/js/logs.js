@@ -51,6 +51,22 @@ async function loadLogs(page = currentPage) {
 
         const data = await response.json();
 
+        const successLogs = data.logs.filter(
+    log => log.status === "success"
+).length;
+
+const failedLogs = data.logs.filter(
+    log => log.status !== "success"
+).length;
+
+const premiumLogs = data.logs.filter(
+    log => (log.licenseType || "").toLowerCase() === "premium"
+).length;
+
+const uniqueDevices = new Set(
+    data.logs.map(log => log.serial)
+).size;
+
         if (!data.success) {
 
             container.innerHTML =
@@ -76,65 +92,189 @@ async function loadLogs(page = currentPage) {
             data.totalLogs
         );
 
-        let html = `
+let html = `
+
+<div class="logs-stats">
+
+    <div class="stat-card success">
+
+        <div class="stat-number">
+
+            ${successLogs}
+
+        </div>
+
+        <div class="stat-label">
+
+            Success
+
+        </div>
+
+    </div>
+
+    <div class="stat-card failed">
+
+        <div class="stat-number">
+
+            ${failedLogs}
+
+        </div>
+
+        <div class="stat-label">
+
+            Failed
+
+        </div>
+
+    </div>
+
+    <div class="stat-card premium">
+
+        <div class="stat-number">
+
+            ${premiumLogs}
+
+        </div>
+
+        <div class="stat-label">
+
+            Premium
+
+        </div>
+
+    </div>
+
+    <div class="stat-card devices">
+
+        <div class="stat-number">
+
+            ${uniqueDevices}
+
+        </div>
+
+        <div class="stat-label">
+
+            Devices
+
+        </div>
+
+    </div>
+
+</div>
 
 <div class="logs-info">
 
     Showing ${start}-${end} of ${data.totalLogs} logs
 
 </div>
-        <table class="logs-table">
-            <thead>
-                <tr>
-                    <th>Last Seen</th>
-                    <th>License Key</th>
-                    <th>Device ID</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Reason</th>
-                </tr>
-            </thead>
-            <tbody>
-        `;
+
+<div class="logs-list">
+
+`;
 
         data.logs.forEach(log => {
+const success = log.status === "success";
 
-            html += `
-                <tr>
+html += `
 
-                    <td>${getLastSeen(log.createdAt)}</td>
+<div class="log-card ${success ? "success" : "failed"}">
 
-                    <td>${log.licenseKey}</td>
+    <div class="status-line"></div>
 
-                    <td>${log.serial || "-"}</td>
+<div class="log-top">
 
-                    <td>${log.licenseType}</td>
+    <div class="device-icon">
 
-                    <td class="${log.status === "success"
-                        ? "status-success"
-                        : "status-failed"}">
+        <i class="fas fa-mobile-alt"></i>
 
-                        ${log.status === "success" ? "✅ Success" : "❌ Failed"}
+    </div>
 
-                    </td>
+    <div class="log-title">
 
-                    <td>${log.reason || "-"}</td>
+        <div class="top-row">
 
-                </tr>
-            `;
+            <h3>${log.licenseKey}</h3>
+
+            <span class="status-pill ${success ? "success" : "failed"}">
+
+                ${success ? "Success" : "Failed"}
+
+            </span>
+
+        </div>
+
+        <div class="bottom-row">
+
+            <span class="time">
+
+                🕒 ${getLastSeen(log.createdAt)}
+
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="log-grid">
+
+    <div class="info-card">
+
+        <span class="info-label">
+
+            Device ID
+
+        </span>
+
+        <span class="info-value">
+
+            ${log.serial || "-"}
+
+        </span>
+
+    </div>
+
+    <div class="info-card">
+
+        <span class="info-label">
+
+            License Type
+
+        </span>
+
+        <span class="license-badge ${log.licenseType.toLowerCase()}">
+
+            ${log.licenseType}
+
+        </span>
+
+    </div>
+
+</div>
+
+    <div class="reason-box">
+
+        ${log.reason || "-"}
+
+    </div>
+
+</div>
+
+`;
 
         });
 
 html += `
-    </tbody>
-</table>
+
+</div>
 
 <div class="logs-pagination">
 
     <button
+        id="prevBtn"
         class="page-btn"
-        ${data.currentPage === 1 ? "disabled" : ""}
-        onclick="loadLogs(${data.currentPage - 1})">
+        ${data.currentPage === 1 ? "disabled" : ""}>
 
         ← Previous
 
@@ -147,9 +287,9 @@ html += `
     </span>
 
     <button
+        id="nextBtn"
         class="page-btn"
-        ${data.currentPage === data.totalPages ? "disabled" : ""}
-        onclick="loadLogs(${data.currentPage + 1})">
+        ${data.currentPage === data.totalPages ? "disabled" : ""}>
 
         Next →
 
@@ -159,6 +299,29 @@ html += `
 `;
 
         container.innerHTML = html;
+
+        const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+if (prevBtn && !prevBtn.disabled) {
+
+    prevBtn.addEventListener("click", () => {
+
+        loadLogs(currentPage - 1);
+
+    });
+
+}
+
+if (nextBtn && !nextBtn.disabled) {
+
+    nextBtn.addEventListener("click", () => {
+
+        loadLogs(currentPage + 1);
+
+    });
+
+}
 
     } catch (err) {
 

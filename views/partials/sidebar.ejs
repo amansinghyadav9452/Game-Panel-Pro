@@ -10,11 +10,33 @@
 
         <div class="admin-info">
 
-    <div class="avatar">
+<div class="avatar" id="profileAvatar">
+
+    <% if (admin && admin.profileImage) { %>
+
+        <img
+            src="<%= admin.profileImage %>"
+            class="profile-photo"
+            alt="Profile">
+
+    <% } else { %>
 
         A
 
-    </div>
+    <% } %>
+
+    <input
+        type="file"
+        id="profileInput"
+        accept="image/*"
+        hidden>
+
+        <p style="color:red;font-size:12px;">
+    Admin Exists:
+    <%= typeof admin !== "undefined" ? "YES" : "NO" %>
+</p>
+
+</div>
 
     <div>
 

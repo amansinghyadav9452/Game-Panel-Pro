@@ -4,7 +4,7 @@ const router = express.Router();
 const UserLog = require("../models/UserLog");
 const auth = require("../middleware/auth");
 
-router.get("/", (req, res) => {
+router.get("/",(req, res) => {
 
     res.render("logs", {
         activePage: "logs",
@@ -13,7 +13,7 @@ router.get("/", (req, res) => {
 
 });
 
-router.get("/recent", async (req, res) => {
+router.get("/recent", auth, async (req, res) => {
 
     try {
 

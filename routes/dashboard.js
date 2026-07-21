@@ -16,7 +16,8 @@ router.get("/panel", (req, res) => {
     res.render("dashboard", {
 
         activePage: "dashboard",
-        pageTitle: "Dashboard"
+        pageTitle: "Dashboard",
+        admin: req.admin
 
     });
 
@@ -27,7 +28,8 @@ router.get("/public-keys", (req, res) => {
     res.render("public-keys", {
 
         activePage: "public-keys",
-        pageTitle: "Public Keys"
+        pageTitle: "Public Keys",
+        admin: req.admin
 
     });
 
