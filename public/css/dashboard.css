@@ -46,6 +46,34 @@ body{
 
 }
 
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#0F172A;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#3B82F6;
+
+    border-radius:999px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#60A5FA;
+
+}
+
+
+
 .layout{
 
     display:flex;
@@ -66,13 +94,481 @@ body{
 
     border-right:1px solid var(--border);
 
-    padding:30px;
+    padding:20px;
 
     position:sticky;
 
     top:0;
 
 }
+
+/* ==========================
+   SIDEBAR PROFILE
+========================== */
+
+.sidebar-profile{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    margin-bottom:24px;
+
+}
+
+.profile-image-wrapper{
+
+    position:relative;
+
+    width: 100%;
+
+    display:flex;
+
+    justify-content:center;
+
+}
+
+.profile-avatar{
+
+    width:180px;
+
+    height:180px;
+
+    border-radius:24px;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    position:relative;
+
+    background:#1E293B;
+
+    border:2px solid rgba(255,255,255,.08);
+
+    transition:.3s;
+
+}
+
+.profile-avatar:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 20px 45px rgba(59,130,246,.28);
+
+}
+
+.profile-avatar::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:rgba(0,0,0,.42);
+
+    opacity:0;
+
+    transition:.25s;
+
+}
+
+.profile-avatar:hover::after{
+
+    opacity:1;
+
+}
+
+.profile-avatar::before{
+
+    content:"Manage";
+
+    position:absolute;
+
+    top:50%;
+
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    letter-spacing:.5px;
+
+    opacity:0;
+
+    z-index:2;
+
+    transition:.25s;
+
+    pointer-events:none;
+
+}
+
+.profile-avatar:hover::before{
+
+    opacity:1;
+
+}
+
+.profile-photo{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    border:none;
+
+    border-radius:inherit;
+
+    transition:transform .35s ease;
+
+}
+
+.profile-avatar:hover .profile-photo{
+
+    transform:scale(1.06);
+
+}
+
+.profile-letter{
+
+    width:100%;
+
+    height:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:72px;
+
+    font-weight:700;
+
+    color:white;
+
+    background:linear-gradient(135deg,#3B82F6,#7C3AED);
+
+}
+
+.profile-edit{
+
+    position:absolute;
+
+    bottom:12px;
+
+    right:calc(50% - 90px);
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#2563EB;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    transition:.25s;
+
+    z-index:20;
+
+}
+
+.profile-edit:hover{
+
+    transform:scale(1.08);
+
+}
+
+#adminDisplayName{
+
+    margin-top:18px;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    text-align:center;
+
+}
+
+.sidebar-status{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-top:10px;
+
+    color:#CBD5E1;
+
+    font-size:14px;
+
+}
+
+.sidebar-divider{
+
+    border:none;
+
+    height:1px;
+
+    margin:26px 0;
+
+    background:rgba(255,255,255,.08);
+
+}
+
+/* ==========================
+   PROFILE MENU
+========================== */
+
+.profile-menu{
+
+    position:absolute;
+
+    top:calc(100% + 14px);
+
+    left:50%;
+
+    transform:translateX(-50%) scale(.96);
+
+    width:235px;
+
+    background:rgba(17,24,39,.97);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.25s ease;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.45);
+
+    z-index:999;
+
+    pointer-events: none;
+
+}
+
+.profile-menu.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+    transform:translateX(-50%) scale(1);
+
+    pointer-events: auto;
+
+}
+
+.profile-menu::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:-8px;
+
+    left:50%;
+
+    width:16px;
+
+    height:16px;
+
+    background:rgba(17,24,39,.97);
+
+    border-left:1px solid rgba(255,255,255,.08);
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    transform:translateX(-50%) rotate(45deg);
+
+}
+
+.profile-menu button{
+
+    width:100%;
+
+    height:58px;
+
+    border:none;
+
+    background:none;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    padding:0 20px;
+
+    color:#F8FAFC;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    transition:.2s;
+
+}
+
+.profile-menu button:first-child{
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+}
+
+.profile-menu button:hover{
+
+    background:rgba(59,130,246,.12);
+
+}
+
+.profile-menu button:focus{
+
+    background:rgba(59,130,246,.18);
+
+    outline:none;
+
+}
+
+.profile-menu button i{
+
+    width:18px;
+
+    color:#60A5FA;
+
+}
+
+/* ==========================
+   PROFILE VIEWER
+========================== */
+
+.profile-viewer{
+
+    position:fixed;
+
+    inset:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(0,0,0,.84);
+
+    backdrop-filter:blur(10px);
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.3s;
+
+    z-index:999999;
+
+}
+
+.profile-viewer.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+}
+
+.profile-viewer img{
+
+    max-width:88vw;
+
+    max-height:88vh;
+
+    border-radius:24px;
+
+    object-fit:contain;
+
+    box-shadow:0 30px 80px rgba(0,0,0,.45);
+
+    animation:viewerZoom .25s ease;
+
+}
+
+.close-viewer{
+
+    position:absolute;
+
+    top:28px;
+
+    right:28px;
+
+    width:50px;
+
+    height:50px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(255,255,255,.12);
+
+    color:#fff;
+
+    font-size:30px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.close-viewer:hover{
+
+    background:rgba(255,255,255,.22);
+
+    transform:rotate(90deg);
+
+}
+
+
 
 .logo{
 
@@ -415,52 +911,6 @@ th,td{
 
 }
 
-.admin-info{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:15px;
-
-    margin-bottom:35px;
-
-}
-
-.avatar{
-
-    width:56px;
-
-    height:56px;
-
-    border-radius:50%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    background:linear-gradient(135deg,#3B82F6,#7C3AED);
-
-    color:#fff;
-
-    font-size:22px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    overflow:hidden;
-
-    position:relative;
-
-    transition:.25s ease;
-
-    user-select:none;
-
-}
-
 .admin-info small{
 
     display:flex;
@@ -478,6 +928,32 @@ th,td{
     font-size:8px;
 
 }
+
+.profile-content{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+.profile-content h4{
+
+    color:#fff;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    overflow:hidden;
+
+    white-space:nowrap;
+
+    text-overflow:ellipsis;
+
+}
+
+
 
 /* ======================
 TOPBAR
@@ -1607,73 +2083,108 @@ table{
 
 }
 
-.profile-photo{
+.display-name-row{
 
-    width:100%;
+    display:flex;
 
-    height:100%;
+    justify-content:space-between;
 
-    object-fit:cover;
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.online-ring{
+
+    position:absolute;
+
+    inset:-2px;
 
     border-radius:50%;
 
-}
+    border:1.5px solid #22C55E;
 
-.avatar:hover{
-
-    transform:scale(1.06);
-
-    box-shadow:0 0 18px rgba(59,130,246,.45);
+    animation:ringPulse 2s infinite;
 
 }
 
-.avatar::after{
+.profile-status{
 
-    content:"";
+    display:flex;
 
-    position:absolute;
+    align-items:center;
 
-    inset:0;
+    gap:7px;
 
-    background:rgba(0,0,0,.45);
+    margin-top:6px;
 
-    opacity:0;
+    font-size:13px;
 
-    transition:.25s;
-
-}
-
-.avatar:hover::after{
-
-    opacity:1;
+    color:#E5E7EB;
 
 }
 
-.avatar::before{
+.status-dot{
 
-    content:"\f030";
+    width:8px;
 
-    font-family:"Font Awesome 6 Free";
+    height:8px;
 
-    font-weight:900;
+    border-radius:50%;
 
-    position:absolute;
+    background:#22C55E;
+}
+
+.edit-display-btn{
+
+    width:36px;
+
+    height:36px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.14);
 
     color:#fff;
 
-    font-size:18px;
-
-    opacity:0;
-
-    z-index:2;
+    cursor:pointer;
 
     transition:.25s;
 
 }
 
-.avatar:hover::before{
+.edit-display-btn:hover{
 
-    opacity:1;
+    background:#fff;
+
+    color:#4F46E5;
+
+    transform:rotate(-12deg);
+
+}
+
+@keyframes ringPulse{
+
+    0%{
+
+        box-shadow:0 0 0 0 rgba(34,197,94,.55);
+
+    }
+
+    70%{
+
+        box-shadow:0 0 0 10px rgba(34,197,94,0);
+
+    }
+
+    100%{
+
+        box-shadow:0 0 0 0 rgba(34,197,94,0);
+
+    }
 
 }
 
@@ -1711,6 +2222,26 @@ table{
 
 }
 
+@keyframes viewerZoom{
+
+    from{
+
+        transform:scale(.88);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
+
 @media(max-width:768px){
 
     .layout{
@@ -1732,6 +2263,44 @@ table{
         border-bottom:1px solid rgba(255,255,255,.06);
 
     }
+
+    .sidebar-profile{
+
+    margin-bottom:20px;
+
+}
+
+.profile-avatar{
+
+    width:130px;
+
+    height:130px;
+
+    border-radius:20px;
+
+}
+
+.profile-edit{
+
+    right:calc(50% - 65px);
+
+    width:38px;
+
+    height:38px;
+
+}
+
+#adminDisplayName{
+
+    font-size:20px;
+
+}
+
+.profile-menu{
+
+    width:210px;
+
+}
 
     .create-btn{
 
@@ -1788,8 +2357,6 @@ table{
 
 }
 
-@media(max-width:768px){
-
 .card-icon{
 
     top:17px;
@@ -1803,8 +2370,6 @@ table{
     font-size:22px;
 
     border-radius:15px;
-
-}
 
 }
 
@@ -2087,6 +2652,50 @@ table{
 .hero-right{
 
     width:100%;
+
+}
+
+@media(max-width:480px){
+
+    .profile-avatar{
+
+        width:110px;
+
+        height:110px;
+
+        border-radius:18px;
+
+    }
+
+    .profile-edit{
+
+        right:calc(50% - 55px);
+
+        width:34px;
+
+        height:34px;
+
+        border-radius:10px;
+
+    }
+
+    #adminDisplayName{
+
+        font-size:18px;
+
+    }
+
+    .sidebar-status{
+
+        font-size:13px;
+
+    }
+
+    .profile-menu{
+
+        width:190px;
+
+    }
 
 }
 

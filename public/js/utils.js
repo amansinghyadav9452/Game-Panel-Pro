@@ -193,83 +193,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initDisplayNameEditor();
 
-});
+    initProfileMenu();
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    const avatar = document.getElementById("profileAvatar");
-    const input = document.getElementById("profileInput");
-
-    if (!avatar || !input) return;
-
-    avatar.addEventListener("click", () => {
-
-        input.click();
-
-    });
-
-    input.addEventListener("change", async () => {
-
-        if (!input.files.length) return;
-
-        const formData = new FormData();
-
-        formData.append("profile", input.files[0]);
-
-        const token = localStorage.getItem("token");
-
-        try {
-
-            const res = await fetch("/settings/profile/upload", {
-
-                method: "POST",
-
-                headers: {
-
-                    Authorization: `Bearer ${token}`
-
-                },
-
-                body: formData
-
-            });
-
-            const data = await res.json();
-
-            if (!data.success) {
-
-                alert(data.message);
-
-                return;
-
-            }
-
-            const img = avatar.querySelector("img");
-
-avatar.innerHTML = `
-    <img
-        src="${data.image}?t=${Date.now()}"
-        class="profile-photo"
-        alt="Profile">
-
-    <input
-        type="file"
-        id="profileInput"
-        accept="image/*"
-        hidden>
-`;
-
-await loadProfilePhoto();
-
-        } catch (err) {
-
-            console.error(err);
-
-            alert("Upload Failed");
-
-        }
-
-    });
+    handleProfileUpload();
 
 });
 
@@ -298,24 +224,15 @@ async function loadProfilePhoto() {
         const data = await res.json();
 
         if (!data.success) return;
+const img = avatar.querySelector(".profile-photo");
 
-        if (data.admin.profileImage) {
+if(img && data.admin.profileImage){
 
-            avatar.innerHTML = `
-            <img
-                    src="${data.admin.profileImage}?t=${Date.now()}"
-                    class="profile-photo"
-                    alt="Profile">
+    img.src =
 
-                <input
-                    type="file"
-                    id="profileInput"
-                    accept="image/*"
-                    hidden>
-            `;
+    `${data.admin.profileImage}?t=${Date.now()}`;
 
-        }
-            initDisplayNameEditor();
+}
 
         const displayName =
     document.getElementById("adminDisplayName");
@@ -342,7 +259,7 @@ function initDisplayNameEditor() {
 
     if (!btn || !title) return;
 
-    btn.addEventListener("click", () => {
+    btn.onclick = () => {
 
         const currentName = title.textContent;
 
@@ -419,6 +336,178 @@ function initDisplayNameEditor() {
             );
 
         });
+
+    };
+
+}
+
+function initProfileMenu() {
+
+    const avatar = document.getElementById("profileAvatar");
+    const menu = document.getElementById("profileMenu");
+
+    const viewBtn = document.getElementById("viewProfileBtn");
+    const updateBtn = document.getElementById("updateProfileBtn");
+
+    const viewer = document.getElementById("profileViewer");
+    const viewerImage = document.getElementById("viewerImage");
+
+    const closeViewer = document.getElementById("closeViewer");
+
+    const input = document.getElementById("profileInput");
+
+    if (
+        !avatar ||
+        !menu ||
+        !viewBtn ||
+        !updateBtn ||
+        !viewer ||
+        !viewerImage ||
+        !closeViewer ||
+        !input
+    ) {
+        return;
+    }
+
+    avatar.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+        menu.classList.toggle("show");
+
+    });
+
+    document.addEventListener("click", () => {
+
+        menu.classList.remove("show");
+
+    });
+
+    menu.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+    });
+
+    viewBtn.addEventListener("click", () => {
+
+        const img = avatar.querySelector(".profile-photo");
+
+        if (!img) {
+
+            showToast("No profile picture found", "error");
+
+            return;
+
+        }
+
+        viewerImage.src = img.src;
+
+        viewer.classList.add("show");
+
+        menu.classList.remove("show");
+
+    });
+
+    updateBtn.addEventListener("click", () => {
+
+        input.click();
+
+        menu.classList.remove("show");
+
+    });
+
+    closeViewer.addEventListener("click", () => {
+
+        viewer.classList.remove("show");
+
+    });
+
+    viewer.addEventListener("click", (e) => {
+
+        if (e.target === viewer) {
+
+            viewer.classList.remove("show");
+
+        }
+
+    });
+
+    document.addEventListener("keydown", (e) => {
+
+    if (e.key === "Escape") {
+
+        viewer.classList.remove("show");
+
+    }
+
+});
+
+}
+
+function handleProfileUpload() {
+
+    const input = document.getElementById("profileInput");
+
+    if (!input) return;
+
+    input.addEventListener("change", async () => {
+
+        if (!input.files.length) return;
+
+        const formData = new FormData();
+
+        formData.append("profile", input.files[0]);
+
+        const token = localStorage.getItem("token");
+
+        try {
+
+            const res = await fetch("/settings/profile/upload", {
+
+                method: "POST",
+
+                headers: {
+
+                    Authorization: `Bearer ${token}`
+
+                },
+
+                body: formData
+
+            });
+
+            const data = await res.json();
+
+            if (!data.success) {
+
+                showToast(data.message, "error");
+
+                return;
+
+            }
+
+            await loadProfilePhoto();
+
+            const menu = document.getElementById("profileMenu");
+
+            if (menu) {
+
+             menu.classList.remove("show");
+
+            }
+
+            showToast("Profile picture updated");
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+            showToast("Upload Failed", "error");
+
+        }
 
     });
 

@@ -1,67 +1,92 @@
     <aside class="sidebar">
 
-        <div class="logo">
+<div class="sidebar-profile">
 
-            <i class="fa-solid fa-shield-halved"></i>
+<div class="profile-image-wrapper">
 
-            <span>GAME PANEL</span>
+    <div
+        class="profile-avatar"
+        id="profileAvatar">
 
-        </div>
+        <% if (typeof admin !== "undefined" && admin.profileImage) { %>
 
-        <div class="admin-info">
+            <img
+                src="<%= admin.profileImage %>"
+                class="profile-photo"
+                alt="Profile">
 
-<div class="avatar" id="profileAvatar">
+        <% } else { %>
 
-    <% if (typeof admin !== "undefined" && admin.profileImage) { %>
+            <span class="profile-letter">A</span>
 
-        <img
-            src="<%= admin.profileImage %>"
-            class="profile-photo"
-            alt="Profile">
+        <% } %>
 
-    <% } else { %>
+        <input
+            type="file"
+            id="profileInput"
+            accept="image/*"
+            hidden>
 
-        A
+    </div>
 
-    <% } %>
+    <div
+        class="profile-menu"
+        id="profileMenu">
 
-    <input
-        type="file"
-        id="profileInput"
-        accept="image/*"
-        hidden>
+        <button
+            type="button"
+            id="viewProfileBtn">
 
+            <i class="fa-solid fa-expand"></i>
+
+            View Profile Picture
+
+        </button>
+
+        <button
+            type="button"
+            id="updateProfileBtn">
+
+            <i class="fa-solid fa-upload"></i>
+
+            Update Profile Picture
+
+        </button>
+
+    </div>
 
 </div>
 
-    <div>
-
-        <div class="display-name-row">
-
-    <h4 id="adminDisplayName">Loading...</h4>
-
     <button
         id="editDisplayName"
-        class="edit-display-btn"
-        title="Edit Display Name">
+        class="profile-edit">
 
         <i class="fa-solid fa-pen"></i>
 
     </button>
 
-</div>
+    <h3 id="adminDisplayName">
 
-<small>
+        Loading...
 
-    <i class="fa-solid fa-circle"></i>
+    </h3>
 
-    Online
+    <div class="sidebar-status">
 
-</small>
+        <span class="status-dot"></span>
+
+        <span class="admin-status-text">
+
+            Online
+
+        </span>
 
     </div>
 
 </div>
+
+<hr class="sidebar-divider">
+
 
         <nav>
 
@@ -125,4 +150,22 @@ class="<%= activePage === 'settings' ? 'active' : '' %>">
 </a>
 
 </nav>
+<div
+class="profile-viewer"
+id="profileViewer">
+
+<span
+    id="closeViewer"
+    class="close-viewer">
+
+    ×
+
+</span>
+
+<img
+    id="viewerImage"
+    src=""
+    alt="Profile">
+
+</div>
     </aside>
