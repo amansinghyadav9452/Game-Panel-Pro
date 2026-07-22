@@ -1,3 +1,16 @@
+if (!localStorage.getItem("token")) {
+
+    window.location.replace("/login");
+
+}
+
+if (typeof initSidebar === "function") {
+
+    initSidebar();
+
+}
+
+initAutoLogout();
 let currentPage = 1;
 const limit = 100;
 

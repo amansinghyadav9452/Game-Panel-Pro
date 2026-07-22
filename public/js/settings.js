@@ -6,6 +6,7 @@ if (!localStorage.getItem("token")) {
 document.addEventListener("DOMContentLoaded", () => {
 
     initSidebar();
+    initAutoLogout();
 
     const searchInput =
         document.querySelector(".settings-search input");
