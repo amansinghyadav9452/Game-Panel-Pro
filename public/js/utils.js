@@ -191,6 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadProfilePhoto();
 
+    initDisplayNameMenu();
+
     initDisplayNameEditor();
 
     initProfileMenu();
@@ -224,16 +226,42 @@ async function loadProfilePhoto() {
         const data = await res.json();
 
         if (!data.success) return;
+        
 const img = avatar.querySelector(".profile-photo");
+if (data.admin.profileImage) {
 
-if(img && data.admin.profileImage){
+    let img =
+        avatar.querySelector(".profile-photo");
+
+    if (!img) {
+
+        const letter =
+            avatar.querySelector(".profile-letter");
+
+        if (letter) {
+
+            letter.remove();
+
+        }
+
+        img =
+            document.createElement("img");
+
+        img.className = "profile-photo";
+
+        img.alt = "Profile";
+
+        avatar.insertBefore(
+            img,
+            document.getElementById("profileInput")
+        );
+
+    }
 
     img.src =
-
-    `${data.admin.profileImage}?t=${Date.now()}`;
+        `${data.admin.profileImage}?t=${Date.now()}`;
 
 }
-
         const displayName =
     document.getElementById("adminDisplayName");
 
@@ -241,6 +269,7 @@ if (displayName) {
 
     displayName.textContent =
         data.admin.displayName || "Administrator";
+
 
 }
 
@@ -254,7 +283,7 @@ if (displayName) {
 
 function initDisplayNameEditor() {
 
-    const btn = document.getElementById("editDisplayName");
+    const btn = document.getElementById("editNameBtn");
     const title = document.getElementById("adminDisplayName");
 
     if (!btn || !title) return;
@@ -276,6 +305,31 @@ function initDisplayNameEditor() {
 
         input.focus();
         input.select();
+
+const cancelEdit = (e) => {
+
+    if (e.target === input) return;
+
+    input.outerHTML = `
+        <h3 id="adminDisplayName">
+            ${currentName}
+        </h3>
+    `;
+
+    initDisplayNameMenu();
+    initDisplayNameEditor();
+
+};
+
+setTimeout(() => {
+
+    document.addEventListener(
+        "click",
+        cancelEdit,
+        { once: true }
+    );
+
+}, 0);
 
         input.addEventListener("keydown", async (e) => {
 
@@ -324,11 +378,12 @@ function initDisplayNameEditor() {
             }
 
             input.outerHTML = `
-                <h4 id="adminDisplayName">
+                <h3 id="adminDisplayName">
                     ${data.displayName}
-                </h4>
+                </h3>
             `;
 
+            initDisplayNameMenu();
             initDisplayNameEditor();
 
             showToast(
@@ -336,6 +391,44 @@ function initDisplayNameEditor() {
             );
 
         });
+
+    };
+
+}
+
+function initDisplayNameMenu() {
+
+    const title = document.getElementById("adminDisplayName");
+    const menu = document.getElementById("displayNameMenu");
+    const editBtn = document.getElementById("editNameBtn");
+
+    if (!title || !menu || !editBtn) return;
+
+    title.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+        menu.classList.toggle("show");
+
+    });
+
+    menu.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+    });
+
+    document.addEventListener("click", () => {
+
+        menu.classList.remove("show");
+
+    });
+
+    editBtn.onclick = () => {
+
+        menu.classList.remove("show");
+
+        initDisplayNameEditor();
 
     };
 
@@ -390,17 +483,19 @@ function initProfileMenu() {
     });
 
     viewBtn.addEventListener("click", () => {
+const img =
+    avatar.querySelector(".profile-photo");
 
-        const img = avatar.querySelector(".profile-photo");
+if (!img) {
 
-        if (!img) {
+    showToast(
+        "No profile picture found",
+        "error"
+    );
 
-            showToast("No profile picture found", "error");
+    return;
 
-            return;
-
-        }
-
+}
         viewerImage.src = img.src;
 
         viewer.classList.add("show");

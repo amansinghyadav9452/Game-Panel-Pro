@@ -57,19 +57,31 @@
 
 </div>
 
-    <button
-        id="editDisplayName"
-        class="profile-edit">
-
-        <i class="fa-solid fa-pen"></i>
-
-    </button>
+<div class="display-name-wrapper">
 
     <h3 id="adminDisplayName">
 
         Loading...
 
     </h3>
+
+    <div
+        class="display-name-menu"
+        id="displayNameMenu">
+
+        <button
+            type="button"
+            id="editNameBtn">
+
+            <i class="fa-solid fa-pen"></i>
+
+            Edit Name
+
+        </button>
+
+    </div>
+
+</div>
 
     <div class="sidebar-status">
 
@@ -133,14 +145,6 @@ class="<%= activePage === 'settings' ? 'active' : '' %>">
 
 </a>
 
-        <a href="#" id="notificationBtn">
-
-    <i class="fa-solid fa-bell"></i>
-
-    Notifications
-
-</a>
-
 <a href="#" id="sidebarLogout">
 
     <i class="fa-solid fa-right-from-bracket"></i>
@@ -150,6 +154,7 @@ class="<%= activePage === 'settings' ? 'active' : '' %>">
 </a>
 
 </nav>
+</aside>
 <div
 class="profile-viewer"
 id="profileViewer">
@@ -168,4 +173,3 @@ id="profileViewer">
     alt="Profile">
 
 </div>
-    </aside>

@@ -1,12 +1,12 @@
 :root{
 
-    --bg:#090F1F;
+    --bg:#1f0909;
 
     --sidebar:#111827;
 
     --card:#172033;
 
-    --primary:#3B82F6;
+    --primary:#3bc1f6;
 
     --text:#F8FAFC;
 
@@ -2222,6 +2222,92 @@ table{
 
 }
 
+.display-name-wrapper{
+
+    position:relative;
+
+    display:inline-flex;
+
+    justify-content:center;
+
+    width:100%;
+
+}
+
+#adminDisplayName{
+
+    cursor:pointer;
+
+}
+
+.display-name-menu{
+
+    position:absolute;
+
+    top:calc(100% + 8px);
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:180px;
+
+    background:#1a2434;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.25s;
+
+    z-index:1000;
+
+}
+
+.display-name-menu.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+}
+
+.display-name-menu button{
+
+    width:100%;
+
+    height:48px;
+
+    border:none;
+
+    background:none;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:0 16px;
+
+}
+
+.display-name-menu button:hover{
+
+    background:rgba(255,255,255,.08);
+
+}
+
 @keyframes viewerZoom{
 
     from{
@@ -2239,6 +2325,56 @@ table{
         opacity:1;
 
     }
+
+}
+
+.display-name-wrapper{
+
+    position:relative;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+}
+
+.display-name-menu{
+
+    position:absolute;
+
+    top:calc(100% + 8px);
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:180px;
+
+    background:#18263B;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.25s;
+
+    z-index:1000;
+
+}
+
+.display-name-menu.show{
+
+    opacity:1;
+
+    visibility:visible;
 
 }
 
