@@ -1,23 +1,4 @@
 const multer = require("multer");
-const path = require("path");
-
-const storage = multer.diskStorage({
-
-    destination(req, file, cb) {
-
-        cb(null, "public/uploads/profile");
-
-    },
-
-    filename(req, file, cb) {
-
-        const ext = path.extname(file.originalname);
-
-        cb(null, `admin-${Date.now()}${ext}`);
-
-    }
-
-});
 
 const fileFilter = (req, file, cb) => {
 
@@ -47,7 +28,7 @@ const fileFilter = (req, file, cb) => {
 
 module.exports = multer({
 
-    storage,
+    storage: multer.memoryStorage(),
 
     fileFilter,
 

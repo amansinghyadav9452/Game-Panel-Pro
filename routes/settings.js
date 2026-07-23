@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
 const uploadProfile = require("../middleware/uploadProfile");
+const cloudinary = require("../services/cloudinary");
+const streamifier = require("streamifier");
 
 router.get("/", (req, res) => {
 
@@ -869,9 +871,7 @@ router.put("/api",  auth, async (req, res) => {
 
 });
 
-router.post(
-    "/profile/upload",
-    auth,
+router.post("/profile/upload", auth,
     uploadProfile.single("profile"),
     async (req, res) => {
 
@@ -886,20 +886,57 @@ router.post(
 
             }
 
-            req.admin.profileImage =
-                `/uploads/profile/${req.file.filename}`;
+const result = await new Promise((resolve, reject) => {
 
-            await req.admin.save();
+    const uploadStream = cloudinary.uploader.upload_stream(
 
-            return res.json({
+        {
 
-                success: true,
+            folder: "bhukha-panel/profile",
 
-                image: req.admin.profileImage,
+            public_id: `admin-${req.admin._id}`,
 
-                message: "Profile photo updated successfully."
+            overwrite: true,
 
-            });
+            resource_type: "image"
+
+        },
+
+        (error, result) => {
+
+            if (error) {
+
+                return reject(error);
+
+            }
+
+            resolve(result);
+
+        }
+
+    );
+
+    streamifier
+
+        .createReadStream(req.file.buffer)
+
+        .pipe(uploadStream);
+
+});
+
+req.admin.profileImage = result.secure_url;
+
+await req.admin.save();
+
+return res.json({
+
+    success: true,
+
+    image: result.secure_url,
+
+    message: "Profile photo updated successfully."
+
+});
 
         } catch (error) {
 

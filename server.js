@@ -64,7 +64,16 @@ app.use(
                     "'self'",
                     "https://fonts.gstatic.com",
                     "https://cdnjs.cloudflare.com"
-                ]
+                ],
+                                imgSrc: [
+
+                    "'self'",
+
+                    "data:",
+
+                    "https://res.cloudinary.com"
+
+                ],
             }
         }
     })
