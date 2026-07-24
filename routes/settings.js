@@ -924,9 +924,35 @@ const result = await new Promise((resolve, reject) => {
 
 });
 
-req.admin.profileImage = result.secure_url;
+const settings = await Settings.findOne();
 
-await req.admin.save();
+if (!settings.panelProfile) {
+
+    settings.panelProfile = {
+
+        displayName: "Administrator",
+
+        profileImage: ""
+
+    };
+
+}
+
+if (!settings) {
+
+    return res.status(404).json({
+
+        success: false,
+
+        message: "Settings not found."
+
+    });
+
+}
+
+settings.panelProfile.profileImage = result.secure_url;
+
+await settings.save();
 
 return res.json({
 
@@ -959,21 +985,49 @@ router.get("/account/me", auth, async (req, res) => {
 
     try {
 
-        res.json({
+const settings = await Settings.findOne();
 
-            success: true,
+if (!settings.panelProfile) {
 
-        admin: {
+    settings.panelProfile = {
 
-            username: req.admin.username,
+        displayName: "Administrator",
 
-            displayName: req.admin.displayName,
+        profileImage: ""
 
-            profileImage: req.admin.profileImage
+    };
 
-        }
+    await settings.save();
 
-        });
+}
+
+if (!settings) {
+
+    return res.status(404).json({
+
+        success: false,
+
+        message: "Settings not found."
+
+    });
+
+}
+
+res.json({
+
+    success: true,
+
+    admin: {
+
+        username: req.admin.username,
+
+        displayName: settings.panelProfile.displayName,
+
+        profileImage: settings.panelProfile.profileImage
+
+    }
+
+});
 
     } catch (err) {
 
@@ -1011,15 +1065,43 @@ router.put("/display-name", auth, async (req, res) => {
 
         req.admin.displayName = displayName.trim();
 
-        await req.admin.save();
+const settings = await Settings.findOne();
 
-        res.json({
+if (!settings.panelProfile) {
 
-            success: true,
+    settings.panelProfile = {
 
-            displayName: req.admin.displayName
+        displayName: "Administrator",
 
-        });
+        profileImage: ""
+
+    };
+
+}
+
+if (!settings) {
+
+    return res.status(404).json({
+
+        success: false,
+
+        message: "Settings not found."
+
+    });
+
+}
+
+settings.panelProfile.displayName = displayName.trim();
+
+await settings.save();
+
+res.json({
+
+    success: true,
+
+    displayName: settings.panelProfile.displayName
+
+});
 
     } catch (err) {
 

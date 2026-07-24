@@ -2,6 +2,19 @@ const mongoose = require("mongoose");
 
 const settingsSchema = new mongoose.Schema({
 
+    panelProfile: {
+
+    displayName: {
+        type: String,
+        default: "Administrator"
+    },
+
+    profileImage: {
+        type: String,
+        default: ""
+    }
+
+},
     security:{
 
         turnstileEnabled:{
