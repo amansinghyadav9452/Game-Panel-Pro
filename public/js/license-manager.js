@@ -41,6 +41,18 @@ function initLicenseManager(endpoint) {
 
 }
 
+function formatLastUsed(lastUsed) {
+
+    if (!lastUsed) {
+
+        return "Never Used";
+
+    }
+
+    return new Date(lastUsed).toLocaleString();
+
+}
+
 function renderLicenses(licenses) {
 
     const table = document.getElementById("licenseTable");
@@ -122,6 +134,13 @@ function renderLicenses(licenses) {
                 <strong>Devices :</strong>
 
                 ${license.usedCount}/${license.maxUses}
+
+            </p>
+            <p>
+
+                <strong>Last Used :</strong>
+
+                ${formatLastUsed(license.lastUsed)}
 
             </p>
 

@@ -25,6 +25,11 @@ const licenseSchema = new mongoose.Schema({
         required: true
     },
 
+    lastUsed: {
+    type: Date,
+    default: null
+    },
+
     maxUses: {
         type: Number,
         default: 1
@@ -47,11 +52,6 @@ const licenseSchema = new mongoose.Schema({
     createdBy: {
         type: String,
         default: "admin"
-    },
-
-    lastUsed: {
-        type: Date,
-        default: null
     },
 
 }, {

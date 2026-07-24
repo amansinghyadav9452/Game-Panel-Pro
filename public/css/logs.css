@@ -165,9 +165,9 @@
 
     flex-direction:column;
 
-    gap:22px;
+    gap:12px;
 
-    margin-top:22px;
+    margin-top:14px;
 
 }
 
@@ -186,9 +186,9 @@
 
     border:1px solid rgba(255,255,255,.08);
 
-    border-radius:22px;
+    border-radius:16px;
 
-    padding:24px;
+    padding:14px;
 
     transition:.28s ease;
 
@@ -248,17 +248,17 @@
 
     align-items:center;
 
-    gap:18px;
+    gap:12px;
 
 }
 
 .device-icon{
 
-    width:62px;
+    width:46px;
 
-    height:62px;
+    height:46px;
 
-    border-radius:18px;
+    border-radius:12px;
 
     display:flex;
 
@@ -266,7 +266,7 @@
 
     justify-content:center;
 
-    font-size:26px;
+    font-size:20px;
 
     background:
 
@@ -294,7 +294,7 @@
 
     color:#fff;
 
-    font-size:18px;
+    font-size:16px;
 
 }
 
@@ -308,11 +308,11 @@
 
 .status-pill{
 
-    padding:8px 16px;
+    padding:5px 12px;
 
     border-radius:999px;
 
-    font-size:13px;
+    font-size:12px;
 
     font-weight:700;
 
@@ -336,13 +336,13 @@
 
 .log-grid{
 
-    margin-top:24px;
+    margin-top:12px;
 
     display:grid;
 
     grid-template-columns:repeat(2,1fr);
 
-    gap:20px;
+    gap:10px;
 
 }
 
@@ -366,9 +366,9 @@
 
 .reason-box{
 
-    margin-top:22px;
+    margin-top:10px;
 
-    padding:16px;
+    padding:10px 12px;
 
     border-radius:14px;
 
@@ -386,9 +386,9 @@
 
     border:1px solid rgba(255,255,255,.05);
 
-    border-radius:16px;
+    border-radius:12px;
 
-    padding:18px;
+    padding:10px 12px;
 
 }
 
@@ -452,6 +452,76 @@
 
 }
 
+.log-meta{
+
+    margin-top:10px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.meta-row{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+}
+
+.meta-label{
+
+    color:#94A3B8;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    flex-shrink:0;
+
+}
+
+.meta-value{
+
+    flex:1;
+
+    color:#F8FAFC;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.meta-row.reason{
+
+    background:rgba(255,255,255,.05);
+
+    border-radius:10px;
+
+    padding:8px 10px;
+
+    color:#CBD5E1;
+
+    font-size:12px;
+
+    word-break:break-word;
+
+}
+
 .top-row{
 
     display:flex;
@@ -466,7 +536,15 @@
 
 .bottom-row{
 
-    margin-top:10px;
+    margin-top:8px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
 
 }
 
@@ -706,9 +784,9 @@
 
 .device-icon{
 
-    width:52px;
+    width:27px;
 
-    height:52px;
+    height:27px;
 
     font-size:22px;
 
@@ -734,4 +812,12 @@
 
 }
 
+.log-card::before,
+.log-card::after{
+
+    display:none;
+
 }
+
+}
+

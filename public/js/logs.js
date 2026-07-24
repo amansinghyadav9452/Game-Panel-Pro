@@ -204,43 +204,49 @@ html += `
 
     <div class="log-title">
 
-        <div class="top-row">
+<div class="top-row">
 
-            <h3>${log.licenseKey}</h3>
+    <h3>${log.licenseKey}</h3>
 
-            <span class="status-pill ${success ? "success" : "failed"}">
+    <span class="status-pill ${success ? "success" : "failed"}">
 
-                ${success ? "Success" : "Failed"}
+        ${success ? "Success" : "Failed"}
 
-            </span>
+    </span>
 
-        </div>
+</div>
 
-        <div class="bottom-row">
+<div class="bottom-row">
 
-            <span class="time">
+    <span class="time">
 
-                🕒 ${getLastSeen(log.createdAt)}
+        🕒 ${getLastSeen(log.createdAt)}
 
-            </span>
+    </span>
 
-        </div>
+    <span class="license-badge ${log.licenseType.toLowerCase()}">
+
+        ${log.licenseType}
+
+    </span>
+
+</div>
 
     </div>
 
 </div>
 
-<div class="log-grid">
+<div class="log-meta">
 
-    <div class="info-card">
+    <div class="meta-row">
 
-        <span class="info-label">
+        <span class="meta-label">
 
-            Device ID
+            ID : 
 
         </span>
 
-        <span class="info-value">
+        <span class="meta-value">
 
             ${log.serial || "-"}
 
@@ -248,29 +254,17 @@ html += `
 
     </div>
 
-    <div class="info-card">
+    ${!success && log.reason ? `
 
-        <span class="info-label">
+    <div class="meta-row reason">
 
-            License Type
-
-        </span>
-
-        <span class="license-badge ${log.licenseType.toLowerCase()}">
-
-            ${log.licenseType}
-
-        </span>
+        ${log.reason}
 
     </div>
+
+    ` : ""}
 
 </div>
-
-    <div class="reason-box">
-
-        ${log.reason || "-"}
-
-    </div>
 
 </div>
 
