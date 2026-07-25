@@ -1,10 +1,3 @@
-/* ==========================================================
-   THEME ENGINE
-   Driven by Appearance settings (see /js/theme.js). Classes/
-   vars below are toggled on <html> at runtime so changes made
-   in Settings > Appearance reflect across the whole panel.
-========================================================== */
-
 :root{
     --accent:#3B82F6;
     --accent-dark:#2563EB;
@@ -46,7 +39,7 @@ html.light-theme{
     --card:#ffffff;
     --text:#1a1f36;
     --muted:#64748b;
-    --border:rgba(15,23,42,.08);
+    --border:rgba(27, 42, 15, 0.08);
 }
 
 html.light-theme body{
@@ -75,7 +68,7 @@ html.light-theme .modal-box{
 html.light-theme input,
 html.light-theme select,
 html.light-theme textarea{
-    background:#ffffff !important;
+    background:lightcyan !important;
     color:var(--text) !important;
     border:1px solid var(--border) !important;
 }
@@ -92,6 +85,48 @@ html.light-theme nav a:hover{
 html.light-theme .page-subtitle,
 html.light-theme .setting-description,
 html.light-theme .admin-status-text{
+    color:var(--muted) !important;
+}
+
+html.light-theme .page-heading{
+    color:var(--text) !important;
+}
+
+html.light-theme .setting-group label{
+    color:var(--text) !important;
+}
+
+html.light-theme .back-btn{
+    background:rgba(15,23,42,.06) !important;
+    color:var(--text) !important;
+}
+
+html.light-theme .back-btn:hover{
+    background:rgba(15,23,42,.12) !important;
+    transform:translateX(-4px);
+}
+
+html.light-theme .system-status{
+    background:rgb(0, 157, 255) !important;
+    border:1px solid var(--border) !important;
+}
+
+html.light-theme .system-status h3{
+    color:var(--text) !important;
+}
+
+html.light-theme .status-grid > .status-card,
+html.light-theme .status-card{
+    background:rgb(0, 255, 204) !important;
+    border:1px solid var(--border) !important;
+}
+
+html.light-theme .status-top span:first-child{
+    color:var(--text) !important;
+}
+
+html.light-theme .status-card small,
+html.light-theme .status-grid > .status-card span{
     color:var(--muted) !important;
 }
 
