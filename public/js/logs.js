@@ -105,6 +105,16 @@ const uniqueDevices = new Set(
             data.totalLogs
         );
 
+        const rangeLabels = {
+            live: "Live",
+            "2h": "Last 2 Hours",
+            "24h": "Last 24 Hours",
+            "7d": "Last 7 Days",
+            "1m": "Last 1 Month"
+        };
+
+        const rangeLabel = rangeLabels[data.range] || "Last 24 Hours";
+
 let html = `
 
 <div class="logs-stats">
@@ -177,7 +187,7 @@ let html = `
 
 <div class="logs-info">
 
-    Showing ${start}-${end} of ${data.totalLogs} logs
+    Showing ${start}-${end} of ${data.totalLogs} logs · ${rangeLabel}
 
 </div>
 

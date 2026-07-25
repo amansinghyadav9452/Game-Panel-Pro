@@ -54,15 +54,15 @@ Manage log storage and exports
 
 <label>Log Retention</label>
 
-<select>
+<select id="retentionDays">
 
-<option>7 Days</option>
+<option value="7" <%= settings.logs.retentionDays === 7 ? "selected" : "" %>>7 Days</option>
 
-<option selected>30 Days</option>
+<option value="30" <%= settings.logs.retentionDays === 30 ? "selected" : "" %>>30 Days</option>
 
-<option>90 Days</option>
+<option value="90" <%= settings.logs.retentionDays === 90 ? "selected" : "" %>>90 Days</option>
 
-<option>365 Days</option>
+<option value="365" <%= settings.logs.retentionDays === 365 ? "selected" : "" %>>365 Days</option>
 
 </select>
 
@@ -70,9 +70,31 @@ Manage log storage and exports
 
 <div class="setting-group">
 
+<label>Log Display Range</label>
+
+<select id="displayRange">
+
+<option value="live" <%= settings.logs.displayRange === "live" ? "selected" : "" %>>Live</option>
+
+<option value="2h" <%= settings.logs.displayRange === "2h" ? "selected" : "" %>>Last 2 Hours</option>
+
+<option value="24h" <%= settings.logs.displayRange === "24h" ? "selected" : "" %>>Last 24 Hours</option>
+
+<option value="7d" <%= settings.logs.displayRange === "7d" ? "selected" : "" %>>Last 7 Days</option>
+
+<option value="1m" <%= settings.logs.displayRange === "1m" ? "selected" : "" %>>Last 1 Month</option>
+
+</select>
+
+<p class="field-hint">Controls how many days of user logs are shown on the Logs page.</p>
+
+</div>
+
+<div class="setting-group">
+
 <label>Export Logs</label>
 
-<button class="action-btn">
+<button id="exportLogsBtn" class="action-btn">
 
 <i class="fa-solid fa-file-export"></i>
 
@@ -86,7 +108,7 @@ Export Logs
 
 <label>Download Error Logs</label>
 
-<button class="action-btn">
+<button id="downloadErrorsBtn" class="action-btn">
 
 <i class="fa-solid fa-bug"></i>
 
@@ -110,7 +132,7 @@ Delete Logs
 
 </div>
 
-<button class="save-btn">
+<button id="saveLogsBtn" class="save-btn">
 
 <i class="fa-solid fa-floppy-disk"></i>
 

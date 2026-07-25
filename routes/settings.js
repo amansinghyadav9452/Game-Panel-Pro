@@ -195,18 +195,40 @@ router.get("/database", (req, res) => {
 
 });
 
-router.get("/logs", auth, (req, res) => {
+router.get("/logs", async (req, res) => {
 
-    res.render("settings/logs", {
+    try {
 
-        admin: {
-            username: "Admin"
-        },
+        const settings = await Settings.findOne();
 
-        activePage: "settings",
-        pageTitle: "Logs"
+        if (!settings) {
 
-    });
+            return res.status(404).send("Settings not found");
+
+        }
+
+        res.render("settings/logs", {
+
+            admin: {
+                username: "Admin"
+            },
+
+            settings,
+
+            activePage: "settings",
+            pageTitle: "Logs"
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).send("Internal Server Error");
+
+    }
 
 });
 
@@ -850,6 +872,92 @@ router.put("/api",  auth, async (req, res) => {
             success: true,
 
             message: "API settings updated successfully."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.put("/logs", auth, async (req, res) => {
+
+    try {
+
+        const {
+
+            retentionDays,
+
+            displayRange
+
+        } = req.body;
+
+        const allowedRetention = [7, 30, 90, 365];
+
+        const allowedRange = ["live", "2h", "24h", "7d", "1m"];
+
+        if (!allowedRetention.includes(Number(retentionDays))) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid log retention value."
+
+            });
+
+        }
+
+        if (!allowedRange.includes(displayRange)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid log display range."
+
+            });
+
+        }
+
+        const settings = await Settings.findOne();
+
+        if (!settings) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Settings not found."
+
+            });
+
+        }
+
+        settings.logs.retentionDays = Number(retentionDays);
+
+        settings.logs.displayRange = displayRange;
+
+        await settings.save();
+
+        return res.json({
+
+            success: true,
+
+            message: "Log settings updated successfully."
 
         });
 

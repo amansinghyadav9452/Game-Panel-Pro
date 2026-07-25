@@ -147,6 +147,21 @@ api:{
 
     },
 
+    logs:{
+
+        retentionDays:{
+            type:Number,
+            default:30
+        },
+
+        displayRange:{
+            type:String,
+            enum:["live","2h","24h","7d","1m"],
+            default:"24h"
+        }
+
+    },
+
     notifications:{
 
         telegram:{
