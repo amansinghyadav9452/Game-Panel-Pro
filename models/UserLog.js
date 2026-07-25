@@ -10,6 +10,8 @@ const userLogSchema = new mongoose.Schema({
 
     deviceModel: String,
 
+    deviceMarketingName: String,
+
     deviceBrand: String,
 
     androidVersion: String,

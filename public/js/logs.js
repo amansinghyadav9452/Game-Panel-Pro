@@ -257,13 +257,24 @@ html += `
         </span>
     </div>
 
-    ${(log.deviceBrand || log.deviceModel) ? `
+    ${(log.deviceMarketingName || log.deviceBrand) ? `
     <div class="meta-row">
         <span class="meta-label">
             Device :
         </span>
         <span class="meta-value">
-            ${[log.deviceBrand, log.deviceModel].filter(Boolean).join(" ") || "-"}
+            ${log.deviceMarketingName || [log.deviceBrand, log.deviceModel].filter(Boolean).join(" ") || "-"}
+        </span>
+    </div>
+    ` : ""}
+
+    ${log.deviceModel ? `
+    <div class="meta-row">
+        <span class="meta-label">
+            Model :
+        </span>
+        <span class="meta-value">
+            ${log.deviceModel}
         </span>
     </div>
     ` : ""}

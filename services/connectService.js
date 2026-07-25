@@ -1,6 +1,7 @@
 const License = require("../models/License");
 const UserLog = require("../models/UserLog");
 const md5 = require("md5");
+const { resolveMarketingName } = require("./deviceLookup");
 require("dotenv").config();
 
 async function verifyLicense(body, req, expectedType = "public") {
@@ -250,6 +251,9 @@ async function saveClientLog(body) {
     const deviceBrand = body.device_brand || "";
     const androidVersion = body.android_version || "";
 
+    const resolved = await resolveMarketingName(deviceModel);
+    const deviceMarketingName = resolved?.marketingName || "";
+
     let existingLog = null;
 
     if (serial) {
@@ -296,6 +300,7 @@ async function saveClientLog(body) {
     if (existingLog) {
 
         existingLog.deviceModel = deviceModel;
+        existingLog.deviceMarketingName = deviceMarketingName;
         existingLog.deviceBrand = deviceBrand;
         existingLog.androidVersion = androidVersion;
 
@@ -324,6 +329,8 @@ async function saveClientLog(body) {
         serial,
 
         deviceModel,
+
+        deviceMarketingName,
 
         deviceBrand,
 

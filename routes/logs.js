@@ -126,6 +126,7 @@ router.get("/export", auth, async (req, res) => {
             "Status",
             "Reason",
             "Serial",
+            "Device Name",
             "Device Model",
             "Device Brand",
             "Android Version"
@@ -138,6 +139,7 @@ router.get("/export", auth, async (req, res) => {
             log.status,
             log.reason,
             log.serial,
+            log.deviceMarketingName,
             log.deviceModel,
             log.deviceBrand,
             log.androidVersion
