@@ -249,20 +249,35 @@ html += `
 <div class="log-meta">
 
     <div class="meta-row">
-
         <span class="meta-label">
-
-            ID : 
-
+            ID :
         </span>
-
         <span class="meta-value">
-
             ${log.serial || "-"}
-
         </span>
-
     </div>
+
+    ${(log.deviceBrand || log.deviceModel) ? `
+    <div class="meta-row">
+        <span class="meta-label">
+            Device :
+        </span>
+        <span class="meta-value">
+            ${[log.deviceBrand, log.deviceModel].filter(Boolean).join(" ") || "-"}
+        </span>
+    </div>
+    ` : ""}
+
+    ${log.androidVersion ? `
+    <div class="meta-row">
+        <span class="meta-label">
+            Android :
+        </span>
+        <span class="meta-value">
+            ${log.androidVersion}
+        </span>
+    </div>
+    ` : ""}
 
     ${!success && log.reason ? `
 

@@ -107,7 +107,7 @@ html.light-theme .back-btn:hover{
 }
 
 html.light-theme .system-status{
-    background:rgb(0, 157, 255) !important;
+    background:rgb(0, 89, 255) !important;
     border:1px solid var(--border) !important;
 }
 
