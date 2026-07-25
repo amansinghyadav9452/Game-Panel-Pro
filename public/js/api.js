@@ -23,7 +23,7 @@ if (response.status === 401) {
     localStorage.removeItem("token");
     localStorage.removeItem("logoutAt");
 
-    showToast("Session Expired", "error");
+    showToast("Error", "Session Expired", "error");
 
     setTimeout(() => {
 

@@ -262,7 +262,7 @@ const response = await apiFetch(
 
 if (!data.success) {
 
-    showToast(data.message, "error");
+    showToast("Error", data.message, "error");
 
     return;
 
@@ -394,7 +394,7 @@ const response = await apiFetch(
 
         if(data.success){
 
-            showToast(data.message);
+            showToast("Success", data.message);
 
             modal.classList.remove("active");
 
@@ -405,7 +405,7 @@ const response = await apiFetch(
             
         }else{
             
-            showToast(data.message,"error");
+            showToast("Error", data.message, "error");
             
         }
         
@@ -413,7 +413,7 @@ const response = await apiFetch(
         
         console.error(err);
         
-        showToast("Server Error","error");
+        showToast("Error", "Server Error", "error");
         
     }
     
@@ -534,7 +534,7 @@ async function createCustomLicense() {
 
     if (!key) {
 
-        showToast("License Key Required", "error");
+        showToast("Error", "License Key Required", "error");
 
         return;
 
@@ -576,7 +576,7 @@ const response = await apiFetch(endpoint, {
 
         if (data.success) {
 
-            showToast("License Created Successfully");
+            showToast("Success", "License Created Successfully");
 
             createModal.classList.remove("active");
 
@@ -596,7 +596,7 @@ const response = await apiFetch(endpoint, {
 
         else {
 
-            showToast(data.message, "error");
+            showToast("Error", data.message, "error");
 
         }
 
@@ -604,7 +604,7 @@ const response = await apiFetch(endpoint, {
 
         console.error(err);
 
-        showToast("Server Error", "error");
+        showToast("Error", "Server Error", "error");
 
     }
     finally{
@@ -622,7 +622,7 @@ async function extendLicense() {
 
     if (!days || days <= 0) {
 
-        showToast("Enter valid days", "error");
+        showToast("Error", "Enter valid days", "error");
 
         return;
 
@@ -651,13 +651,13 @@ const response = await apiFetch(
 
         if (!data.success) {
 
-            showToast(data.message, "error");
+            showToast("Error", data.message, "error");
 
             return;
 
         }
 
-        showToast("License Extended Successfully");
+        showToast("Success", "License Extended Successfully");
 
         extendModal.classList.remove("active");
 
@@ -673,7 +673,7 @@ const response = await apiFetch(
 
         console.error(err);
 
-        showToast("Server Error", "error");
+        showToast("Error", "Server Error", "error");
 
     }
 
@@ -700,13 +700,13 @@ const response = await apiFetch(
 
         if (!data.success) {
 
-            showToast(data.message, "error");
+            showToast("Error", data.message, "error");
 
             return;
 
         }
 
-        showToast("Device Reset Successfully");
+        showToast("Success", "Device Reset Successfully");
 
         modal.classList.remove("active");
 
@@ -720,7 +720,7 @@ const response = await apiFetch(
 
         console.error(err);
 
-        showToast("Server Error", "error");
+        showToast("Error", "Server Error", "error");
 
     }
 
@@ -750,13 +750,13 @@ const response = await apiFetch(
 
         if (!data.success) {
 
-            showToast(data.message, "error");
+            showToast("Error", data.message, "error");
 
             return;
 
         }
 
-        showToast("License Deleted Successfully");
+        showToast("Success", "License Deleted Successfully");
 
         deleteModal.classList.remove("active");
 
@@ -772,7 +772,7 @@ const response = await apiFetch(
 
         console.error(err);
 
-        showToast("Server Error", "error");
+        showToast("Error", "Server Error", "error");
 
     }
 

@@ -54,11 +54,25 @@ Configure notification preferences
 
 <label>Telegram Alerts</label>
 
-<select>
+<select id="telegram">
 
-<option selected>Enabled</option>
+<option value="true" <%= settings.notifications.telegram ? "selected" : "" %>>Enabled</option>
 
-<option>Disabled</option>
+<option value="false" <%= !settings.notifications.telegram ? "selected" : "" %>>Disabled</option>
+
+</select>
+
+</div>
+
+<div class="setting-group">
+
+<label>Discord Alerts</label>
+
+<select id="discord">
+
+<option value="true" <%= settings.notifications.discord ? "selected" : "" %>>Enabled</option>
+
+<option value="false" <%= !settings.notifications.discord ? "selected" : "" %>>Disabled</option>
 
 </select>
 
@@ -69,7 +83,9 @@ Configure notification preferences
 <label>Discord Webhook</label>
 
 <input
+id="discordWebhookUrl"
 type="text"
+value="<%= settings.notifications.discordWebhookUrl %>"
 placeholder="https://discord.com/api/webhooks/...">
 
 </div>
@@ -78,11 +94,11 @@ placeholder="https://discord.com/api/webhooks/...">
 
 <label>Email Notifications</label>
 
-<select>
+<select id="email">
 
-<option>Enabled</option>
+<option value="true" <%= settings.notifications.email ? "selected" : "" %>>Enabled</option>
 
-<option selected>Disabled</option>
+<option value="false" <%= !settings.notifications.email ? "selected" : "" %>>Disabled</option>
 
 </select>
 
@@ -92,17 +108,17 @@ placeholder="https://discord.com/api/webhooks/...">
 
 <label>Critical Alerts Only</label>
 
-<select>
+<select id="criticalOnly">
 
-<option>Enabled</option>
+<option value="true" <%= settings.notifications.criticalOnly ? "selected" : "" %>>Enabled</option>
 
-<option selected>Disabled</option>
+<option value="false" <%= !settings.notifications.criticalOnly ? "selected" : "" %>>Disabled</option>
 
 </select>
 
 </div>
 
-<button class="save-btn">
+<button id="saveNotificationsBtn" class="save-btn">
 
 <i class="fa-solid fa-floppy-disk"></i>
 

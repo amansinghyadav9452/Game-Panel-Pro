@@ -16,7 +16,7 @@ const response = await apiFetch("/dashboard");
 
 if (!data.success) {
 
-    showToast(data.message, "error");
+    showToast("Error", data.message, "error");
 
     return;
 

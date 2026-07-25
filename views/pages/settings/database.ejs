@@ -55,8 +55,9 @@ Manage database configuration
 <label>Database Status</label>
 
 <input
+id="dbStatus"
 type="text"
-value="Connected"
+value="Checking..."
 readonly>
 
 </div>
@@ -65,7 +66,7 @@ readonly>
 
 <label>Backup Database</label>
 
-<button class="action-btn">
+<button id="backupBtn" class="action-btn">
 
 <i class="fa-solid fa-download"></i>
 
@@ -79,7 +80,9 @@ Create Backup
 
 <label>Restore Database</label>
 
-<button class="action-btn">
+<input id="restoreInput" type="file" accept="application/json" style="display:none">
+
+<button id="restoreBtn" class="action-btn">
 
 <i class="fa-solid fa-upload"></i>
 
@@ -93,7 +96,7 @@ Restore Backup
 
 <label>Clear Cache</label>
 
-<button class="danger-btn">
+<button id="clearCacheBtn" class="danger-btn">
 
 <i class="fa-solid fa-trash"></i>
 
@@ -102,14 +105,6 @@ Clear Cache
 </button>
 
 </div>
-
-<button class="save-btn">
-
-<i class="fa-solid fa-floppy-disk"></i>
-
-Save Changes
-
-</button>
 
 </div>
 

@@ -65,15 +65,7 @@ if (!response.ok) {
 
 }
 
-showToast(
-
-    "Success",
-
-    data.message,
-
-    "success"
-
-);
+showToast("Success", data.message, "success");
 
     }
 
@@ -81,15 +73,7 @@ showToast(
 
         console.error(error);
 
-        showToast(
-
-    "Error",
-
-    "Something went wrong.",
-
-    "error"
-
-);
+        showToast("Error", "Something went wrong.", "error");
 
     }
 
@@ -145,26 +129,18 @@ console.log(result);
 
 if (!verifyResponse.ok || !result.success) {
 
-    showToast(
-        "Error",
-        result.message || "Biometric registration failed.",
-        "error"
-    );
+    showToast("Error", result.message || "Biometric registration failed.", "error");
 
     return;
 }
 
-showToast(
-    "Success",
-    "Biometric enabled successfully.",
-    "success"
-);
+showToast("Success", "Biometric enabled successfully.", "success");
 
         } catch (err) {
 
             console.error(err);
 
-            showToast("Biometric registration cancelled.", "error");
+            showToast("Error", "Biometric registration cancelled.", "error");
 
         }
 
@@ -209,15 +185,7 @@ if (removeBiometricBtn) {
 
             }
 
-            showToast(
-
-                "Success",
-
-                result.message,
-
-                "success"
-
-            );
+            showToast("Success", result.message, "success");
 
         }
 
@@ -225,15 +193,7 @@ if (removeBiometricBtn) {
 
             console.error(error);
 
-            showToast(
-
-                "Error",
-
-                "Unable to remove biometric.",
-
-                "error"
-
-            );
+            showToast("Error", "Unable to remove biometric.", "error");
 
         }
 

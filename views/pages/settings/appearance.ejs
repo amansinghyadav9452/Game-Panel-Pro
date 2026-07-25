@@ -54,13 +54,11 @@ Customize the panel interface
 
 <label>Theme</label>
 
-<select>
+<select id="darkMode">
 
-<option selected>Dark</option>
+<option value="true" <%= settings.appearance.darkMode ? "selected" : "" %>>Dark</option>
 
-<option>Light</option>
-
-<option>System Default</option>
+<option value="false" <%= !settings.appearance.darkMode ? "selected" : "" %>>Light</option>
 
 </select>
 
@@ -70,17 +68,17 @@ Customize the panel interface
 
 <label>Accent Color</label>
 
-<select>
+<select id="accentColor">
 
-<option selected>Blue</option>
+<option value="blue" <%= settings.appearance.accentColor === "blue" ? "selected" : "" %>>Blue</option>
 
-<option>Purple</option>
+<option value="purple" <%= settings.appearance.accentColor === "purple" ? "selected" : "" %>>Purple</option>
 
-<option>Green</option>
+<option value="green" <%= settings.appearance.accentColor === "green" ? "selected" : "" %>>Green</option>
 
-<option>Orange</option>
+<option value="orange" <%= settings.appearance.accentColor === "orange" ? "selected" : "" %>>Orange</option>
 
-<option>Red</option>
+<option value="red" <%= settings.appearance.accentColor === "red" ? "selected" : "" %>>Red</option>
 
 </select>
 
@@ -90,11 +88,11 @@ Customize the panel interface
 
 <label>Sidebar Style</label>
 
-<select>
+<select id="sidebarCollapsed">
 
-<option selected>Expanded</option>
+<option value="false" <%= !settings.appearance.sidebarCollapsed ? "selected" : "" %>>Expanded</option>
 
-<option>Collapsed</option>
+<option value="true" <%= settings.appearance.sidebarCollapsed ? "selected" : "" %>>Collapsed</option>
 
 </select>
 
@@ -104,17 +102,17 @@ Customize the panel interface
 
 <label>Animations</label>
 
-<select>
+<select id="animationsEnabled">
 
-<option selected>Enabled</option>
+<option value="true" <%= settings.appearance.animationsEnabled ? "selected" : "" %>>Enabled</option>
 
-<option>Disabled</option>
+<option value="false" <%= !settings.appearance.animationsEnabled ? "selected" : "" %>>Disabled</option>
 
 </select>
 
 </div>
 
-<button class="save-btn">
+<button id="saveAppearanceBtn" class="save-btn">
 
 <i class="fa-solid fa-floppy-disk"></i>
 

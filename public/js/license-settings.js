@@ -1,3 +1,15 @@
+if (!localStorage.getItem("token")) {
+
+    window.location.replace("/login");
+
+}
+
+if (typeof initSidebar === "function") {
+
+    initSidebar();
+
+}
+
 const saveBtn = document.getElementById("saveLicenseBtn");
 
 if (saveBtn) {
@@ -25,15 +37,27 @@ if (saveBtn) {
         const autoUppercase =
             document.getElementById("autoUppercase").value === "true";
 
+        if (!publicPrefix || !premiumPrefix) {
+
+            showToast("Error", "Prefixes cannot be empty.", "error");
+
+            return;
+
+        }
+
+        const token = localStorage.getItem("token");
+
         try {
 
-            const response = await fetch("/license", {
+            const response = await fetch("/settings/license", {
 
                 method: "PUT",
 
                 headers: {
 
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+
+                    Authorization: `Bearer ${token}`
 
                 },
 
@@ -59,7 +83,13 @@ if (saveBtn) {
 
             const data = await response.json();
 
-            alert(data.message);
+            if (!response.ok) {
+
+                throw new Error(data.message);
+
+            }
+
+            showToast("Success", data.message, "success");
 
         }
 
@@ -67,7 +97,7 @@ if (saveBtn) {
 
             console.error(error);
 
-            alert("Something went wrong.");
+            showToast("Error", error.message || "Something went wrong.", "error");
 
         }
 

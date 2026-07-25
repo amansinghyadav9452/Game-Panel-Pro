@@ -2,11 +2,16 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
+const License = require("../models/License");
+const Activity = require("../models/Activity");
+const UserLog = require("../models/UserLog");
 const uploadProfile = require("../middleware/uploadProfile");
 const cloudinary = require("../services/cloudinary");
 const streamifier = require("streamifier");
+const deleteExpiredLicenses = require("../services/licenseCleanup");
 
 router.get("/", (req, res) => {
 
@@ -195,6 +200,253 @@ router.get("/database", (req, res) => {
 
 });
 
+router.get("/database/status", auth, async (req, res) => {
+
+    try {
+
+        const connected = mongoose.connection.readyState === 1;
+
+        let collections = 0;
+
+        if (connected) {
+
+            const list = await mongoose.connection.db
+                .listCollections()
+                .toArray();
+
+            collections = list.length;
+
+        }
+
+        return res.json({
+
+            success: true,
+
+            connected,
+
+            collections
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.get("/database/backup", auth, async (req, res) => {
+
+    try {
+
+        const [settings, admins, licenses, activity, userLogs] =
+            await Promise.all([
+
+                Settings.findOne(),
+
+                Admin.find().select("-password -biometricCredentials -twoFactorSecret -currentRegistrationChallenge -currentAuthenticationChallenge"),
+
+                License.find(),
+
+                Activity.find(),
+
+                UserLog.find()
+
+            ]);
+
+        const backup = {
+
+            exportedAt: new Date().toISOString(),
+
+            version: "1.0.0",
+
+            data: {
+
+                settings,
+
+                admins,
+
+                licenses,
+
+                activity,
+
+                userLogs
+
+            }
+
+        };
+
+        const filename =
+            `game-panel-backup-${new Date().toISOString().slice(0, 10)}.json`;
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${filename}"`
+        );
+
+        res.setHeader("Content-Type", "application/json");
+
+        return res.send(JSON.stringify(backup, null, 2));
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Backup failed."
+
+        });
+
+    }
+
+});
+
+router.post("/database/restore", auth, async (req, res) => {
+
+    try {
+
+        const backup = req.body;
+
+        if (!backup || !backup.data) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid backup file."
+
+            });
+
+        }
+
+        const { settings, licenses, activity, userLogs } = backup.data;
+
+        if (settings) {
+
+            await Settings.deleteMany({});
+            await Settings.create(settings);
+
+        }
+
+        if (Array.isArray(licenses)) {
+
+            await License.deleteMany({});
+
+            if (licenses.length) {
+                await License.insertMany(licenses, { ordered: false });
+            }
+
+        }
+
+        if (Array.isArray(activity)) {
+
+            await Activity.deleteMany({});
+
+            if (activity.length) {
+                await Activity.insertMany(activity, { ordered: false });
+            }
+
+        }
+
+        if (Array.isArray(userLogs)) {
+
+            await UserLog.deleteMany({});
+
+            if (userLogs.length) {
+                await UserLog.insertMany(userLogs, { ordered: false });
+            }
+
+        }
+
+        return res.json({
+
+            success: true,
+
+            message: "Database restored successfully."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Restore failed. The backup file may be invalid."
+
+        });
+
+    }
+
+});
+
+router.post("/database/clear-cache", auth, async (req, res) => {
+
+    try {
+
+        await deleteExpiredLicenses();
+
+        const settings = await Settings.findOne();
+
+        const retentionDays = settings?.logs?.retentionDays || 30;
+
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - retentionDays);
+
+        const [activityResult, userLogResult] = await Promise.all([
+
+            Activity.deleteMany({ createdAt: { $lte: cutoff } }),
+
+            UserLog.deleteMany({ createdAt: { $lte: cutoff } })
+
+        ]);
+
+        return res.json({
+
+            success: true,
+
+            message: `Cache cleared. Removed ${activityResult.deletedCount + userLogResult.deletedCount} old records.`
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Failed to clear cache."
+
+        });
+
+    }
+
+});
+
 router.get("/logs", async (req, res) => {
 
     try {
@@ -232,33 +484,77 @@ router.get("/logs", async (req, res) => {
 
 });
 
-router.get("/appearance", (req, res) => {
+router.get("/appearance", async (req, res) => {
 
-    res.render("settings/appearance", {
+    try {
 
-        admin: {
-            username: "Admin"
-        },
+        const settings = await Settings.findOne();
 
-        activePage: "settings",
-        pageTitle: "Appearance"
+        if (!settings) {
 
-    });
+            return res.status(404).send("Settings not found");
+
+        }
+
+        res.render("settings/appearance", {
+
+            admin: {
+                username: "Admin"
+            },
+
+            settings,
+
+            activePage: "settings",
+            pageTitle: "Appearance"
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).send("Internal Server Error");
+
+    }
 
 });
 
-router.get("/notifications", (req, res) => {
+router.get("/notifications", async (req, res) => {
 
-    res.render("settings/notifications", {
+    try {
 
-        admin: {
-            username: "Admin"
-        },
+        const settings = await Settings.findOne();
 
-        activePage: "settings",
-        pageTitle: "Notifications"
+        if (!settings) {
 
-    });
+            return res.status(404).send("Settings not found");
+
+        }
+
+        res.render("settings/notifications", {
+
+            admin: {
+                username: "Admin"
+            },
+
+            settings,
+
+            activePage: "settings",
+            pageTitle: "Notifications"
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).send("Internal Server Error");
+
+    }
 
 });
 
@@ -274,6 +570,46 @@ router.get("/about", (req, res) => {
         pageTitle: "About"
 
     });
+
+});
+
+router.get("/about/status", auth, async (req, res) => {
+
+    try {
+
+        const pkg = require("../package.json");
+
+        return res.json({
+
+            success: true,
+
+            panelVersion: `v${pkg.version}`,
+
+            nodeVersion: process.version,
+
+            dbConnected: mongoose.connection.readyState === 1,
+
+            environment: process.env.NODE_ENV || "development",
+
+            uptime: process.uptime()
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
 
 });
 
@@ -499,23 +835,6 @@ await req.admin.save();
         message:"All devices logged out."
 
     });
-
-});
-
-router.get("/account/2fa/setup",  async (req, res) => {
-
-  const admin = {
-    username: "Admin"};
-
-    if (!admin) {
-
-        return res.status(404).json({
-
-            success:false
-
-        });
-
-    }
 
 });
 
@@ -958,6 +1277,172 @@ router.put("/logs", auth, async (req, res) => {
             success: true,
 
             message: "Log settings updated successfully."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.put("/appearance", auth, async (req, res) => {
+
+    try {
+
+        const {
+
+            darkMode,
+
+            accentColor,
+
+            sidebarCollapsed,
+
+            animationsEnabled
+
+        } = req.body;
+
+        const allowedColors = ["blue", "purple", "green", "orange", "red"];
+
+        if (!allowedColors.includes(accentColor)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid accent color."
+
+            });
+
+        }
+
+        const settings = await Settings.findOne();
+
+        if (!settings) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Settings not found."
+
+            });
+
+        }
+
+        settings.appearance.darkMode = darkMode;
+        settings.appearance.accentColor = accentColor;
+        settings.appearance.sidebarCollapsed = sidebarCollapsed;
+        settings.appearance.animationsEnabled = animationsEnabled;
+
+        await settings.save();
+
+        return res.json({
+
+            success: true,
+
+            message: "Appearance settings updated successfully."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.put("/notifications", auth, async (req, res) => {
+
+    try {
+
+        const {
+
+            telegram,
+
+            discord,
+
+            discordWebhookUrl,
+
+            email,
+
+            criticalOnly
+
+        } = req.body;
+
+        const webhookUrl = (discordWebhookUrl || "").trim();
+
+        if (discord && webhookUrl) {
+
+            const isValidWebhook =
+                /^https:\/\/discord(app)?\.com\/api\/webhooks\/.+/.test(
+                    webhookUrl
+                );
+
+            if (!isValidWebhook) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message: "Invalid Discord webhook URL."
+
+                });
+
+            }
+
+        }
+
+        const settings = await Settings.findOne();
+
+        if (!settings) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Settings not found."
+
+            });
+
+        }
+
+        settings.notifications.telegram = telegram;
+        settings.notifications.discord = discord;
+        settings.notifications.discordWebhookUrl = webhookUrl;
+        settings.notifications.email = email;
+        settings.notifications.criticalOnly = criticalOnly;
+
+        await settings.save();
+
+        return res.json({
+
+            success: true,
+
+            message: "Notification settings updated successfully."
 
         });
 

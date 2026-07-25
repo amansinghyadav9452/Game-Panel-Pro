@@ -1,45 +1,42 @@
 const rateLimit = require("express-rate-limit");
 const Settings = require("../models/Settings");
 
-const rateLimiter = async (req, res, next) => {
+const rateLimiter = rateLimit({
 
-    try {
+    windowMs: 15 * 60 * 1000,
 
-        const settings = await Settings.findOne();
+    max: async (req) => {
 
-        const maxRequests =
-            settings?.api?.rateLimit || 100;
+        try {
 
-        return rateLimit({
+            const settings = await Settings.findOne();
 
-            windowMs: 15 * 60 * 1000,
+            return settings?.api?.rateLimit || 100;
 
-            max: maxRequests,
+        }
 
-            standardHeaders: true,
+        catch (error) {
 
-            legacyHeaders: false,
+            console.error(error);
 
-            message: {
+            return 100;
 
-                success: false,
+        }
 
-                message: "Too many requests. Please try again later."
+    },
 
-            }
+    standardHeaders: true,
 
-        })(req, res, next);
+    legacyHeaders: false,
 
-    }
+    message: {
 
-    catch (error) {
+        success: false,
 
-        console.error(error);
-
-        next();
+        message: "Too many requests. Please try again later."
 
     }
 
-};
+});
 
 module.exports = rateLimiter;

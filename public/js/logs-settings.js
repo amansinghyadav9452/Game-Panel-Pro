@@ -58,15 +58,7 @@ async function downloadCsv(url, filenameFallback) {
 
         window.URL.revokeObjectURL(downloadUrl);
 
-        showToast(
-
-            "Success",
-
-            "Download started.",
-
-            "success"
-
-        );
+        showToast("Success", "Download started.", "success");
 
     }
 
@@ -74,15 +66,7 @@ async function downloadCsv(url, filenameFallback) {
 
         console.error(error);
 
-        showToast(
-
-            "Error",
-
-            error.message || "Something went wrong.",
-
-            "error"
-
-        );
+        showToast("Error", error.message || "Something went wrong.", "error");
 
     }
 
@@ -158,15 +142,7 @@ if (saveBtn) {
 
             }
 
-            showToast(
-
-                "Success",
-
-                data.message,
-
-                "success"
-
-            );
+            showToast("Success", data.message, "success");
 
         }
 
@@ -174,15 +150,7 @@ if (saveBtn) {
 
             console.error(error);
 
-            showToast(
-
-                "Error",
-
-                error.message || "Something went wrong.",
-
-                "error"
-
-            );
+            showToast("Error", error.message || "Something went wrong.", "error");
 
         }
 

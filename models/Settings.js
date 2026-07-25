@@ -143,6 +143,16 @@ api:{
         accentColor:{
             type:String,
             default:"blue"
+        },
+
+        sidebarCollapsed:{
+            type:Boolean,
+            default:false
+        },
+
+        animationsEnabled:{
+            type:Boolean,
+            default:true
         }
 
     },
@@ -174,7 +184,17 @@ api:{
             default:false
         },
 
+        discordWebhookUrl:{
+            type:String,
+            default:""
+        },
+
         email:{
+            type:Boolean,
+            default:false
+        },
+
+        criticalOnly:{
             type:Boolean,
             default:false
         }

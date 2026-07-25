@@ -16,6 +16,8 @@ if (saveBtn) {
         const rateLimit =
             document.getElementById("rateLimit").value;
 
+        const token = localStorage.getItem("token");
+
         try {
 
             const response = await fetch("/settings/api", {
@@ -24,7 +26,9 @@ if (saveBtn) {
 
                 headers: {
 
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+
+                    Authorization: `Bearer ${token}`
 
                 },
 
@@ -50,29 +54,13 @@ if (saveBtn) {
 
             }
 
-            showToast(
-
-                "Success",
-
-                data.message,
-
-                "success"
-
-            );
+            showToast("Success", data.message, "success");
 
         }
 
         catch (error) {
 
-            showToast(
-
-                "Error",
-
-                error.message,
-
-                "error"
-
-            );
+            showToast("Error", error.message, "error");
 
         }
 

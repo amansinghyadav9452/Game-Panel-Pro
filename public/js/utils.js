@@ -1,24 +1,9 @@
-function showToast(message, type = "success") {
-
-    const toast = document.getElementById("toast");
-
-    if (!toast) return;
-
-    toast.textContent = message;
-
-    toast.className = "";
-
-    toast.classList.add(type);
-
-    toast.classList.add("show");
-
-    setTimeout(() => {
-
-        toast.classList.remove("show");
-
-    }, 2500);
-
-}
+/*
+ * NOTE: showToast(title, message, type) is defined in toast.js,
+ * which is loaded globally on every page via partials/head.ejs.
+ * It is intentionally not redefined here to avoid two conflicting
+ * global implementations.
+ */
 
 function formatDate(date) {
 
@@ -30,7 +15,7 @@ function copyText(text) {
 
     navigator.clipboard.writeText(text);
 
-    showToast("Copied Successfully");
+    showToast("Success", "Copied Successfully");
 
 }
 
@@ -369,6 +354,7 @@ setTimeout(() => {
             if (!data.success) {
 
                 showToast(
+                    "Error",
                     data.message,
                     "error"
                 );
@@ -387,6 +373,7 @@ setTimeout(() => {
             initDisplayNameEditor();
 
             showToast(
+                "Success",
                 "Display Name Updated"
             );
 
@@ -489,6 +476,7 @@ const img =
 if (!img) {
 
     showToast(
+        "Error",
         "No profile picture found",
         "error"
     );
@@ -576,7 +564,7 @@ function handleProfileUpload() {
 
             if (!data.success) {
 
-                showToast(data.message, "error");
+                showToast("Error", data.message, "error");
 
                 return;
 
@@ -592,7 +580,7 @@ function handleProfileUpload() {
 
             }
 
-            showToast("Profile picture updated");
+            showToast("Success", "Profile picture updated");
 
         }
 
@@ -600,7 +588,7 @@ function handleProfileUpload() {
 
             console.error(err);
 
-            showToast("Upload Failed", "error");
+            showToast("Error", "Upload Failed", "error");
 
         }
 
