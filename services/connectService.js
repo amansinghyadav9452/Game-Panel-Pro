@@ -230,19 +230,91 @@ async function verifyPublicLicense(body, req) {
 
 async function saveClientLog(body) {
 
+    const userKey = body.user_key || "";
+    const serial = body.serial || "";
+
+    const deviceModel = body.device_model || "";
+    const deviceBrand = body.device_brand || "";
+    const androidVersion = body.android_version || "";
+
+    let existingLog = null;
+
+    if (serial) {
+
+        // Exact match: same license key + same device serial.
+        existingLog = await UserLog.findOne({
+
+            licenseKey: userKey,
+
+            serial,
+
+            status: "success"
+
+        }).sort({ createdAt: -1 });
+
+    }
+
+    if (!existingLog) {
+
+        // Fallback for older clients that don't send a serial yet:
+        // merge into the most recent unmatched success log for this key.
+        const recentCutoff = new Date(Date.now() - 5 * 60 * 1000);
+
+        existingLog = await UserLog.findOne({
+
+            licenseKey: userKey,
+
+            status: "success",
+
+            createdAt: { $gte: recentCutoff },
+
+            $or: [
+
+                { deviceModel: { $in: [null, ""] } },
+
+                { deviceModel: { $exists: false } }
+
+            ]
+
+        }).sort({ createdAt: -1 });
+
+    }
+
+    if (existingLog) {
+
+        existingLog.deviceModel = deviceModel;
+        existingLog.deviceBrand = deviceBrand;
+        existingLog.androidVersion = androidVersion;
+
+        if (serial) {
+            existingLog.serial = serial;
+        }
+
+        await existingLog.save();
+
+        return {
+
+            status: true,
+
+            message: "Log Merged"
+
+        };
+
+    }
+
     await UserLog.create({
 
-        licenseKey: body.user_key || "",
+        licenseKey: userKey,
 
         licenseType: body.license_type || "public",
 
-        serial: body.serial || "",
+        serial,
 
-        deviceModel: body.device_model || "",
+        deviceModel,
 
-        deviceBrand: body.device_brand || "",
+        deviceBrand,
 
-        androidVersion: body.android_version || "",
+        androidVersion,
 
         status: body.status || "success",
 
