@@ -27,7 +27,7 @@ router.get("/account", async (req, res) => {
     try {
 
       const admin = {
-    username: "Admin"};
+    username: ""};
 
         if (!admin) {
 

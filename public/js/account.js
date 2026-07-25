@@ -1,3 +1,48 @@
+if (!localStorage.getItem("token")) {
+
+    window.location.replace("/login");
+
+}
+
+async function loadAccountDetails() {
+
+    const usernameInput = document.getElementById("username");
+
+    if (!usernameInput) return;
+
+    const token = localStorage.getItem("token");
+
+    try {
+
+        const response = await fetch("/settings/account/me", {
+
+            headers: {
+
+                Authorization: `Bearer ${token}`
+
+            }
+
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            usernameInput.value = data.admin.username;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+loadAccountDetails();
 
 const saveBtn = document.getElementById("saveAccountBtn");
 
@@ -20,13 +65,17 @@ if (saveBtn) {
 
         try {
 
+            const token = localStorage.getItem("token");
+
             const response = await fetch("/settings/account", {
 
                 method: "PUT",
 
                 headers: {
 
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+
+                    Authorization: `Bearer ${token}`
 
                 },
 
@@ -61,6 +110,78 @@ if (saveBtn) {
             alert("Something went wrong.");
 
         }
+
+    });
+
+}
+
+const logoutAllBtn = document.getElementById("logoutAllBtn");
+
+if (logoutAllBtn) {
+
+    logoutAllBtn.addEventListener("click", () => {
+
+        showConfirm(
+
+            "Logout All Devices",
+
+            "This will sign you out on this device and every other device. Continue?",
+
+            async () => {
+
+                const token = localStorage.getItem("token");
+
+                try {
+
+                    const response = await fetch(
+
+                        "/settings/account/logout-all",
+
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                Authorization: `Bearer ${token}`
+
+                            }
+
+                        }
+
+                    );
+
+                    const data = await response.json();
+
+                    if (data.success) {
+
+                        localStorage.removeItem("token");
+
+                        localStorage.removeItem("logoutAt");
+
+                        window.location.replace("/login");
+
+                    }
+
+                    else {
+
+                        alert(data.message || "Something went wrong.");
+
+                    }
+
+                }
+
+                catch (error) {
+
+                    console.error(error);
+
+                    alert("Something went wrong.");
+
+                }
+
+            }
+
+        );
 
     });
 
@@ -138,6 +259,8 @@ if (savePassword) {
 
         try {
 
+            const token = localStorage.getItem("token");
+
             const response = await fetch(
 
                 "/settings/account/password",
@@ -148,7 +271,9 @@ if (savePassword) {
 
                     headers: {
 
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+
+                        Authorization: `Bearer ${token}`
 
                     },
 
@@ -179,6 +304,12 @@ if (savePassword) {
                 document.getElementById("newPassword").value = "";
 
                 document.getElementById("confirmPassword").value = "";
+
+                localStorage.removeItem("token");
+
+                localStorage.removeItem("logoutAt");
+
+                window.location.replace("/login");
 
             }
 
