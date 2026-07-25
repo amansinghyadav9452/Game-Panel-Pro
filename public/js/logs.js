@@ -248,15 +248,6 @@ html += `
 
 <div class="log-meta">
 
-    <div class="meta-row">
-        <span class="meta-label">
-            ID :
-        </span>
-        <span class="meta-value">
-            ${log.serial || "-"}
-        </span>
-    </div>
-
     ${(log.deviceMarketingName || log.deviceBrand) ? `
     <div class="meta-row">
         <span class="meta-label">
@@ -264,6 +255,17 @@ html += `
         </span>
         <span class="meta-value">
             ${log.deviceMarketingName || [log.deviceBrand, log.deviceModel].filter(Boolean).join(" ") || "-"}
+        </span>
+    </div>
+    ` : ""}
+
+        ${log.androidVersion ? `
+    <div class="meta-row">
+        <span class="meta-label">
+            Android :
+        </span>
+        <span class="meta-value">
+            ${log.androidVersion}
         </span>
     </div>
     ` : ""}
@@ -279,16 +281,14 @@ html += `
     </div>
     ` : ""}
 
-    ${log.androidVersion ? `
-    <div class="meta-row">
+        <div class="meta-row">
         <span class="meta-label">
-            Android :
+            ID :
         </span>
         <span class="meta-value">
-            ${log.androidVersion}
+            ${log.serial || "-"}
         </span>
     </div>
-    ` : ""}
 
     ${!success && log.reason ? `
 

@@ -330,11 +330,11 @@ async function saveClientLog(body) {
 
         deviceModel,
 
+        androidVersion,
+
         deviceMarketingName,
 
         deviceBrand,
-
-        androidVersion,
 
         status: body.status || "success",
 
