@@ -175,16 +175,29 @@ license.lastUsed = new Date();
 
 await license.save();
 
-await UserLog.create({
+const duplicateWindow = new Date(Date.now() - 15 * 1000);
+
+const recentSuccessLog = await UserLog.findOne({
     licenseKey: user_key,
-    licenseType: expectedType,
     serial,
-    deviceModel: body.device_model || "",
-    deviceBrand: body.device_brand || "",
-    androidVersion: body.android_version || "",
     status: "success",
-    reason: ""
-});
+    createdAt: { $gte: duplicateWindow }
+}).sort({ createdAt: -1 });
+
+if (!recentSuccessLog) {
+
+    await UserLog.create({
+        licenseKey: user_key,
+        licenseType: expectedType,
+        serial,
+        deviceModel: body.device_model || "",
+        deviceBrand: body.device_brand || "",
+        androidVersion: body.android_version || "",
+        status: "success",
+        reason: ""
+    });
+
+}
 
 const rng = Math.floor(Date.now() / 1000);
 
