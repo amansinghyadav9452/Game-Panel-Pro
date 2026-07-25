@@ -186,6 +186,11 @@
 
 }
 
+.action-btn:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
 .action-btn:hover{
 
     background:#1d4ed8;

@@ -66,6 +66,22 @@ if (saveAppearanceBtn) {
 
             }
 
+            if (typeof applyAppearanceSettings === "function") {
+
+                applyAppearanceSettings({
+
+                    darkMode,
+
+                    accentColor,
+
+                    sidebarCollapsed,
+
+                    animationsEnabled
+
+                });
+
+            }
+
             showToast("Success", data.message, "success");
 
         }

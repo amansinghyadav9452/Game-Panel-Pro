@@ -62,9 +62,9 @@ Manage your security settings
 
     <div class="biometric-status">
 
-        <span class="badge warning">
+        <span class="badge warning" id="biometricBadge">
 
-            Disabled
+            Checking...
 
         </span>
 
@@ -84,7 +84,8 @@ Manage your security settings
     <button
     type="button"
     id="removeBiometricBtn"
-    class="danger-btn">
+    class="danger-btn"
+    style="display:none;">
 
     Remove Biometric
 
@@ -185,6 +186,22 @@ value="60"
 <select id="jwtExpiry">
 
 <option
+value="15m"
+<%= settings.security.jwtExpiry === "15m" ? "selected" : "" %>>
+
+15 Minutes
+
+</option>
+
+<option
+value="30m"
+<%= settings.security.jwtExpiry === "30m" ? "selected" : "" %>>
+
+30 Minutes
+
+</option>
+
+<option
 value="1h"
 <%= settings.security.jwtExpiry === "1h" ? "selected" : "" %>>
 
@@ -193,10 +210,10 @@ value="1h"
 </option>
 
 <option
-value="6h"
-<%= settings.security.jwtExpiry === "6h" ? "selected" : "" %>>
+value="12h"
+<%= settings.security.jwtExpiry === "12h" ? "selected" : "" %>>
 
-6 Hours
+12 Hours
 
 </option>
 
@@ -205,6 +222,14 @@ value="24h"
 <%= settings.security.jwtExpiry === "24h" ? "selected" : "" %>>
 
 24 Hours
+
+</option>
+
+<option
+value="7d"
+<%= settings.security.jwtExpiry === "7d" ? "selected" : "" %>>
+
+7 Days
 
 </option>
 

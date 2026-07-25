@@ -1000,6 +1000,40 @@ if (!allowedExpiry.includes(jwtExpiry)) {
 
 });
 
+router.get("/security/status", auth, async (req, res) => {
+
+    try {
+
+        const hasBiometric =
+            Array.isArray(req.admin.biometricCredentials) &&
+            req.admin.biometricCredentials.length > 0;
+
+        return res.json({
+
+            success: true,
+
+            biometricEnabled: hasBiometric
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
 router.delete("/security/biometric", auth, async (req, res) => {
 
     try {
@@ -1277,6 +1311,50 @@ router.put("/logs", auth, async (req, res) => {
             success: true,
 
             message: "Log settings updated successfully."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.get("/appearance/current", auth, async (req, res) => {
+
+    try {
+
+        const settings = await Settings.findOne();
+
+        if (!settings) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Settings not found."
+
+            });
+
+        }
+
+        return res.json({
+
+            success: true,
+
+            appearance: settings.appearance
 
         });
 

@@ -1,3 +1,15 @@
+if (!localStorage.getItem("token")) {
+
+    window.location.replace("/login");
+
+}
+
+if (typeof initSidebar === "function") {
+
+    initSidebar();
+
+}
+
 const saveBtn = document.getElementById("saveApiBtn");
 
 if (saveBtn) {

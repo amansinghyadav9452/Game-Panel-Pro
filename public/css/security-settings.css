@@ -267,6 +267,36 @@ background:#b91c1c;
 
 @media(max-width:768px){
 
+.biometric-status{
+
+margin:6px 0 12px;
+
+}
+
+.badge{
+
+display:inline-block;
+padding:4px 12px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+
+}
+
+.badge.warning{
+
+background:rgba(255,159,67,0.15);
+color:#ff9f43;
+
+}
+
+.badge.success{
+
+background:rgba(46,213,115,0.15);
+color:#2ed573;
+
+}
+
 .settings-page{
 
 padding:22px 16px 40px;

@@ -1,3 +1,78 @@
+if (!localStorage.getItem("token")) {
+
+    window.location.replace("/login");
+
+}
+
+if (typeof initSidebar === "function") {
+
+    initSidebar();
+
+}
+
+const biometricBadge = document.getElementById("biometricBadge");
+const enableBiometricButton = document.getElementById("enableBiometricBtn");
+const removeBiometricButton = document.getElementById("removeBiometricBtn");
+
+function renderBiometricStatus(enabled) {
+
+    if (biometricBadge) {
+
+        biometricBadge.textContent = enabled ? "Enabled" : "Disabled";
+
+        biometricBadge.classList.toggle("warning", !enabled);
+        biometricBadge.classList.toggle("success", enabled);
+
+    }
+
+    if (enableBiometricButton) {
+
+        enableBiometricButton.style.display = enabled ? "none" : "";
+
+    }
+
+    if (removeBiometricButton) {
+
+        removeBiometricButton.style.display = enabled ? "" : "none";
+
+    }
+
+}
+
+async function loadBiometricStatus() {
+
+    const token = localStorage.getItem("token");
+
+    try {
+
+        const response = await fetch("/settings/security/status", {
+
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            renderBiometricStatus(data.biometricEnabled);
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+loadBiometricStatus();
+
 const saveBtn = document.getElementById("saveSecurityBtn");
 
 saveBtn.addEventListener("click", async () => {
@@ -136,6 +211,8 @@ if (!verifyResponse.ok || !result.success) {
 
 showToast("Success", "Biometric enabled successfully.", "success");
 
+            loadBiometricStatus();
+
         } catch (err) {
 
             console.error(err);
@@ -155,6 +232,14 @@ if (removeBiometricBtn) {
 
     removeBiometricBtn.addEventListener("click", async () => {
 
+        const currentPassword = await requestPassword();
+
+        if (!currentPassword) {
+
+            return;
+
+        }
+
         try {
 
             const token = localStorage.getItem("token");
@@ -169,9 +254,13 @@ if (removeBiometricBtn) {
 
                     headers: {
 
+                        "Content-Type": "application/json",
+
                         Authorization: `Bearer ${token}`
 
-                    }
+                    },
+
+                    body: JSON.stringify({ currentPassword })
 
                 }
 
@@ -187,13 +276,15 @@ if (removeBiometricBtn) {
 
             showToast("Success", result.message, "success");
 
+            loadBiometricStatus();
+
         }
 
         catch (error) {
 
             console.error(error);
 
-            showToast("Error", "Unable to remove biometric.", "error");
+            showToast("Error", error.message || "Unable to remove biometric.", "error");
 
         }
 

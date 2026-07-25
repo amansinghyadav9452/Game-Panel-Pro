@@ -1,0 +1,151 @@
+/* ==========================================================
+   THEME ENGINE
+   Driven by Appearance settings (see /js/theme.js). Classes/
+   vars below are toggled on <html> at runtime so changes made
+   in Settings > Appearance reflect across the whole panel.
+========================================================== */
+
+:root{
+    --accent:#3B82F6;
+    --accent-dark:#2563EB;
+}
+
+/* ---------------- Accent color ---------------- */
+
+.save-btn,
+.action-btn:not(:disabled):not(.danger-btn){
+    background:var(--accent) !important;
+}
+
+.save-btn:hover,
+.action-btn:not(:disabled):not(.danger-btn):hover{
+    background:var(--accent-dark) !important;
+}
+
+nav a.active{
+    background:linear-gradient(90deg,var(--accent-dark),var(--accent)) !important;
+}
+
+.badge.success{
+    background:rgba(59,130,246,.15) !important;
+    color:var(--accent) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:var(--accent) !important;
+    outline-color:var(--accent) !important;
+}
+
+/* ---------------- Light theme ---------------- */
+
+html.light-theme{
+    --bg:#f4f6fb;
+    --sidebar:#ffffff;
+    --card:#ffffff;
+    --text:#1a1f36;
+    --muted:#64748b;
+    --border:rgba(15,23,42,.08);
+}
+
+html.light-theme body{
+    background:var(--bg) !important;
+    color:var(--text) !important;
+}
+
+html.light-theme .sidebar{
+    background:rgba(255,255,255,.92) !important;
+    border-right:1px solid var(--border) !important;
+}
+
+html.light-theme .content,
+html.light-theme .account-card,
+html.light-theme .modal-box,
+html.light-theme .card{
+    color:var(--text) !important;
+}
+
+html.light-theme .account-card,
+html.light-theme .modal-box{
+    background:var(--card) !important;
+    border:1px solid var(--border) !important;
+}
+
+html.light-theme input,
+html.light-theme select,
+html.light-theme textarea{
+    background:#ffffff !important;
+    color:var(--text) !important;
+    border:1px solid var(--border) !important;
+}
+
+html.light-theme nav a{
+    color:#334155 !important;
+}
+
+html.light-theme nav a:hover{
+    background:#eef2f7 !important;
+    color:#0f172a !important;
+}
+
+html.light-theme .page-subtitle,
+html.light-theme .setting-description,
+html.light-theme .admin-status-text{
+    color:var(--muted) !important;
+}
+
+html.light-theme .topbar,
+html.light-theme .sidebar-divider{
+    border-color:var(--border) !important;
+}
+
+/* ---------------- Sidebar collapsed ---------------- */
+
+@media(min-width:769px){
+
+    html.sidebar-collapsed .sidebar{
+        width:84px !important;
+        padding:20px 12px !important;
+    }
+
+    html.sidebar-collapsed .display-name-wrapper,
+    html.sidebar-collapsed .sidebar-status,
+    html.sidebar-collapsed .sidebar-divider{
+        display:none !important;
+    }
+
+    html.sidebar-collapsed .profile-avatar{
+        width:48px !important;
+        height:48px !important;
+        border-radius:12px !important;
+    }
+
+    html.sidebar-collapsed .sidebar-profile{
+        margin-bottom:16px !important;
+    }
+
+    html.sidebar-collapsed nav a{
+        justify-content:center;
+        padding:15px 10px;
+        font-size:0;
+    }
+
+    html.sidebar-collapsed nav a i{
+        font-size:18px;
+    }
+
+    html.sidebar-collapsed .content{
+        padding:35px 24px;
+    }
+
+}
+
+/* ---------------- Animations disabled ---------------- */
+
+html.no-animations *,
+html.no-animations *::before,
+html.no-animations *::after{
+    transition:none !important;
+    animation:none !important;
+}
