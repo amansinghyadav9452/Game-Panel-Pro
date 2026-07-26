@@ -14,6 +14,7 @@ const publicRoutes = require("./routes/public");
 const connectRoutes = require("./routes/connect");
 const errorHandler = require("./middleware/errorHandler");
 const rateLimiter = require("./middleware/rateLimiter");
+const sanitizeInput = require("./middleware/sanitizeInput");
 const activityRoutes = require("./routes/activity");
 const premiumRoutes = require("./routes/premium");
 const settingsRoutes = require("./routes/settings");
@@ -34,6 +35,7 @@ connectDB().then(async () => {
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(sanitizeInput);
 app.use(cors());
 app.use(rateLimiter);
 

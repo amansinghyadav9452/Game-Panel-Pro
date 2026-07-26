@@ -18,6 +18,8 @@ const userLogSchema = new mongoose.Schema({
 
     serial: String,
 
+    ip: String,
+
     status: {
         type: String,
         enum: ["success", "failed"]

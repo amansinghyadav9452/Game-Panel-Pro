@@ -49,6 +49,21 @@ const licenseSchema = new mongoose.Schema({
         default: null
     },
 
+    failedAttempts: {
+        type: Number,
+        default: 0
+    },
+
+    lastFailedAt: {
+        type: Date,
+        default: null
+    },
+
+    banReason: {
+        type: String,
+        default: ""
+    },
+
     createdBy: {
         type: String,
         default: "admin"

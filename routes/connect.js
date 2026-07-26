@@ -8,83 +8,105 @@ const {
     saveClientLog
 } = require("../services/connectService");
 
-router.post("/connect-premium", async (req, res) => {
-    console.log("Premium License called");
+const apiAccess = require("../middleware/connectApiAccess");
+const connectRateLimiter = require("../middleware/connectRateLimiter");
 
-    try {
+router.post(
 
-        console.log("Premium route hit");
+    "/connect-premium",
 
-        const result =
-            await verifyPremiumLicense(req.body, req);
+    connectRateLimiter,
 
-            console.log(JSON.stringify(result,null,2));
+    apiAccess("premium"),
 
-        res.json(result);
+    async (req, res) => {
 
-    } catch (err) {
+        try {
 
-        console.error("Premium Connect API Error", err);
+            const result = await verifyPremiumLicense(req.body, req);
 
-        res.status(500).json({
+            res.json(result);
 
-            status: false,
-            reason: "Internal Server Error"
+        } catch (err) {
 
-        });
+            console.error("Premium Connect API Error", err);
 
-    }
+            res.status(500).json({
 
-});
+                status: false,
+                reason: "Internal Server Error"
 
-router.post("/connect", async (req, res) => {
+            });
 
-    try {
-
-        const result =
-            await verifyPublicLicense(req.body, req);
-
-            console.log(JSON.stringify(result,null,2));
-
-        res.json(result);
-
-    } catch (err) {
-
-        console.error("Connect API Error", err);
-
-        res.status(500).json({
-
-            status: false,
-            reason: "Internal Server Error"
-
-        });
+        }
 
     }
 
-});
+);
 
-router.post("/client-log", async (req, res) => {
+router.post(
 
-    try {
+    "/connect",
 
-        const result = await saveClientLog(req.body);
+    connectRateLimiter,
 
-        res.json(result);
+    apiAccess("public"),
 
-    } catch (err) {
+    async (req, res) => {
 
-        console.error("Client Log API Error", err);
+        try {
 
-        res.status(500).json({
+            const result = await verifyPublicLicense(req.body, req);
 
-            status: false,
+            res.json(result);
 
-            reason: "Internal Server Error"
+        } catch (err) {
 
-        });
+            console.error("Connect API Error", err);
+
+            res.status(500).json({
+
+                status: false,
+                reason: "Internal Server Error"
+
+            });
+
+        }
 
     }
 
-});
+);
+
+router.post(
+
+    "/client-log",
+
+    connectRateLimiter,
+
+    async (req, res) => {
+
+        try {
+
+            const result = await saveClientLog(req.body);
+
+            res.json(result);
+
+        } catch (err) {
+
+            console.error("Client Log API Error", err);
+
+            res.status(500).json({
+
+                status: false,
+
+                reason: "Internal Server Error"
+
+            });
+
+        }
+
+    }
+
+);
 
 module.exports = router;

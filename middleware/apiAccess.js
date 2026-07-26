@@ -14,6 +14,18 @@ function apiAccess(type) {
 
             }
 
+            if (settings.api.maintenanceMode) {
+
+                return res.status(503).json({
+
+                    success: false,
+
+                    message: "Panel is under maintenance. Please try again later."
+
+                });
+
+            }
+
             if (
                 type === "public" &&
                 !settings.api.publicApiEnabled
