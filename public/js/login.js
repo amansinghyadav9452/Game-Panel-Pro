@@ -93,7 +93,25 @@ if (data.success && data.twoFactorRequired) {
 
     form.style.display = "none";
 
-    document.getElementById("otpStep").style.display = "block";
+    const securityStatus = document.getElementById("securityStatus");
+
+    if (securityStatus) securityStatus.style.display = "none";
+
+    const otpStep = document.getElementById("otpStep");
+
+    otpStep.style.display = "block";
+
+    document.querySelector(".login-card").scrollTop = 0;
+
+    const otpField = document.getElementById("otpInput");
+
+    if (otpField) {
+
+        otpField.value = "";
+
+        setTimeout(() => otpField.focus(), 100);
+
+    }
 
     loginBtn.disabled = false;
 
@@ -500,6 +518,32 @@ if (resendOtpLink) {
             showMessage("Server Connection Failed", false);
 
         }
+
+    });
+
+}
+
+const backToLoginLink = document.getElementById("backToLoginLink");
+
+if (backToLoginLink) {
+
+    backToLoginLink.addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+        pendingUsername = "";
+
+        document.getElementById("otpStep").style.display = "none";
+
+        const securityStatus = document.getElementById("securityStatus");
+
+        if (securityStatus) securityStatus.style.display = "flex";
+
+        form.style.display = "block";
+
+        password.value = "";
+
+        message.innerHTML = "";
 
     });
 
