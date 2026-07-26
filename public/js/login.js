@@ -89,36 +89,54 @@ body: JSON.stringify({
 
 if (data.success && data.twoFactorRequired) {
 
-    pendingUsername = username.value.trim();
+    try {
 
-    form.style.display = "none";
+        pendingUsername = username.value.trim();
 
-    const securityStatus = document.getElementById("securityStatus");
+        form.style.display = "none";
 
-    if (securityStatus) securityStatus.style.display = "none";
+        const securityStatus = document.getElementById("securityStatus");
 
-    const otpStep = document.getElementById("otpStep");
+        if (securityStatus) securityStatus.style.display = "none";
 
-    otpStep.style.display = "block";
+        const otpStep = document.getElementById("otpStep");
 
-    document.querySelector(".login-card").scrollTop = 0;
+        if (!otpStep) {
 
-    const otpField = document.getElementById("otpInput");
+            throw new Error("otpStep element not found in DOM - login.ejs may not be updated.");
 
-    if (otpField) {
+        }
 
-        otpField.value = "";
+        otpStep.style.display = "block";
+        otpStep.style.visibility = "visible";
+        otpStep.style.opacity = "1";
 
-        setTimeout(() => otpField.focus(), 100);
+        const otpField = document.getElementById("otpInput");
+
+        if (otpField) {
+
+            otpField.value = "";
+
+            setTimeout(() => otpField.focus(), 100);
+
+        }
+
+        loginBtn.disabled = false;
+
+        loginBtn.innerHTML =
+            `<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
+
+        showMessage("Verification code sent to your email.", true);
 
     }
 
-    loginBtn.disabled = false;
+    catch (stepError) {
 
-    loginBtn.innerHTML =
-        `<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
+        console.error("2FA step error:", stepError);
 
-    showMessage("Verification code sent to your email.", true);
+        showMessage("Could not show verification screen: " + stepError.message, false);
+
+    }
 
 } else if (data.success) {
 
