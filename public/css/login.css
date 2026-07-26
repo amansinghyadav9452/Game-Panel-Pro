@@ -4,18 +4,18 @@
 
 :root{
 
-    --bg:#050816;
-    --bg2:#0b1225;
+    --bg:#000000;
+    --bg2:#060606;
 
-    --card:rgba(10,18,35,.72);
+    --card:rgba(10,10,10,.72);
 
     --border:rgba(255,255,255,.08);
 
-    --primary:#3b82f6;
-    --primary2:#60a5fa;
+    --primary:#ffffff;
+    --primary2:#d4d4d4;
 
     --text:#ffffff;
-    --muted:#9aa8c7;
+    --muted:#a1a1aa;
 
     --success:#22c55e;
 
@@ -53,11 +53,11 @@ body{
 
     background:
 
-    radial-gradient(circle at top left,#183b8d 0%,transparent 35%),
+    radial-gradient(circle at top left,#1f1f1f 0%,transparent 35%),
 
-    radial-gradient(circle at bottom right,#5b21b6 0%,transparent 30%),
+    radial-gradient(circle at bottom right,#262626 0%,transparent 30%),
 
-    linear-gradient(145deg,#040815,#091325,#030713);
+    linear-gradient(145deg,#030303,#050505,#000000);
 
     min-height:100vh;
 
@@ -135,7 +135,7 @@ body::before{
 
     height:420px;
 
-    background:#2563eb;
+    background:#3a3a3a;
 
     top:-160px;
 
@@ -150,7 +150,7 @@ body::before{
 
     height:360px;
 
-    background:#6d28d9;
+    background:#2e2e2e;
 
     right:-120px;
 
@@ -167,7 +167,7 @@ body::before{
 
     height:260px;
 
-    background:#06b6d4;
+    background:#333333;
 
     top:55%;
 
@@ -249,9 +249,9 @@ body::before{
 
         145deg,
 
-        rgba(20,30,55,.88),
+        rgba(20,20,20,.88),
 
-        rgba(8,15,30,.82)
+        rgba(10,10,10,.82)
 
     );
 
@@ -288,7 +288,7 @@ body::before{
 
     radial-gradient(
 
-        rgba(6,182,212,.16),
+        rgba(255,255,255,.16),
 
         transparent 75%
 
@@ -315,7 +315,7 @@ body::before{
 
 .login-card::-webkit-scrollbar-thumb{
 
-    background:#334155;
+    background:#262626;
 
     border-radius:20px;
 
@@ -347,7 +347,7 @@ body::before{
 
     radial-gradient(
 
-        rgba(96,165,250,.22),
+        rgba(255,255,255,.22),
 
         transparent 72%
 
@@ -389,9 +389,9 @@ body::before{
 
     background:linear-gradient(
         135deg,
-        rgba(59,130,246,.7),
+        rgba(255,255,255,.7),
         transparent,
-        rgba(6,182,212,.7),
+        rgba(255,255,255,.7),
         transparent
     );
 
@@ -451,13 +451,13 @@ body::before{
 
     border-color:
 
-    rgba(59,130,246,.20);
+    rgba(255,255,255,.20);
 
     box-shadow:
 
         0 40px 100px rgba(0,0,0,.62),
 
-        0 0 35px rgba(37,99,235,.15);
+        0 0 35px rgba(255,255,255,.15);
 
 }
 
@@ -497,8 +497,8 @@ body::before{
 
     linear-gradient(
         145deg,
-        #eb255d,
-        #60faf7b6
+        #3a3a3a,
+        #1a1a1ab6
     );
 
     color:#ffffff;
@@ -507,11 +507,11 @@ body::before{
 
     box-shadow:
 
-        0 0 0 10px rgba(59,130,246,.08),
+        0 0 0 10px rgba(255,255,255,.08),
 
-        0 0 40px rgba(59,130,246,.45),
+        0 0 40px rgba(255,255,255,.45),
 
-        0 15px 50px rgba(37,99,235,.40);
+        0 15px 50px rgba(255,255,255,.40);
 
     animation:shieldPulse 4s ease infinite;
 
@@ -527,7 +527,7 @@ body::before{
 
     border-radius:50%;
 
-    border:1px solid rgba(96,165,250,.22);
+    border:1px solid rgba(255,255,255,.22);
 
 }
 
@@ -552,7 +552,7 @@ body::before{
     linear-gradient(
         90deg,
         #ffffff,
-        #60a5fa,
+        #d4d4d4,
         #ffffff
     );
 
@@ -586,7 +586,7 @@ body::before{
 
     margin-top:10px;
 
-    color:#9fb3d9;
+    color:#a3a3a3;
 
     font-size:15px;
 
@@ -609,9 +609,9 @@ body::before{
 
         box-shadow:
 
-        0 0 0 10px rgba(59,130,246,.08),
+        0 0 0 10px rgba(255,255,255,.08),
 
-        0 0 40px rgba(59,130,246,.35);
+        0 0 40px rgba(255,255,255,.35);
 
     }
 
@@ -621,9 +621,9 @@ body::before{
 
         box-shadow:
 
-        0 0 0 18px rgba(59,130,246,.03),
+        0 0 0 18px rgba(255,255,255,.03),
 
-        0 0 65px rgba(59,130,246,.55);
+        0 0 65px rgba(255,255,255,.55);
 
     }
 
@@ -633,9 +633,9 @@ body::before{
 
         box-shadow:
 
-        0 0 0 10px rgba(59,130,246,.08),
+        0 0 0 10px rgba(255,255,255,.08),
 
-        0 0 40px rgba(59,130,246,.35);
+        0 0 40px rgba(255,255,255,.35);
 
     }
 
@@ -663,7 +663,7 @@ body::before{
 
     letter-spacing:.8px;
 
-    color:#9fb3d9;
+    color:#a3a3a3;
 
     text-transform:uppercase;
 
@@ -683,8 +683,8 @@ body::before{
 
     linear-gradient(
         145deg,
-        rgba(12,20,38,.95),
-        rgba(18,28,48,.92)
+        rgba(12,12,12,.95),
+        rgba(18,18,18,.92)
     );
 
     border:1px solid rgba(255,255,255,.06);
@@ -711,7 +711,7 @@ body::before{
 
     height:100%;
 
-    background:#3b82f6;
+    background:#e5e5e5;
 
     transform:scaleY(0);
 
@@ -721,19 +721,19 @@ body::before{
 
 .input-box:hover{
 
-    border-color:rgba(59,130,246,.30);
+    border-color:rgba(255,255,255,.30);
 
 }
 
 .input-box:focus-within{
 
-    border-color:#3b82f6;
+    border-color:#e5e5e5;
 
     box-shadow:
 
-        0 0 0 4px rgba(59,130,246,.14),
+        0 0 0 4px rgba(255,255,255,.14),
 
-        0 0 28px rgba(59,130,246,.10);
+        0 0 28px rgba(255,255,255,.10);
 
 }
 
@@ -751,7 +751,7 @@ body::before{
 
     font-size:18px;
 
-    color:#8ea9d8;
+    color:#a3a3a3;
 
     transition:.3s;
 
@@ -759,7 +759,7 @@ body::before{
 
 .input-box:focus-within i{
 
-    color:#60a5fa;
+    color:#d4d4d4;
 
     transform:scale(1.08);
 
@@ -787,7 +787,7 @@ body::before{
 
 .input-box input::placeholder{
 
-    color:#6b7d9d;
+    color:#8a8a8a;
 
     transition:.25s;
 
@@ -809,7 +809,7 @@ body::before{
 
     background:none;
 
-    color:#8ea9d8;
+    color:#a3a3a3;
 
     cursor:pointer;
 
@@ -819,7 +819,7 @@ body::before{
 
 .input-box button:hover{
 
-    color:#60a5fa;
+    color:#d4d4d4;
 
     transform:scale(1.08);
 
@@ -847,14 +847,14 @@ body::before{
 
     linear-gradient(
         135deg,
-        #2563eb,
-        #3b82f6,
-        #60a5fa
+        #ffffff,
+        #e5e5e5,
+        #d4d4d4
     );
 
     background-size:250% 250%;
 
-    color:#fff;
+    color:#0a0a0a;
 
     font-size:17px;
 
@@ -870,7 +870,7 @@ body::before{
 
     box-shadow:
 
-        0 15px 40px rgba(37,99,235,.35);
+        0 15px 40px rgba(255,255,255,.35);
 
 }
 
@@ -925,7 +925,7 @@ body::before{
 
     box-shadow:
 
-        0 22px 50px rgba(37,99,235,.45);
+        0 22px 50px rgba(255,255,255,.45);
 
 }
 
@@ -1037,8 +1037,8 @@ body::before{
 
     linear-gradient(
         145deg,
-        rgba(15,25,45,.95),
-        rgba(10,18,35,.90)
+        rgba(15,15,15,.95),
+        rgba(10,10,10,.90)
     );
 
     border:1px solid rgba(255,255,255,.06);
@@ -1049,11 +1049,11 @@ body::before{
 
 .cf-turnstile:hover{
 
-    border-color:rgba(59,130,246,.30);
+    border-color:rgba(255,255,255,.30);
 
     box-shadow:
 
-        0 0 28px rgba(37,99,235,.12);
+        0 0 28px rgba(255,255,255,.12);
 
 }
 
@@ -1075,7 +1075,7 @@ body::before{
 
 .footer p{
 
-    color:#8fa6d3;
+    color:#a3a3a3;
 
     font-size:13px;
 
@@ -1085,7 +1085,7 @@ body::before{
 
 .footer i{
 
-    color:#3b82f6;
+    color:#e5e5e5;
 
     margin-right:6px;
 
@@ -1105,7 +1105,7 @@ body::before{
 
     border-radius:50%;
 
-    background:#60a5fa;
+    background:#d4d4d4;
 
     opacity:.35;
 
@@ -1215,7 +1215,7 @@ background:rgba(255,255,255,.05);
 
 border:1px solid rgba(255,255,255,.08);
 
-color:#9fb3d9;
+color:#a3a3a3;
 
 }
 
@@ -1320,12 +1320,12 @@ font-size:8px;
 
     overflow:hidden;
 
-    background:rgba(40,170,255,.08);
+    background:rgba(255,255,255,.08);
 
-    border:2px solid rgba(70,180,255,.28);
+    border:2px solid rgba(255,255,255,.28);
 
     box-shadow:
-        0 0 18px rgba(0,180,255,.20);
+        0 0 18px rgba(255,255,255,.20);
 
     transition:.35s;
 
@@ -1335,7 +1335,7 @@ font-size:8px;
 
     font-size:38px;
 
-    color:#53b8ff;
+    color:#d4d4d4;
 
 }
 
@@ -1344,13 +1344,13 @@ font-size:8px;
     transform:scale(1.06);
 
     box-shadow:
-        0 0 30px rgba(0,180,255,.45);
+        0 0 30px rgba(255,255,255,.45);
 
 }
 
 .fp-text{
 
-    color:#d7e8ff;
+    color:#e5e5e5;
 
     font-size:14px;
 
@@ -1376,7 +1376,7 @@ font-size:8px;
 
     background:conic-gradient(
         transparent,
-        rgba(0,183,255,.55),
+        rgba(255,255,255,.55),
         transparent,
         transparent
     );
@@ -1395,7 +1395,7 @@ font-size:8px;
 
     border-radius:50%;
 
-    background:#121826;
+    background:#0f0f0f;
 
 }
 
@@ -1440,7 +1440,7 @@ font-size:8px;
         transform:scale(1);
 
         box-shadow:
-        0 0 15px rgba(0,183,255,.30);
+        0 0 15px rgba(255,255,255,.30);
 
     }
 
@@ -1449,7 +1449,7 @@ font-size:8px;
         transform:scale(1.08);
 
         box-shadow:
-        0 0 35px rgba(0,183,255,.90);
+        0 0 35px rgba(255,255,255,.90);
 
     }
 
@@ -1458,7 +1458,7 @@ font-size:8px;
         transform:scale(1);
 
         box-shadow:
-        0 0 15px rgba(0,183,255,.30);
+        0 0 15px rgba(255,255,255,.30);
 
     }
 
@@ -1474,9 +1474,9 @@ font-size:8px;
 
     text-align:center;
 
-    background:rgba(59,130,246,.12);
+    background:rgba(255,255,255,.12);
 
-    color:#60A5FA;
+    color:#d4d4d4;
 
     font-size:.9rem;
 
