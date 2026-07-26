@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+const md5 = require("md5");
 const License = require("../models/License");
 const UserLog = require("../models/UserLog");
 const { resolveMarketingName } = require("./deviceLookup");
@@ -212,16 +212,15 @@ async function verifyLicense(body, req, expectedType = "public") {
 
     const rng = Math.floor(Date.now() / 1000);
 
-    // HMAC-SHA256 with the secret used as the *key* (not concatenated
-    // into the message) - this is the correct construction and is not
-    // vulnerable to length-extension attacks the way MD5(secret+data) is.
-    const token = crypto
+    // MD5 kept here to match the game client, which cannot be updated to
+    // verify HMAC-SHA256. The secret is never exposed in the response
+    // (unlike the old code) - that was the actual vulnerability, not the
+    // hash algorithm choice by itself.
+    const token = md5(
 
-        .createHmac("sha256", process.env.TOKEN_SECRET)
+        `${game}-${user_key}-${serial}-${process.env.TOKEN_SECRET}`
 
-        .update(`${game}-${user_key}-${serial}`)
-
-        .digest("hex");
+    );
 
     return {
 
