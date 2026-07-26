@@ -67,8 +67,8 @@
 
                     <input
                         type="email"
-                        placeholder="Coming Soon"
-                        disabled>
+                        id="email"
+                        placeholder="Enter your email for 2FA">
 
                 </div>
 
@@ -91,11 +91,35 @@
 
                     <label>Two Factor Authentication (2FA)</label>
 
-                    <button class="action-btn" disabled title="Coming Soon">
+                    <div class="biometric-status">
+
+                        <span class="badge warning" id="twoFaBadge">
+
+                            Disabled
+
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="action-btn"
+                        id="enable2faBtn"
+                        type="button">
 
                         <i class="fa-solid fa-shield-halved"></i>
 
-                        Enable 2FA (Coming Soon)
+                        Enable 2FA
+
+                    </button>
+
+                    <button
+                        class="danger-btn"
+                        id="disable2faBtn"
+                        type="button">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        Disable 2FA
 
                     </button>
 
@@ -222,7 +246,13 @@
 
 </div>
 
+<%- include("../../partials/password-modal") %>
+
+<%- include("../../partials/otp-modal") %>
+
 <script src="/js/utils.js"></script>
+<script src="/js/password-modal.js"></script>
+<script src="/js/otp-modal.js"></script>
 <script src="/js/account.js"></script>
 
 </body>

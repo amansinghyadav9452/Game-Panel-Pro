@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
 const generateToken = require("../services/tokenGenerator");
+const { generateOtp, hashOtp, compareOtp, OTP_TTL_MS } = require("../services/otp");
+const { sendOtpEmail } = require("../services/mailer");
 
 const router = express.Router();
 const fetch = global.fetch;
@@ -117,6 +119,42 @@ if (!match) {
         admin.failedAttempts = 0;
 admin.lockUntil = null;
 
+if (admin.twoFactorEnabled) {
+
+    if (!admin.email) {
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "2FA is enabled but no email is on file. Contact support."
+
+        });
+
+    }
+
+    const otp = generateOtp();
+
+    admin.otpCode = await hashOtp(otp);
+
+    admin.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+
+    await admin.save();
+
+    await sendOtpEmail(admin.email, otp);
+
+    return res.json({
+
+        success: true,
+
+        twoFactorRequired: true,
+
+        username: admin.username
+
+    });
+
+}
+
 if (settings?.security?.forceSingleLogin) {
 
     admin.sessionVersion++;
@@ -144,6 +182,170 @@ if (settings?.security?.forceSingleLogin) {
             success: false,
 
             message: "Server Error"
+
+        });
+
+    }
+
+});
+
+router.post("/login/2fa/verify", async (req, res) => {
+
+    try {
+
+        const { username, otp } = req.body;
+
+        if (!username || !otp) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Username and code are required."
+
+            });
+
+        }
+
+        const admin = await Admin.findOne({ username });
+
+        if (!admin) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Admin not found."
+
+            });
+
+        }
+
+        if (
+
+            !admin.otpCode ||
+
+            !admin.otpExpiresAt ||
+
+            admin.otpExpiresAt < Date.now()
+
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Code expired. Please login again."
+
+            });
+
+        }
+
+        const matched = await compareOtp(otp, admin.otpCode);
+
+        if (!matched) {
+
+            return res.status(401).json({
+
+                success: false,
+
+                message: "Invalid verification code."
+
+            });
+
+        }
+
+        admin.otpCode = "";
+
+        admin.otpExpiresAt = null;
+
+        const settings = await Settings.findOne();
+
+        if (settings?.security?.forceSingleLogin) {
+
+            admin.sessionVersion++;
+
+        }
+
+        await admin.save();
+
+        const token = await generateToken(admin);
+
+        return res.json({
+
+            success: true,
+
+            token
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+});
+
+router.post("/login/2fa/resend", async (req, res) => {
+
+    try {
+
+        const { username } = req.body;
+
+        const admin = await Admin.findOne({ username });
+
+        if (!admin || !admin.twoFactorEnabled) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Request failed."
+
+            });
+
+        }
+
+        const otp = generateOtp();
+
+        admin.otpCode = await hashOtp(otp);
+
+        admin.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+
+        await admin.save();
+
+        await sendOtpEmail(admin.email, otp);
+
+        return res.json({
+
+            success: true,
+
+            message: "A new code has been sent."
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Failed to resend code."
 
         });
 

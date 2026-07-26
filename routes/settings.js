@@ -12,6 +12,8 @@ const uploadProfile = require("../middleware/uploadProfile");
 const cloudinary = require("../services/cloudinary");
 const streamifier = require("streamifier");
 const deleteExpiredLicenses = require("../services/licenseCleanup");
+const { generateOtp, hashOtp, compareOtp, OTP_TTL_MS } = require("../services/otp");
+const { sendOtpEmail } = require("../services/mailer");
 
 router.get("/", (req, res) => {
 
@@ -1692,6 +1694,8 @@ res.json({
 
         username: req.admin.username,
 
+        email: req.admin.email,
+
         displayName: settings.panelProfile.displayName,
 
         profileImage: settings.panelProfile.profileImage
@@ -1709,6 +1713,280 @@ res.json({
             success: false,
 
             message: "Server Error"
+
+        });
+
+    }
+
+});
+
+router.get("/account/2fa/status", auth, async (req, res) => {
+
+    try {
+
+        const email = req.admin.email || "";
+
+        const maskedEmail = email
+            ? email.replace(/^(.{2}).+(@.+)$/, "$1***$2")
+            : "";
+
+        return res.json({
+
+            success: true,
+
+            enabled: req.admin.twoFactorEnabled,
+
+            email: maskedEmail
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.post("/account/2fa/send-otp", auth, async (req, res) => {
+
+    try {
+
+        const { email } = req.body;
+
+        const targetEmail = (email || req.admin.email || "").trim();
+
+        if (!targetEmail) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Email is required to enable 2FA."
+
+            });
+
+        }
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailPattern.test(targetEmail)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Enter a valid email address."
+
+            });
+
+        }
+
+        const otp = generateOtp();
+
+        req.admin.otpCode = await hashOtp(otp);
+
+        req.admin.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+
+        req.admin.pendingEmail = targetEmail;
+
+        await req.admin.save();
+
+        await sendOtpEmail(targetEmail, otp);
+
+        return res.json({
+
+            success: true,
+
+            message: `Verification code sent to ${targetEmail}.`
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Failed to send verification code."
+
+        });
+
+    }
+
+});
+
+router.post("/account/2fa/verify", auth, async (req, res) => {
+
+    try {
+
+        const { otp } = req.body;
+
+        if (!otp) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Verification code is required."
+
+            });
+
+        }
+
+        if (
+
+            !req.admin.otpCode ||
+
+            !req.admin.otpExpiresAt ||
+
+            req.admin.otpExpiresAt < Date.now()
+
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Code expired. Please request a new one."
+
+            });
+
+        }
+
+        const matched = await compareOtp(otp, req.admin.otpCode);
+
+        if (!matched) {
+
+            return res.status(401).json({
+
+                success: false,
+
+                message: "Invalid verification code."
+
+            });
+
+        }
+
+        req.admin.twoFactorEnabled = true;
+
+        req.admin.email = req.admin.pendingEmail || req.admin.email;
+
+        req.admin.pendingEmail = "";
+
+        req.admin.otpCode = "";
+
+        req.admin.otpExpiresAt = null;
+
+        await req.admin.save();
+
+        return res.json({
+
+            success: true,
+
+            message: "Two-factor authentication enabled successfully."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Verification failed."
+
+        });
+
+    }
+
+});
+
+router.post("/account/2fa/disable", auth, async (req, res) => {
+
+    try {
+
+        const { currentPassword } = req.body;
+
+        if (!currentPassword) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Current password is required."
+
+            });
+
+        }
+
+        const matched = await bcrypt.compare(
+
+            currentPassword,
+
+            req.admin.password
+
+        );
+
+        if (!matched) {
+
+            return res.status(401).json({
+
+                success: false,
+
+                message: "Current password is incorrect."
+
+            });
+
+        }
+
+        req.admin.twoFactorEnabled = false;
+
+        req.admin.otpCode = "";
+
+        req.admin.otpExpiresAt = null;
+
+        req.admin.pendingEmail = "";
+
+        await req.admin.save();
+
+        return res.json({
+
+            success: true,
+
+            message: "Two-factor authentication disabled."
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
 
         });
 

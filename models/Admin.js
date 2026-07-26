@@ -30,6 +30,38 @@ twoFactorSecret:{
 
 },
 
+email:{
+
+    type:String,
+
+    default:""
+
+},
+
+otpCode:{
+
+    type:String,
+
+    default:""
+
+},
+
+otpExpiresAt:{
+
+    type:Date,
+
+    default:null
+
+},
+
+pendingEmail:{
+
+    type:String,
+
+    default:""
+
+},
+
     password: {
         type: String,
         required: true

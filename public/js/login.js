@@ -10,6 +10,8 @@ const togglePassword = document.getElementById("togglePassword");
 
 const message = document.getElementById("message");
 
+let pendingUsername = "";
+
 /* -------------------------
    Show / Hide Password
 -------------------------- */
@@ -85,7 +87,22 @@ body: JSON.stringify({
 
         data = await response.json();
 
-if (data.success) {
+if (data.success && data.twoFactorRequired) {
+
+    pendingUsername = username.value.trim();
+
+    form.style.display = "none";
+
+    document.getElementById("otpStep").style.display = "block";
+
+    loginBtn.disabled = false;
+
+    loginBtn.innerHTML =
+        `<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
+
+    showMessage("Verification code sent to your email.", true);
+
+} else if (data.success) {
 
     localStorage.setItem("token", data.token);
 
@@ -334,6 +351,153 @@ window.location.href = "/panel";
                 "error"
 
             );
+
+        }
+
+    });
+
+}
+/* -------------------------
+   OTP Verification (2FA)
+-------------------------- */
+
+const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+
+const otpInput = document.getElementById("otpInput");
+
+const resendOtpLink = document.getElementById("resendOtpLink");
+
+if (verifyOtpBtn) {
+
+    verifyOtpBtn.addEventListener("click", async () => {
+
+        const otp = otpInput.value.trim();
+
+        if (!otp) {
+
+            showMessage("Enter the verification code.", false);
+
+            return;
+
+        }
+
+        verifyOtpBtn.disabled = true;
+
+        verifyOtpBtn.innerHTML =
+            `<i class="fa-solid fa-spinner fa-spin"></i> Verifying...`;
+
+        try {
+
+            const response = await fetch("/login/2fa/verify", {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    username: pendingUsername,
+
+                    otp
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+
+                localStorage.setItem("token", data.token);
+
+                localStorage.setItem(
+                    "logoutAt",
+                    Date.now() + 15 * 60 * 1000
+                );
+
+                verifyOtpBtn.innerHTML =
+                    `<i class="fa-solid fa-check"></i> Success`;
+
+                setTimeout(() => {
+
+                    window.location.href = "/panel";
+
+                }, 700);
+
+            } else {
+
+                showMessage(data.message, false);
+
+                verifyOtpBtn.disabled = false;
+
+                verifyOtpBtn.innerHTML =
+                    `<i class="fa-solid fa-check"></i> Verify Code`;
+
+            }
+
+        }
+
+        catch (err) {
+
+            showMessage("Server Connection Failed", false);
+
+            verifyOtpBtn.disabled = false;
+
+            verifyOtpBtn.innerHTML =
+                `<i class="fa-solid fa-check"></i> Verify Code`;
+
+        }
+
+    });
+
+}
+
+if (resendOtpLink) {
+
+    resendOtpLink.addEventListener("click", async (e) => {
+
+        e.preventDefault();
+
+        try {
+
+            const response = await fetch("/login/2fa/resend", {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    username: pendingUsername
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            showMessage(
+
+                data.message ||
+                    "A new code has been sent if applicable.",
+
+                data.success
+
+            );
+
+        }
+
+        catch (err) {
+
+            showMessage("Server Connection Failed", false);
 
         }
 
