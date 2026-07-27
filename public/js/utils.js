@@ -595,3 +595,20 @@ function handleProfileUpload() {
     });
 
 }
+
+const sidebarLogoutBtn = document.getElementById("sidebarLogout");
+
+if (sidebarLogoutBtn) {
+
+    sidebarLogoutBtn.addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("logoutAt");
+
+        window.location.replace("/login");
+
+    });
+
+}

@@ -357,18 +357,6 @@ closeModal.addEventListener("click",()=>{
 document.getElementById("banLicenseBtn")
 .addEventListener("click",banLicense);
 
-document.getElementById("sidebarLogout")
-.addEventListener("click", (e) => {
-
-    e.preventDefault();
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("logoutAt");
-
-    window.location.replace("/login");
-
-});
-
 async function banLicense(){
 
     try{

@@ -39,7 +39,7 @@ html.light-theme{
     --card:#ffffff;
     --text:#1a1f36;
     --muted:#64748b;
-    --border:rgba(27, 42, 15, 0.08);
+    --border:rgba(15,23,42,.08);
 }
 
 html.light-theme body{
@@ -68,7 +68,7 @@ html.light-theme .modal-box{
 html.light-theme input,
 html.light-theme select,
 html.light-theme textarea{
-    background:lightcyan !important;
+    background:#ffffff !important;
     color:var(--text) !important;
     border:1px solid var(--border) !important;
 }
@@ -107,7 +107,7 @@ html.light-theme .back-btn:hover{
 }
 
 html.light-theme .system-status{
-    background:rgb(0, 89, 255) !important;
+    background:#3B82F6 !important;
     border:1px solid var(--border) !important;
 }
 
@@ -117,7 +117,7 @@ html.light-theme .system-status h3{
 
 html.light-theme .status-grid > .status-card,
 html.light-theme .status-card{
-    background:rgb(0, 255, 204) !important;
+    background:rgb(0, 255, 213) !important;
     border:1px solid var(--border) !important;
 }
 
@@ -130,9 +130,29 @@ html.light-theme .status-grid > .status-card span{
     color:var(--muted) !important;
 }
 
+/* .modal-content (License Details / Create License / Delete / Extend
+   modals) always keeps a dark card background regardless of site theme -
+   its text has no color of its own and was inheriting the light-theme
+   body color, making it near-invisible on its own dark background. */
+html.light-theme .modal-content{
+    color:#f1f5f9 !important;
+}
+
+html.light-theme .detail{
+    border-bottom-color:rgba(255,255,255,.08) !important;
+}
+
 html.light-theme .topbar,
 html.light-theme .sidebar-divider{
     border-color:var(--border) !important;
+}
+
+html.light-theme .topbar-row{
+    background:#f4f6fb !important;
+}
+
+html.light-theme .topbar-row h2{
+    color:var(--text) !important;
 }
 
 /* ---------------- Sidebar collapsed ---------------- */
