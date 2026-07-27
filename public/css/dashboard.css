@@ -1209,9 +1209,9 @@ TOPBAR
 
     background:none;
 
-    color:white;
+    color:rgba(255, 0, 0, 0.66);
 
-    font-size:22px;
+    font-size:40px;
 
     cursor:pointer;
 
@@ -1251,7 +1251,7 @@ TOPBAR
 
     border-radius:12px;
 
-    color:white;
+    color:black;
 
     cursor:pointer;
 
