@@ -303,47 +303,42 @@ router.put("/dashboard/extend/:key", auth, async (req, res) => {
 
     try {
 
-        const { days } = req.body;
+const { days } = req.body;
 
-        console.log("=========== REQUEST DEBUG ===========");
-console.log("Request Body:", req.body);
-console.log("Days:", days);
+const license = await License.findOne({
+    key: req.params.key
+});
+
+if (!license) {
+
+    return res.status(404).json({
+        success: false,
+        message: "License Not Found"
+    });
+
+}
+
 console.log("Expiry Before:", license.expiry);
 
-        const license = await License.findOne({
-            key: req.params.key
-        });
-
-        if (!license) {
-
-            return res.status(404).json({
-                success: false,
-                message: "License Not Found"
-            });
-
-        }
-
-const baseDate =
+const baseDate = new Date(
     license.expiry > new Date()
         ? license.expiry
-        : new Date();
-
-baseDate.setDate(
-    baseDate.getDate() + Number(days)
+        : new Date()
 );
 
-license.expiry = baseDate;
+baseDate.setDate(baseDate.getDate() + Number(days));
 
+license.expiry = baseDate;
 license.status = "active";
 
 await license.save();
 
-const updatedLicense = await License.findById(license._id);
+const fresh = await License.findById(license._id);
 
 res.json({
     success: true,
     message: "License Extended Successfully",
-    expiry: license.expiry
+    expiry: fresh.expiry
 });
 
     } catch (err) {

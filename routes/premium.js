@@ -333,44 +333,46 @@ router.put("/premium/extend/:key", auth, apiAccess("premium"), async (req, res) 
 
         }
 
-const baseDate =
+const baseDate = new Date(
     license.expiry > new Date()
         ? license.expiry
-        : new Date();
+        : new Date()
+);
 
 baseDate.setDate(
     baseDate.getDate() + Number(days)
 );
 
 license.expiry = baseDate;
-
 license.status = "active";
 
-        await license.save();
+await license.save();
 
-        await logActivity({
+const fresh = await License.findById(license._id);
 
-            action: "EXTEND",
+await logActivity({
 
-            licenseKey: license.key,
+    action: "EXTEND",
 
-            licenseType: "premium",
+    licenseKey: fresh.key,
 
-            admin: req.admin.username,
+    licenseType: "premium",
 
-            details: `${days} Days Extended`
+    admin: req.admin.username,
 
-        });
+    details: `${days} Days Extended`
 
-        res.json({
+});
 
-            success: true,
+res.json({
 
-            message: "Premium Key Extended Successfully",
+    success: true,
 
-            expiry: license.expiry
+    message: "Premium Key Extended Successfully",
 
-        });
+    expiry: fresh.expiry
+
+});
 
     } catch (err) {
 
