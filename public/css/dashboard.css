@@ -1017,40 +1017,6 @@ TOPBAR
 
 }
 
-.search-box{
-
-    width:280px;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    background:#1E293B;
-
-    padding:0 18px;
-
-    border-radius:14px;
-
-    height:50px;
-
-}
-
-.search-box input{
-
-    flex:1;
-
-    border:none;
-
-    outline:none;
-
-    background:none;
-
-    color:white;
-
-}
-
 .icon-btn{
 
     width:48px;

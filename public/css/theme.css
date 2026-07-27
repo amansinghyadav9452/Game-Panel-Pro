@@ -48,7 +48,7 @@ html.light-theme body{
 }
 
 html.light-theme .sidebar{
-    background:rgba(255,255,255,.92) !important;
+    background:rgba(194, 190, 247, 0.473) !important;
     border-right:1px solid var(--border) !important;
 }
 
@@ -68,7 +68,7 @@ html.light-theme .modal-box{
 html.light-theme input,
 html.light-theme select,
 html.light-theme textarea{
-    background:#ffffff !important;
+    background:wheat !important;
     color:var(--text) !important;
     border:1px solid var(--border) !important;
 }
