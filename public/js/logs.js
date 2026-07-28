@@ -270,6 +270,17 @@ html += `
     </div>
     ` : ""}
 
+    ${log.appVersion ? `
+<div class="meta-row">
+    <span class="meta-label">
+        App :
+    </span>
+    <span class="meta-value">
+        ${log.appVersion}
+    </span>
+</div>
+` : ""}
+
     ${log.deviceModel ? `
     <div class="meta-row">
         <span class="meta-label">
@@ -278,13 +289,6 @@ html += `
         <span class="meta-value">
             ${log.deviceModel}
         </span>
-    </div>
-    ` : ""}
-
-            ${log.appVersion ? `
-    <div class="meta-row">
-        <span class="meta-label">
-            Mod Apk :
     </div>
     ` : ""}
 
