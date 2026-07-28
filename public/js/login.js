@@ -566,3 +566,318 @@ if (backToLoginLink) {
     });
 
 }
+
+/* -------------------------
+   Reset Password (3-step)
+-------------------------- */
+
+const openResetPasswordBtn = document.getElementById("openResetPasswordBtn");
+
+const resetUsernameOverlay = document.getElementById("resetUsernameOverlay");
+const resetUsernameInput = document.getElementById("resetUsername");
+const resetUsernameOk = document.getElementById("resetUsernameOk");
+const resetUsernameCancel = document.getElementById("resetUsernameCancel");
+
+const resetOtpOverlay = document.getElementById("resetOtpOverlay");
+const resetOtpInput = document.getElementById("resetOtp");
+const resetOtpOk = document.getElementById("resetOtpOk");
+const resetOtpCancel = document.getElementById("resetOtpCancel");
+
+const resetNewPasswordOverlay = document.getElementById("resetNewPasswordOverlay");
+const resetNewPasswordInput = document.getElementById("resetNewPassword");
+const resetConfirmPasswordInput = document.getElementById("resetConfirmPassword");
+const resetNewPasswordOk = document.getElementById("resetNewPasswordOk");
+const resetNewPasswordCancel = document.getElementById("resetNewPasswordCancel");
+
+let resetUsername = "";
+let resetOtpValue = "";
+
+function closeAllResetModals() {
+
+    resetUsernameOverlay.classList.remove("show");
+    resetOtpOverlay.classList.remove("show");
+    resetNewPasswordOverlay.classList.remove("show");
+
+    resetUsernameInput.value = "";
+    resetOtpInput.value = "";
+    resetNewPasswordInput.value = "";
+    resetConfirmPasswordInput.value = "";
+
+    resetUsername = "";
+    resetOtpValue = "";
+
+}
+
+if (openResetPasswordBtn) {
+
+    openResetPasswordBtn.addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+        resetUsernameOverlay.classList.add("show");
+
+    });
+
+}
+
+if (resetUsernameCancel) {
+
+    resetUsernameCancel.addEventListener("click", closeAllResetModals);
+
+}
+
+if (resetOtpCancel) {
+
+    resetOtpCancel.addEventListener("click", closeAllResetModals);
+
+}
+
+if (resetNewPasswordCancel) {
+
+    resetNewPasswordCancel.addEventListener("click", closeAllResetModals);
+
+}
+
+if (resetUsernameOk) {
+
+    resetUsernameOk.addEventListener("click", async () => {
+
+        const username = resetUsernameInput.value.trim();
+
+        if (!username) {
+
+            showMessage("Enter your username.", false);
+
+            return;
+
+        }
+
+        resetUsernameOk.disabled = true;
+
+        resetUsernameOk.textContent = "Sending...";
+
+        try {
+
+            const response = await fetch(
+
+                "/login/reset-password/send-otp",
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type": "application/json"
+
+                    },
+
+                    body: JSON.stringify({ username })
+
+                }
+
+            );
+
+            const data = await response.json();
+
+            resetUsernameOk.disabled = false;
+
+            resetUsernameOk.textContent = "OK";
+
+            if (data.success) {
+
+                resetUsername = username;
+
+                resetUsernameOverlay.classList.remove("show");
+
+                resetOtpOverlay.classList.add("show");
+
+            } else {
+
+                showMessage(data.message, false);
+
+            }
+
+        }
+
+        catch (err) {
+
+            resetUsernameOk.disabled = false;
+
+            resetUsernameOk.textContent = "OK";
+
+            showMessage("Server Connection Failed", false);
+
+        }
+
+    });
+
+}
+
+if (resetOtpOk) {
+
+    resetOtpOk.addEventListener("click", async () => {
+
+        const otp = resetOtpInput.value.trim();
+
+        if (!otp) {
+
+            showMessage("Enter the OTP.", false);
+
+            return;
+
+        }
+
+        resetOtpOk.disabled = true;
+
+        resetOtpOk.textContent = "Verifying...";
+
+        try {
+
+            const response = await fetch(
+
+                "/login/reset-password/verify-otp",
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type": "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        username: resetUsername,
+
+                        otp
+
+                    })
+
+                }
+
+            );
+
+            const data = await response.json();
+
+            resetOtpOk.disabled = false;
+
+            resetOtpOk.textContent = "OK";
+
+            if (data.success) {
+
+                resetOtpValue = otp;
+
+                resetOtpOverlay.classList.remove("show");
+
+                resetNewPasswordOverlay.classList.add("show");
+
+            } else {
+
+                showMessage(data.message, false);
+
+            }
+
+        }
+
+        catch (err) {
+
+            resetOtpOk.disabled = false;
+
+            resetOtpOk.textContent = "OK";
+
+            showMessage("Server Connection Failed", false);
+
+        }
+
+    });
+
+}
+
+if (resetNewPasswordOk) {
+
+    resetNewPasswordOk.addEventListener("click", async () => {
+
+        const newPassword = resetNewPasswordInput.value;
+
+        const confirmPassword = resetConfirmPasswordInput.value;
+
+        if (!newPassword || !confirmPassword) {
+
+            showMessage("Fill both password fields.", false);
+
+            return;
+
+        }
+
+        resetNewPasswordOk.disabled = true;
+
+        resetNewPasswordOk.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch(
+
+                "/login/reset-password/reset",
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type": "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        username: resetUsername,
+
+                        otp: resetOtpValue,
+
+                        newPassword,
+
+                        confirmPassword
+
+                    })
+
+                }
+
+            );
+
+            const data = await response.json();
+
+            resetNewPasswordOk.disabled = false;
+
+            resetNewPasswordOk.textContent = "OK";
+
+            if (data.success) {
+
+                closeAllResetModals();
+
+                window.location.href = "/login";
+
+            } else {
+
+                showMessage(data.message, false);
+
+            }
+
+        }
+
+        catch (err) {
+
+            resetNewPasswordOk.disabled = false;
+
+            resetNewPasswordOk.textContent = "OK";
+
+            showMessage("Server Connection Failed", false);
+
+        }
+
+    });
+
+}

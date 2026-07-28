@@ -5,8 +5,6 @@ let allLicenses = [];
 
 let currentFilter = "all";
 
-const searchInput = document.querySelector(".search-box input");
-
 const filterButtons =
 document.querySelectorAll(".filter-btn");
 
@@ -178,33 +176,7 @@ function renderLicenses(licenses) {
 
 function applyFilters() {
 
-    const keyword = searchInput.value
-        .trim()
-        .toLowerCase();
-
     let filtered = allLicenses.filter((license) => {
-
-        const matchSearch =
-
-            license.key.toLowerCase().includes(keyword) ||
-
-            license.status.toLowerCase().includes(keyword) ||
-
-            (license.type || "")
-                .toLowerCase()
-                .includes(keyword) ||
-
-String(license.maxUses || "").includes(keyword) ||
-
-new Date(license.expiry)
-    .toLocaleDateString()
-    .includes(keyword);
-
-        if (!matchSearch) {
-
-            return false;
-
-        }
 
         if (currentFilter === "all") {
 
@@ -219,12 +191,6 @@ new Date(license.expiry)
     renderLicenses(filtered);
 
 }
-
-searchInput.addEventListener("input", () => {
-
-    applyFilters();
-
-});
 
 filterButtons.forEach((button) => {
 

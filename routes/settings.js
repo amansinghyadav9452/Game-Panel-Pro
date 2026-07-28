@@ -1794,11 +1794,11 @@ router.post("/account/2fa/send-otp", auth, async (req, res) => {
 
         const otp = generateOtp();
 
-        req.admin.otpCode = await hashOtp(otp);
+        req.admin.setupOtpCode = await hashOtp(otp);
 
-        req.admin.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+        req.admin.setupOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
 
-        req.admin.pendingEmail = targetEmail;
+        req.admin.setupPendingEmail = targetEmail;
 
         await req.admin.save();
 
@@ -1822,7 +1822,7 @@ router.post("/account/2fa/send-otp", auth, async (req, res) => {
 
             success: false,
 
-            message: "Failed to send verification code."
+            message: error.message || "Failed to send verification code."
 
         });
 
@@ -1850,11 +1850,11 @@ router.post("/account/2fa/verify", auth, async (req, res) => {
 
         if (
 
-            !req.admin.otpCode ||
+            !req.admin.setupOtpCode ||
 
-            !req.admin.otpExpiresAt ||
+            !req.admin.setupOtpExpiresAt ||
 
-            req.admin.otpExpiresAt < Date.now()
+            req.admin.setupOtpExpiresAt < Date.now()
 
         ) {
 
@@ -1868,7 +1868,7 @@ router.post("/account/2fa/verify", auth, async (req, res) => {
 
         }
 
-        const matched = await compareOtp(otp, req.admin.otpCode);
+        const matched = await compareOtp(otp, req.admin.setupOtpCode);
 
         if (!matched) {
 
@@ -1884,13 +1884,13 @@ router.post("/account/2fa/verify", auth, async (req, res) => {
 
         req.admin.twoFactorEnabled = true;
 
-        req.admin.email = req.admin.pendingEmail || req.admin.email;
+        req.admin.email = req.admin.setupPendingEmail || req.admin.email;
 
-        req.admin.pendingEmail = "";
+        req.admin.setupPendingEmail = "";
 
-        req.admin.otpCode = "";
+        req.admin.setupOtpCode = "";
 
-        req.admin.otpExpiresAt = null;
+        req.admin.setupOtpExpiresAt = null;
 
         await req.admin.save();
 
@@ -1960,11 +1960,11 @@ router.post("/account/2fa/disable", auth, async (req, res) => {
 
         req.admin.twoFactorEnabled = false;
 
-        req.admin.otpCode = "";
+        req.admin.setupOtpCode = "";
 
-        req.admin.otpExpiresAt = null;
+        req.admin.setupOtpExpiresAt = null;
 
-        req.admin.pendingEmail = "";
+        req.admin.setupPendingEmail = "";
 
         await req.admin.save();
 

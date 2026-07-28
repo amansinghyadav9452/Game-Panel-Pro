@@ -38,7 +38,7 @@ email:{
 
 },
 
-otpCode:{
+loginOtpCode:{
 
     type:String,
 
@@ -46,7 +46,7 @@ otpCode:{
 
 },
 
-otpExpiresAt:{
+loginOtpExpiresAt:{
 
     type:Date,
 
@@ -54,11 +54,43 @@ otpExpiresAt:{
 
 },
 
-pendingEmail:{
+setupOtpCode:{
 
     type:String,
 
     default:""
+
+},
+
+setupOtpExpiresAt:{
+
+    type:Date,
+
+    default:null
+
+},
+
+setupPendingEmail:{
+
+    type:String,
+
+    default:""
+
+},
+
+resetOtpCode:{
+
+    type:String,
+
+    default:""
+
+},
+
+resetOtpExpiresAt:{
+
+    type:Date,
+
+    default:null
 
 },
 

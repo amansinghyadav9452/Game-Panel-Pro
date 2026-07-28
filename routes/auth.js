@@ -135,9 +135,9 @@ if (admin.twoFactorEnabled) {
 
     const otp = generateOtp();
 
-    admin.otpCode = await hashOtp(otp);
+    admin.loginOtpCode = await hashOtp(otp);
 
-    admin.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+    admin.loginOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
 
     await admin.save();
 
@@ -181,7 +181,7 @@ if (settings?.security?.forceSingleLogin) {
 
             success: false,
 
-            message: "Server Error"
+            message: err.message || "Server Error"
 
         });
 
@@ -223,11 +223,11 @@ router.post("/login/2fa/verify", async (req, res) => {
 
         if (
 
-            !admin.otpCode ||
+            !admin.loginOtpCode ||
 
-            !admin.otpExpiresAt ||
+            !admin.loginOtpExpiresAt ||
 
-            admin.otpExpiresAt < Date.now()
+            admin.loginOtpExpiresAt < Date.now()
 
         ) {
 
@@ -241,7 +241,7 @@ router.post("/login/2fa/verify", async (req, res) => {
 
         }
 
-        const matched = await compareOtp(otp, admin.otpCode);
+        const matched = await compareOtp(otp, admin.loginOtpCode);
 
         if (!matched) {
 
@@ -255,9 +255,9 @@ router.post("/login/2fa/verify", async (req, res) => {
 
         }
 
-        admin.otpCode = "";
+        admin.loginOtpCode = "";
 
-        admin.otpExpiresAt = null;
+        admin.loginOtpExpiresAt = null;
 
         const settings = await Settings.findOne();
 
@@ -319,9 +319,9 @@ router.post("/login/2fa/resend", async (req, res) => {
 
         const otp = generateOtp();
 
-        admin.otpCode = await hashOtp(otp);
+        admin.loginOtpCode = await hashOtp(otp);
 
-        admin.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+        admin.loginOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
 
         await admin.save();
 
@@ -382,4 +382,307 @@ router.get("/login", async (req, res) => {
     });
 
 });
+router.post("/login/reset-password/send-otp", async (req, res) => {
+
+    try {
+
+        const { username } = req.body;
+
+        if (!username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Username is required."
+
+            });
+
+        }
+
+        const admin = await Admin.findOne({ username });
+
+        if (!admin) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Admin not found."
+
+            });
+
+        }
+
+        if (!admin.email) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "No recovery email on file for this account."
+
+            });
+
+        }
+
+        const otp = generateOtp();
+
+        admin.resetOtpCode = await hashOtp(otp);
+
+        admin.resetOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+
+        await admin.save();
+
+        await sendOtpEmail(admin.email, otp);
+
+        return res.json({
+
+            success: true,
+
+            message: "Verification code sent to " + admin.email + "."
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: err.message || "Failed to send code."
+
+        });
+
+    }
+
+});
+
+router.post("/login/reset-password/verify-otp", async (req, res) => {
+
+    try {
+
+        const { username, otp } = req.body;
+
+        if (!username || !otp) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Username and code are required."
+
+            });
+
+        }
+
+        const admin = await Admin.findOne({ username });
+
+        if (!admin) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Admin not found."
+
+            });
+
+        }
+
+        if (
+
+            !admin.resetOtpCode ||
+
+            !admin.resetOtpExpiresAt ||
+
+            admin.resetOtpExpiresAt < Date.now()
+
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Code expired. Please request a new one."
+
+            });
+
+        }
+
+        const matched = await compareOtp(otp, admin.resetOtpCode);
+
+        if (!matched) {
+
+            return res.status(401).json({
+
+                success: false,
+
+                message: "Invalid verification code."
+
+            });
+
+        }
+
+        return res.json({
+
+            success: true,
+
+            message: "Code verified."
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: err.message || "Verification failed."
+
+        });
+
+    }
+
+});
+
+router.post("/login/reset-password/reset", async (req, res) => {
+
+    try {
+
+        const {
+            username,
+            otp,
+            newPassword,
+            confirmPassword
+        } = req.body;
+
+        if (!username || !otp || !newPassword || !confirmPassword) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "All fields are required."
+
+            });
+
+        }
+
+        if (newPassword !== confirmPassword) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Passwords do not match."
+
+            });
+
+        }
+
+        if (newPassword.length < 6) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Password must be at least 6 characters."
+
+            });
+
+        }
+
+        const admin = await Admin.findOne({ username });
+
+        if (!admin) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Admin not found."
+
+            });
+
+        }
+
+        if (
+
+            !admin.resetOtpCode ||
+
+            !admin.resetOtpExpiresAt ||
+
+            admin.resetOtpExpiresAt < Date.now()
+
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Code expired. Please request a new one."
+
+            });
+
+        }
+
+        const matched = await compareOtp(otp, admin.resetOtpCode);
+
+        if (!matched) {
+
+            return res.status(401).json({
+
+                success: false,
+
+                message: "Invalid verification code."
+
+            });
+
+        }
+
+        admin.password = await bcrypt.hash(newPassword, 10);
+
+        admin.resetOtpCode = "";
+
+        admin.resetOtpExpiresAt = null;
+
+        admin.sessionVersion++;
+
+        await admin.save();
+
+        return res.json({
+
+            success: true,
+
+            message: "Password reset successfully. Please login."
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: err.message || "Failed to reset password."
+
+        });
+
+    }
+
+});
+
 module.exports = router;
