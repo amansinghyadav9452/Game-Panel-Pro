@@ -2,7 +2,7 @@
   "name": "Game Panel - Admin",
   "short_name": "Game Panel",
   "description": "Enterprise Security Management admin panel",
-  "start_url": "/panel",
+  "start_url": "/login",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
