@@ -270,6 +270,17 @@ html += `
     </div>
     ` : ""}
 
+        ${log.appVersion ? `
+    <div class="meta-row">
+        <span class="meta-label">
+            App :
+        </span>
+        <span class="meta-value">
+            ${log.appVersion}
+        </span>
+    </div>
+    ` : ""}
+
     ${log.deviceModel ? `
     <div class="meta-row">
         <span class="meta-label">

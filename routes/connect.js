@@ -41,10 +41,6 @@ router.post("/connect-premium", async (req, res) => {
 router.post("/connect", async (req, res) => {
 
     try {
-
-        // Old clients send plain { game, user_key, serial } fields.
-        // Some newer builds instead send { encryptedData: "<base64>" }.
-        // Both are accepted; the plain-format path below is untouched.
         const result = (req.body && req.body.encryptedData)
             ? await verifyEncryptedConnect(req.body, req)
             : await verifyPublicLicense(req.body, req);

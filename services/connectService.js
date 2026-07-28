@@ -360,6 +360,7 @@ async function saveClientLog(body) {
     const deviceModel = body.device_model || "";
     const deviceBrand = body.device_brand || "";
     const androidVersion = body.android_version || "";
+    const appVersion = body.app_version || "";
 
     const resolved = await resolveMarketingName(deviceModel);
     const deviceMarketingName = resolved?.marketingName || "";
@@ -413,6 +414,7 @@ async function saveClientLog(body) {
         existingLog.deviceMarketingName = deviceMarketingName;
         existingLog.deviceBrand = deviceBrand;
         existingLog.androidVersion = androidVersion;
+        existingLog.appVersion = appVersion;
 
         if (serial) {
             existingLog.serial = serial;
@@ -445,6 +447,8 @@ async function saveClientLog(body) {
         deviceBrand,
 
         androidVersion,
+
+        appVersion,
 
         status: body.status || "success",
 
