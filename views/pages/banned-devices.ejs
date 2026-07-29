@@ -1,9 +1,42 @@
-<div class="page-header">
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-    <h2>Banned Devices</h2>
+<title>Game Panel | Banned Devices</title>
+<%- include("../partials/head") %>
+
+</head>
+
+<body>
+
+<div id="overlay"></div>
+
+<%- include("../partials/toast") %>
+<%- include("../partials/confirm-modal") %>
+
+<div class="layout">
+
+<%- include("../partials/sidebar") %>
+
+    <main class="content">
+
+        <%- include("../partials/topbar") %>
+
+        <section class="overview-section">
+
+            <div id="bannedDevicesContainer">
+
+                <p style="color:#94A3B8">Loading...</p>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<div id="bannedDevicesContainer"></div>
-
 <script src="/js/banned-devices.js"></script>
+
+</body>
+</html>

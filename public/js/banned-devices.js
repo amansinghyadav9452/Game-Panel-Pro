@@ -70,7 +70,7 @@ async function loadBannedDevices() {
 
         </div>
 
-        <button onclick="unbanDevice('${device.serial}')">
+        <button class="unban-btn" data-serial="${device.serial}">
 
             Unban
 
@@ -85,6 +85,16 @@ async function loadBannedDevices() {
         });
 
         container.innerHTML = html;
+
+        container.querySelectorAll(".unban-btn").forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                unbanDevice(button.dataset.serial);
+
+            });
+
+        });
 
     } catch (err) {
 

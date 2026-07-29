@@ -1,0 +1,91 @@
+/* ==========================
+   BAN DEVICE MODAL
+========================== */
+
+.ban-icon{
+
+    color:#EF4444;
+
+    background:rgba(239,68,68,.15);
+
+}
+
+.ban-modal p#banDeviceLabel{
+
+    margin-bottom:18px;
+
+}
+
+.ban-modal .ban-device-name{
+
+    color:#F8FAFC;
+
+    font-weight:600;
+
+}
+
+.ban-reason-field{
+
+    text-align:left;
+
+    margin-bottom:24px;
+
+}
+
+.ban-reason-field label{
+
+    display:block;
+
+    color:#94A3B8;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    margin-bottom:8px;
+
+}
+
+.ban-reason-field textarea{
+
+    width:100%;
+
+    resize:vertical;
+
+    min-height:70px;
+
+    background:#0B1220;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:12px;
+
+    padding:12px 14px;
+
+    color:#F8FAFC;
+
+    font-family:inherit;
+
+    font-size:14px;
+
+    line-height:1.5;
+
+    transition:.2s;
+
+}
+
+.ban-reason-field textarea::placeholder{
+
+    color:#475569;
+
+}
+
+.ban-reason-field textarea:focus{
+
+    outline:none;
+
+    border-color:#EF4444;
+
+    box-shadow:0 0 0 3px rgba(239,68,68,.15);
+
+}

@@ -398,7 +398,13 @@ router.put("/dashboard/reset-device/:key", auth, async (req, res) => {
 
 router.get("/banned-devices", (req, res) => {
 
-    res.render("banned-devices");
+    res.render("banned-devices", {
+
+        activePage: "banned-devices",
+        pageTitle: "Banned Devices",
+        admin: req.admin
+
+    });
 
 });
 

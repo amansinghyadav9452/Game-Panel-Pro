@@ -237,19 +237,17 @@ html += `
 
     <h3>${log.licenseKey}</h3>
 
-<span class="status-pill ${
-    isBanned
-        ? "failed"
-        : (success ? "success" : "failed")
-}">
+<span class="status-pill ${success ? "success" : "failed"}">
 
-    ${
-        isBanned
-            ? "BANNED"
-            : (success ? "Success" : "Failed")
-    }
+    ${success ? "Success" : "Failed"}
 
 </span>
+
+${
+    isBanned
+        ? `<span class="status-pill failed" title="This device's serial is currently in the banned list">🚫 Banned Device</span>`
+        : ""
+}
 
 </div>
 
@@ -442,15 +440,14 @@ function showDeviceMenu(serial){
 
 function openBanModal(log){
 
-    const reason = prompt(
-        `Ban device?\n\nDevice : ${log.deviceMarketingName || log.deviceModel || "-"}\n\nReason (optional):`
-    );
+    const deviceLabel =
+        log.deviceMarketingName || log.deviceModel || "this device";
 
-    if(reason === null){
-        return;
-    }
+    showBanModal(deviceLabel, (reason) => {
 
-    banDevice(log.serial, reason);
+        banDevice(log.serial, reason);
+
+    });
 
 }
 
