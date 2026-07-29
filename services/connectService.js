@@ -1,5 +1,6 @@
 const License = require("../models/License");
 const UserLog = require("../models/UserLog");
+const BannedDevice = require("../models/BannedDevice");
 const md5 = require("md5");
 const { resolveMarketingName } = require("./deviceLookup");
 const { encryptAES, decryptAES, generateSignature } = require("./cryptoBridge");
@@ -116,6 +117,35 @@ if (!serial) {
         status: false,
 
         reason: "Serial Missing"
+
+    };
+
+}
+
+const bannedDevice = await BannedDevice.findOne({
+    serial
+});
+
+if (bannedDevice) {
+
+    await UserLog.create({
+
+        licenseKey: user_key,
+        licenseType: expectedType,
+        serial,
+        deviceModel: body.device_model || "",
+        deviceBrand: body.device_brand || "",
+        androidVersion: body.android_version || "",
+        status: "failed",
+        reason: "Device Banned"
+
+    });
+
+    return {
+
+        status: false,
+
+        reason: "You are banned by admin."
 
     };
 

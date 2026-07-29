@@ -12,6 +12,8 @@ if (typeof initSidebar === "function") {
 
 initAutoLogout();
 let currentPage = 1;
+let allLogs = [];
+let bannedDevices = [];
 const limit = 100;
 
 function getLastSeen(date) {
@@ -63,6 +65,19 @@ async function loadLogs(page = currentPage) {
         });
 
         const data = await response.json();
+        const bannedResponse = await fetch("/api/banned-devices", {
+
+    headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+
+});
+
+const bannedData = await bannedResponse.json();
+console.log("Banned Devices:", bannedData);
+
+bannedDevices = bannedData.map(device => device.serial);
+        allLogs = data.logs;
 
         const successLogs = data.logs.filter(
     log => log.status === "success"
@@ -198,6 +213,8 @@ let html = `
         data.logs.forEach(log => {
 const success = log.status === "success";
 
+const isBanned = bannedDevices.includes(log.serial);
+
 html += `
 
 <div class="log-card ${success ? "success" : "failed"}">
@@ -206,11 +223,13 @@ html += `
 
 <div class="log-top">
 
-    <div class="device-icon">
+<div
+    class="device-action"
+    data-serial="${log.serial}">
 
-        <i class="fas fa-mobile-alt"></i>
+    <i class="fa-solid fa-mobile-screen-button"></i>
 
-    </div>
+</div>
 
     <div class="log-title">
 
@@ -218,11 +237,19 @@ html += `
 
     <h3>${log.licenseKey}</h3>
 
-    <span class="status-pill ${success ? "success" : "failed"}">
+<span class="status-pill ${
+    isBanned
+        ? "failed"
+        : (success ? "success" : "failed")
+}">
 
-        ${success ? "Success" : "Failed"}
+    ${
+        isBanned
+            ? "BANNED"
+            : (success ? "Success" : "Failed")
+    }
 
-    </span>
+</span>
 
 </div>
 
@@ -354,6 +381,19 @@ html += `
 
         container.innerHTML = html;
 
+        container.querySelectorAll(".device-action")
+.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        showDeviceMenu(
+            button.dataset.serial
+        );
+
+    });
+
+});
+
         const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 
@@ -383,6 +423,118 @@ if (nextBtn && !nextBtn.disabled) {
 
         container.innerHTML =
             `<p style="color:#EF4444;">Server Error.</p>`;
+
+    }
+
+}
+
+function showDeviceMenu(serial){
+
+    const log = allLogs.find(x => x.serial === serial);
+
+    if(!log){
+        return;
+    }
+
+    openBanModal(log);
+
+}
+
+function openBanModal(log){
+
+    const reason = prompt(
+        `Ban device?\n\nDevice : ${log.deviceMarketingName || log.deviceModel || "-"}\n\nReason (optional):`
+    );
+
+    if(reason === null){
+        return;
+    }
+
+    banDevice(log.serial, reason);
+
+}
+
+async function banDevice(serial, reason = ""){
+
+    try{
+
+        const log = allLogs.find(
+            x => x.serial === serial
+        );
+
+        if(!log){
+
+            showToast(
+                "Device not found",
+                "error"
+            );
+
+            return;
+
+        }
+
+        const response = await fetch(
+            "/api/banned-devices/ban",
+            {
+
+                method:"POST",
+            headers:{
+
+                "Content-Type":"application/json",
+
+                Authorization:`Bearer ${localStorage.getItem("token")}`
+
+            },
+
+                body:JSON.stringify({
+
+                    serial:log.serial,
+
+                    userKey:log.licenseKey,
+
+                    deviceBrand:log.deviceBrand,
+
+                    deviceModel:log.deviceModel,
+
+                    androidVersion:log.androidVersion,
+
+                    appVersion:log.appVersion,
+
+                    bannedBy:"Admin",
+
+                    reason:reason || "No reason provided"
+
+                })
+
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.success){
+
+            showToast(
+                "Device banned successfully",
+                "success"
+            );
+
+            await loadLogs(currentPage);
+
+        }else{
+
+            showToast(
+                data.message,
+                "error"
+            );
+
+        }
+
+    }catch(e){
+
+        showToast(
+            "Unable to ban device",
+            "error"
+        );
 
     }
 

@@ -282,9 +282,51 @@
 
 }
 
+.device-action{
+
+    width:46px;
+
+    height:46px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    position:relative;
+
+    z-index:100;
+
+    flex-shrink:0;
+
+}
+
+.device-action i{
+
+    font-size:22px;
+
+    color:#F8FAFC;
+
+    pointer-events:none;
+
+}
+
+.device-action:hover{
+
+    background:rgba(59,130,246,.15);
+
+}
+
 .log-title{
 
     flex:1;
+
+    pointer-events: none;
 
 }
 

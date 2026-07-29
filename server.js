@@ -20,6 +20,7 @@ const premiumRoutes = require("./routes/premium");
 const settingsRoutes = require("./routes/settings");
 const logsRoutes = require("./routes/logs");
 const createSettings = require("./services/createSettings");
+const bannedDeviceRoutes = require("./routes/bannedDevices");
 
 
 const app = express();
@@ -92,6 +93,7 @@ app.use(activityRoutes);
 app.use(premiumRoutes);
 app.use("/settings", settingsRoutes);
 app.use("/logs", logsRoutes);
+app.use("/api/banned-devices", bannedDeviceRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {
