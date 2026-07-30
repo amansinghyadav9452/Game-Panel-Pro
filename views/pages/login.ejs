@@ -24,6 +24,8 @@
 
     <link rel="stylesheet" href="/css/components/password-modal.css">
 
+    <link rel="stylesheet" href="/css/components/otp-verify-modal.css">
+
     <link rel="manifest" href="/manifest.json">
 
     <meta name="theme-color" content="#0F172A">
@@ -237,64 +239,6 @@ data-sitekey="0x4AAAAAADz59UgKdhvFUXRc">
 
             </form>
 
-            <div id="otpStep" class="otp-step" style="display:none;">
-
-                <div class="input-group">
-
-                    <label>Enter Verification Code</label>
-
-                    <p style="color:#94A3B8;font-size:13px;margin:4px 0 12px;">
-
-                        We sent a 6-digit code to your email.
-
-                    </p>
-
-                    <div class="input-box">
-
-                        <i class="fa-solid fa-key"></i>
-
-                        <input
-                            type="text"
-                            id="otpInput"
-                            maxlength="6"
-                            inputmode="numeric"
-                            placeholder="Enter 6-digit code">
-
-                    </div>
-
-                </div>
-
-                <button
-                    class="login-btn"
-                    id="verifyOtpBtn"
-                    type="button">
-
-                    <i class="fa-solid fa-check"></i>
-
-                    Verify Code
-
-                </button>
-
-                <p style="text-align:center;margin-top:14px;">
-
-                    <a href="#" id="resendOtpLink" style="color:#d4d4d4;font-size:13px;">
-
-                        Resend Code
-
-                    </a>
-
-                    &nbsp;•&nbsp;
-
-                    <a href="#" id="backToLoginLink" style="color:#a3a3a3;font-size:13px;">
-
-                        Back to Login
-
-                    </a>
-
-                </p>
-
-            </div>
-
             <div id="message"></div>
 
             <div class="footer">
@@ -411,8 +355,11 @@ Protected by Cloudflare Turnstile • JWT • MongoDB
 
     </div>
 
+    <%- include("../partials/otp-verify-modal") %>
+
 <script src="/vendor/simplewebauthn.js"></script>
 <script src="/js/login.js"></script>
+<script src="/js/otp-verify-modal.js"></script>
 <% if (settings?.security?.turnstileEnabled) { %>
 
 <script

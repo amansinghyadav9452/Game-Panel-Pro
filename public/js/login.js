@@ -89,54 +89,24 @@ body: JSON.stringify({
 
 if (data.success && data.twoFactorRequired) {
 
-    try {
+    pendingUsername = username.value.trim();
 
-        pendingUsername = username.value.trim();
+    if (typeof openOtpVerifyModal === "function") {
 
-        form.style.display = "none";
+        openOtpVerifyModal(pendingUsername);
 
-        const securityStatus = document.getElementById("securityStatus");
+    } else {
 
-        if (securityStatus) securityStatus.style.display = "none";
-
-        const otpStep = document.getElementById("otpStep");
-
-        if (!otpStep) {
-
-            throw new Error("otpStep element not found in DOM - login.ejs may not be updated.");
-
-        }
-
-        otpStep.style.display = "block";
-        otpStep.style.visibility = "visible";
-        otpStep.style.opacity = "1";
-
-        const otpField = document.getElementById("otpInput");
-
-        if (otpField) {
-
-            otpField.value = "";
-
-            setTimeout(() => otpField.focus(), 100);
-
-        }
-
-        loginBtn.disabled = false;
-
-        loginBtn.innerHTML =
-            `<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
-
-        showMessage("Verification code sent to your email.", true);
+        showMessage("Could not show verification screen. Please refresh and try again.", false);
 
     }
 
-    catch (stepError) {
+    loginBtn.disabled = false;
 
-        console.error("2FA step error:", stepError);
+    loginBtn.innerHTML =
+        `<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
 
-        showMessage("Could not show verification screen: " + stepError.message, false);
-
-    }
+    showMessage("Verification code sent to your email.", true);
 
 } else if (data.success) {
 
@@ -393,180 +363,6 @@ window.location.href = "/panel";
     });
 
 }
-/* -------------------------
-   OTP Verification (2FA)
--------------------------- */
-
-const verifyOtpBtn = document.getElementById("verifyOtpBtn");
-
-const otpInput = document.getElementById("otpInput");
-
-const resendOtpLink = document.getElementById("resendOtpLink");
-
-if (verifyOtpBtn) {
-
-    verifyOtpBtn.addEventListener("click", async () => {
-
-        const otp = otpInput.value.trim();
-
-        if (!otp) {
-
-            showMessage("Enter the verification code.", false);
-
-            return;
-
-        }
-
-        verifyOtpBtn.disabled = true;
-
-        verifyOtpBtn.innerHTML =
-            `<i class="fa-solid fa-spinner fa-spin"></i> Verifying...`;
-
-        try {
-
-            const response = await fetch("/login/2fa/verify", {
-
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type": "application/json"
-
-                },
-
-                body: JSON.stringify({
-
-                    username: pendingUsername,
-
-                    otp
-
-                })
-
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-
-                localStorage.setItem("token", data.token);
-
-                localStorage.setItem(
-                    "logoutAt",
-                    Date.now() + 15 * 60 * 1000
-                );
-
-                verifyOtpBtn.innerHTML =
-                    `<i class="fa-solid fa-check"></i> Success`;
-
-                setTimeout(() => {
-
-                    window.location.href = "/panel";
-
-                }, 700);
-
-            } else {
-
-                showMessage(data.message, false);
-
-                verifyOtpBtn.disabled = false;
-
-                verifyOtpBtn.innerHTML =
-                    `<i class="fa-solid fa-check"></i> Verify Code`;
-
-            }
-
-        }
-
-        catch (err) {
-
-            showMessage("Server Connection Failed", false);
-
-            verifyOtpBtn.disabled = false;
-
-            verifyOtpBtn.innerHTML =
-                `<i class="fa-solid fa-check"></i> Verify Code`;
-
-        }
-
-    });
-
-}
-
-if (resendOtpLink) {
-
-    resendOtpLink.addEventListener("click", async (e) => {
-
-        e.preventDefault();
-
-        try {
-
-            const response = await fetch("/login/2fa/resend", {
-
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type": "application/json"
-
-                },
-
-                body: JSON.stringify({
-
-                    username: pendingUsername
-
-                })
-
-            });
-
-            const data = await response.json();
-
-            showMessage(
-
-                data.message ||
-                    "A new code has been sent if applicable.",
-
-                data.success
-
-            );
-
-        }
-
-        catch (err) {
-
-            showMessage("Server Connection Failed", false);
-
-        }
-
-    });
-
-}
-
-const backToLoginLink = document.getElementById("backToLoginLink");
-
-if (backToLoginLink) {
-
-    backToLoginLink.addEventListener("click", (e) => {
-
-        e.preventDefault();
-
-        pendingUsername = "";
-
-        document.getElementById("otpStep").style.display = "none";
-
-        const securityStatus = document.getElementById("securityStatus");
-
-        if (securityStatus) securityStatus.style.display = "flex";
-
-        form.style.display = "block";
-
-        password.value = "";
-
-        message.innerHTML = "";
-
-    });
-
-}
-
 /* -------------------------
    Reset Password (3-step)
 -------------------------- */

@@ -1,0 +1,52 @@
+<div class="otp-verify-overlay" id="otpVerifyOverlay">
+
+    <div class="otp-verify-modal">
+
+        <div class="otp-verify-icon">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+        </div>
+
+        <h3>Two-Factor Verification</h3>
+
+        <p>
+            For your security, this account requires a verification code.
+            Enter the 6-digit code sent to your registered email to finish signing in.
+        </p>
+
+        <div class="otp-verify-input">
+
+            <input
+                type="text"
+                id="otpVerifyInput"
+                maxlength="6"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="one-time-code"
+                placeholder="• • • • • •">
+
+        </div>
+
+        <p class="otp-verify-message" id="otpVerifyMessage"></p>
+
+        <div class="otp-verify-actions">
+
+            <button type="button" id="otpVerifyCancel" class="otp-btn secondary">
+                Cancel
+            </button>
+
+            <button type="button" id="otpVerifyConfirm" class="otp-btn primary">
+                <i class="fa-solid fa-check"></i> Verify Code
+            </button>
+
+        </div>
+
+        <p class="otp-verify-resend">
+            Didn't get a code?
+            <a href="#" id="otpVerifyResend">Resend code</a>
+        </p>
+
+    </div>
+
+</div>

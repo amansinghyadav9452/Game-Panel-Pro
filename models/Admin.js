@@ -54,6 +54,14 @@ loginOtpExpiresAt:{
 
 },
 
+loginOtpAttempts:{
+
+    type:Number,
+
+    default:0
+
+},
+
 setupOtpCode:{
 
     type:String,

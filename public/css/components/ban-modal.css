@@ -89,3 +89,29 @@
     box-shadow:0 0 0 3px rgba(239,68,68,.15);
 
 }
+
+/* ==========================
+   MOBILE BUTTON WIDTH
+========================== */
+
+@media (max-width:768px){
+
+    .ban-modal .confirm-actions{
+
+        width:100%;
+
+        gap:12px;
+
+    }
+
+    .ban-modal .confirm-btn{
+
+        width:100%;
+
+        min-height:48px;
+
+        font-size:15px;
+
+    }
+
+}

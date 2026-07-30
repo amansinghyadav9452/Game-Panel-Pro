@@ -139,6 +139,8 @@ if (admin.twoFactorEnabled) {
 
     admin.loginOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
 
+    admin.loginOtpAttempts = 0;
+
     await admin.save();
 
     await sendOtpEmail(admin.email, otp);
@@ -241,15 +243,41 @@ router.post("/login/2fa/verify", async (req, res) => {
 
         }
 
+        if (
+            admin.loginOtpAttempts >= 5
+        ) {
+
+            admin.loginOtpCode = "";
+            admin.loginOtpExpiresAt = null;
+            admin.loginOtpAttempts = 0;
+
+            await admin.save();
+
+            return res.status(429).json({
+
+                success: false,
+
+                message: "Too many incorrect attempts. Please login again."
+
+            });
+
+        }
+
         const matched = await compareOtp(otp, admin.loginOtpCode);
 
         if (!matched) {
+
+            admin.loginOtpAttempts = (admin.loginOtpAttempts || 0) + 1;
+
+            await admin.save();
 
             return res.status(401).json({
 
                 success: false,
 
-                message: "Invalid verification code."
+                message: "Invalid verification code.",
+
+                attemptsRemaining: Math.max(0, 5 - admin.loginOtpAttempts)
 
             });
 
@@ -258,6 +286,8 @@ router.post("/login/2fa/verify", async (req, res) => {
         admin.loginOtpCode = "";
 
         admin.loginOtpExpiresAt = null;
+
+        admin.loginOtpAttempts = 0;
 
         const settings = await Settings.findOne();
 
@@ -322,6 +352,8 @@ router.post("/login/2fa/resend", async (req, res) => {
         admin.loginOtpCode = await hashOtp(otp);
 
         admin.loginOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+
+        admin.loginOtpAttempts = 0;
 
         await admin.save();
 
