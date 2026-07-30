@@ -48,12 +48,12 @@ const settingsSchema = new mongoose.Schema({
 
         publicExpiry:{
             type:Number,
-            default:30
+            default:1
         },
 
         premiumExpiry:{
             type:Number,
-            default:30
+            default:1
         },
 
         maxDevices:{
