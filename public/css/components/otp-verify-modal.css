@@ -202,7 +202,7 @@
 
 .otp-btn.secondary{
 
-    background:#1E293B;
+    background:#334155;
 
     color:#F8FAFC;
 
@@ -210,21 +210,29 @@
 
 .otp-btn.secondary:hover{
 
-    background:#334155;
+    background:#475569;
 
 }
 
 .otp-btn.primary{
 
-    background:#60A5FA;
+    background:linear-gradient(
+        135deg,
+        #60A5FA,
+        #2563EB
+    );
 
-    color:#0B1220;
+    color:#FFFFFF;
+
+    box-shadow:0 10px 24px rgba(59,130,246,.35);
 
 }
 
 .otp-btn.primary:hover{
 
-    background:#3B82F6;
+    transform:translateY(-2px);
+
+    box-shadow:0 14px 30px rgba(59,130,246,.45);
 
 }
 
@@ -262,11 +270,51 @@
 
 }
 
-@media(max-width:480px){
+@media (max-width:768px){
+
+    .otp-verify-modal{
+
+        width:94%;
+
+        padding:24px;
+
+    }
 
     .otp-verify-actions{
 
-        flex-direction:column;
+        display:flex;
+
+        flex-direction:row;
+
+        gap:12px;
+
+    }
+
+    .otp-btn{
+
+        flex:1;
+
+        min-width:0;
+
+        height:50px;
+
+        font-size:15px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        gap:8px;
+
+    }
+
+    .otp-verify-input input{
+
+        letter-spacing:8px;
+
+        font-size:20px;
 
     }
 
