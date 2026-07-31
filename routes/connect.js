@@ -11,7 +11,7 @@ const {
     saveClientLog
 } = require("../services/connectService");
 
-router.post("/connect-premium", apiAccess("premium"), async (req, res) => {
+router.post("/cheeta-premium", apiAccess("premium"), async (req, res) => {
     console.log("Premium License called");
 
     try {
@@ -40,7 +40,7 @@ router.post("/connect-premium", apiAccess("premium"), async (req, res) => {
 
 });
 
-router.post("/connect", apiAccess("public"), async (req, res) => {
+router.post("/cheeta-public", apiAccess("public"), async (req, res) => {
 
     try {
         const result = (req.body && req.body.encryptedData)
