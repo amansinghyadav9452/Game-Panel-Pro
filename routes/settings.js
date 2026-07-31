@@ -1110,10 +1110,6 @@ router.put("/license",  auth, async (req, res) => {
 
         const {
 
-            publicPrefix,
-
-            premiumPrefix,
-
             publicExpiry,
 
             premiumExpiry,
@@ -1125,6 +1121,60 @@ router.put("/license",  auth, async (req, res) => {
             autoUppercase
 
         } = req.body;
+
+        const numPublicExpiry = Number(publicExpiry);
+        const numPremiumExpiry = Number(premiumExpiry);
+        const numMaxDevices = Number(maxDevices);
+        const numLicenseLength = Number(licenseLength);
+
+        if (
+
+            !Number.isFinite(numPublicExpiry) || numPublicExpiry < 0 || numPublicExpiry > 3650 ||
+            !Number.isFinite(numPremiumExpiry) || numPremiumExpiry < 0 || numPremiumExpiry > 3650
+
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Expiry must be a number between 0 and 3650 days."
+
+            });
+
+        }
+
+        if (
+
+            !Number.isFinite(numMaxDevices) || numMaxDevices < 1 || numMaxDevices > 100
+
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Maximum devices must be a number between 1 and 100."
+
+            });
+
+        }
+
+        if (
+
+            !Number.isFinite(numLicenseLength) || numLicenseLength < 6 || numLicenseLength > 32
+
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "License length must be a number between 6 and 32."
+
+            });
+
+        }
 
         const settings = await Settings.findOne();
 
@@ -1140,19 +1190,15 @@ router.put("/license",  auth, async (req, res) => {
 
         }
 
-        settings.license.publicPrefix = publicPrefix.trim();
+        settings.license.publicExpiry = numPublicExpiry;
 
-        settings.license.premiumPrefix = premiumPrefix.trim();
+        settings.license.premiumExpiry = numPremiumExpiry;
 
-        settings.license.publicExpiry = Number(publicExpiry);
+        settings.license.maxDevices = numMaxDevices;
 
-        settings.license.premiumExpiry = Number(premiumExpiry);
+        settings.license.licenseLength = numLicenseLength;
 
-        settings.license.maxDevices = Number(maxDevices);
-
-        settings.license.licenseLength = Number(licenseLength);
-
-        settings.license.autoUppercase = autoUppercase;
+        settings.license.autoUppercase = autoUppercase === true || autoUppercase === "true";
 
         await settings.save();
 

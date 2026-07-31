@@ -48,27 +48,17 @@ const settingsSchema = new mongoose.Schema({
 
         publicExpiry:{
             type:Number,
-            default:1
+            default:30
         },
 
         premiumExpiry:{
             type:Number,
-            default:1
+            default:30
         },
 
         maxDevices:{
             type:Number,
             default:1
-        },
-
-        publicPrefix:{
-            type:String,
-            default:"PUB"
-        },
-
-        premiumPrefix:{
-            type:String,
-            default:"PREM"
         },
 
         licenseLength:{

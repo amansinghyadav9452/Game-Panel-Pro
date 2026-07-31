@@ -2,6 +2,7 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const logActivity = require("../services/activityLogger");
 const License = require("../models/License")
+const Settings = require("../models/Settings");
 const apiAccess = require("../middleware/apiAccess");
 const deleteExpiredLicenses = require("../services/licenseCleanup");
 
@@ -49,11 +50,28 @@ router.post("/premium/create", auth, apiAccess("premium"), async (req, res) => {
             maxUses
         } = req.body;
 
+        let finalExpiryDays = Number(expiryDays);
+        let finalMaxUses = Number(maxUses);
+
+        if (!Number.isFinite(finalExpiryDays) || !Number.isFinite(finalMaxUses)) {
+
+            const settings = await Settings.findOne();
+
+            if (!Number.isFinite(finalExpiryDays)) {
+                finalExpiryDays = settings ? settings.license.premiumExpiry : 30;
+            }
+
+            if (!Number.isFinite(finalMaxUses)) {
+                finalMaxUses = settings ? settings.license.maxDevices : 1;
+            }
+
+        }
+
         const license = await createLicense(
             key,
             "premium",
-            expiryDays,
-            maxUses,
+            finalExpiryDays,
+            finalMaxUses,
             req.admin.username
         );
 
