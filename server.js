@@ -14,6 +14,7 @@ const publicRoutes = require("./routes/public");
 const connectRoutes = require("./routes/connect");
 const errorHandler = require("./middleware/errorHandler");
 const rateLimiter = require("./middleware/rateLimiter");
+const connectRateLimiter = require("./middleware/connectRateLimiter");
 const sanitizeInput = require("./middleware/sanitizeInput");
 const activityRoutes = require("./routes/activity");
 const premiumRoutes = require("./routes/premium");
@@ -38,7 +39,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(sanitizeInput);
 app.use(cors());
-app.use(rateLimiter);
 
 app.use(
     helmet({
@@ -83,17 +83,17 @@ app.use(
 );
 
 app.use(morgan("dev"));
-app.use(authRoutes);
-app.use(dashboardRoutes);
-app.use("/api/webauthn", webauthnRoutes);
-app.use(publicRoutes);
-app.use(connectRoutes);
+app.use(rateLimiter, authRoutes);
+app.use(rateLimiter, dashboardRoutes);
+app.use("/api/webauthn", rateLimiter, webauthnRoutes);
+app.use(rateLimiter, publicRoutes);
+app.use(connectRateLimiter, connectRoutes);
 
-app.use(activityRoutes);
-app.use(premiumRoutes);
-app.use("/settings", settingsRoutes);
-app.use("/logs", logsRoutes);
-app.use("/api/banned-devices", bannedDeviceRoutes);
+app.use(rateLimiter, activityRoutes);
+app.use(rateLimiter, premiumRoutes);
+app.use("/settings", rateLimiter, settingsRoutes);
+app.use("/logs", rateLimiter, logsRoutes);
+app.use("/api/banned-devices", rateLimiter, bannedDeviceRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {

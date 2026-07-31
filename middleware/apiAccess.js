@@ -20,7 +20,11 @@ function apiAccess(type) {
 
                     success: false,
 
-                    message: "Panel is under maintenance. Please try again later."
+                    message: "Panel is under maintenance. Please try again later.",
+
+                    status: false,
+
+                    reason: "Server is under maintenance. Please try again later."
 
                 });
 
@@ -35,7 +39,11 @@ function apiAccess(type) {
 
                     success: false,
 
-                    message: "Public API is disabled."
+                    message: "Public API is disabled.",
+
+                    status: false,
+
+                    reason: "Public API is currently disabled."
 
                 });
 
@@ -50,7 +58,11 @@ function apiAccess(type) {
 
                     success: false,
 
-                    message: "Premium API is disabled."
+                    message: "Premium API is disabled.",
+
+                    status: false,
+
+                    reason: "Premium API is currently disabled."
 
                 });
 

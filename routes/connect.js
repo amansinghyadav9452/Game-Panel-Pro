@@ -2,6 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 
+const apiAccess = require("../middleware/apiAccess");
+
 const {
     verifyPublicLicense,
     verifyPremiumLicense,
@@ -9,7 +11,7 @@ const {
     saveClientLog
 } = require("../services/connectService");
 
-router.post("/connect-premium", async (req, res) => {
+router.post("/connect-premium", apiAccess("premium"), async (req, res) => {
     console.log("Premium License called");
 
     try {
@@ -38,7 +40,7 @@ router.post("/connect-premium", async (req, res) => {
 
 });
 
-router.post("/connect", async (req, res) => {
+router.post("/connect", apiAccess("public"), async (req, res) => {
 
     try {
         const result = (req.body && req.body.encryptedData)
@@ -64,7 +66,7 @@ router.post("/connect", async (req, res) => {
 
 });
 
-router.post("/client-log", async (req, res) => {
+router.post("/client-log", apiAccess(), async (req, res) => {
 
     try {
 

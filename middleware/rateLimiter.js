@@ -3,7 +3,7 @@ const Settings = require("../models/Settings");
 
 const rateLimiter = rateLimit({
 
-    windowMs: 15 * 60 * 1000,
+    windowMs: 60 * 1000,
 
     max: async (req) => {
 
