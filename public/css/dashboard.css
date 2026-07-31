@@ -1159,6 +1159,27 @@ TOPBAR
 
 }
 
+#generateKeyBtn{
+
+    background:#1E293B;
+    border:1px solid rgba(255,255,255,.08);
+    color:#60A5FA;
+    border-radius:10px;
+    width:44px;
+    flex-shrink:0;
+    cursor:pointer;
+    transition:.2s;
+}
+
+#generateKeyBtn:hover{
+    background:#334155;
+}
+
+#generateKeyBtn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
 .modal-content{
 
     width:500px;

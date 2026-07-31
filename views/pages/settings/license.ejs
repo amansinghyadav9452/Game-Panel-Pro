@@ -52,33 +52,13 @@ Configure license generation settings
 
 <div class="setting-group">
 
-<label>Public Key Prefix</label>
-
-<input
-id="publicPrefix"
-type="text"
-value="<%= settings.license.publicPrefix %>">
-
-</div>
-
-<div class="setting-group">
-
-<label>Premium Key Prefix</label>
-
-<input
-id="premiumPrefix"
-type="text"
-value="<%= settings.license.premiumPrefix %>">
-
-</div>
-
-<div class="setting-group">
-
 <label>Public Default Expiry (Days)</label>
 
 <input
 id="publicExpiry"
 type="number"
+min="0"
+max="3650"
 value="<%= settings.license.publicExpiry %>">
 
 </div>
@@ -90,6 +70,8 @@ value="<%= settings.license.publicExpiry %>">
 <input
 id="premiumExpiry"
 type="number"
+min="0"
+max="3650"
 value="<%= settings.license.premiumExpiry %>">
 
 </div>
@@ -101,6 +83,8 @@ value="<%= settings.license.premiumExpiry %>">
 <input
 id="maxDevices"
 type="number"
+min="1"
+max="100"
 value="<%= settings.license.maxDevices %>">
 
 </div>
@@ -112,6 +96,8 @@ value="<%= settings.license.maxDevices %>">
 <input
 id="licenseLength"
 type="number"
+min="6"
+max="32"
 value="<%= settings.license.licenseLength %>">
 
 </div>

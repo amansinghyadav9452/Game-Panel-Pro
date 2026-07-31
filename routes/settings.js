@@ -14,6 +14,7 @@ const streamifier = require("streamifier");
 const deleteExpiredLicenses = require("../services/licenseCleanup");
 const { generateOtp, hashOtp, compareOtp, OTP_TTL_MS } = require("../services/otp");
 const { sendOtpEmail } = require("../services/mailer");
+const generateKey = require("../services/keyGenerator");
 
 router.get("/", (req, res) => {
 
@@ -104,6 +105,100 @@ router.get("/security", async (req, res) => {
         console.error(error);
 
         res.status(500).send("Internal Server Error");
+
+    }
+
+});
+
+router.get("/license/config", auth, async (req, res) => {
+
+    try {
+
+        const settings = await Settings.findOne();
+
+        if (!settings) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Settings not found."
+
+            });
+
+        }
+
+        res.json({
+
+            success: true,
+
+            license: settings.license
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
+router.get("/license/generate-key", auth, async (req, res) => {
+
+    try {
+
+        const type = req.query.type === "premium" ? "premium" : "public";
+
+        const settings = await Settings.findOne();
+
+        let key;
+        let attempts = 0;
+
+        do {
+
+            key = generateKey(type, settings ? settings.license : null);
+
+            attempts++;
+
+        } while (
+
+            attempts < 10 &&
+            (await License.findOne({ key }))
+
+        );
+
+        res.json({
+
+            success: true,
+
+            key
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
 
     }
 

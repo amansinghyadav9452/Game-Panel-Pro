@@ -411,11 +411,108 @@ document.getElementById("cancelDeleteBtn");
 
 const btn = document.getElementById("openCreateModal");
 
+function getLicenseTypeForPage() {
+
+    const endpoint = window.CREATE_LICENSE_ENDPOINT || "/public/create";
+
+    return endpoint.includes("premium") ? "premium" : "public";
+
+}
+
+async function prefillCreateModalDefaults() {
+
+    try {
+
+        const response = await apiFetch("/settings/license/config");
+
+        const data = await response.json();
+
+        if (!data.success) return;
+
+        const type = getLicenseTypeForPage();
+
+        const expiryField = document.getElementById("expiryDays");
+        const maxUsesField = document.getElementById("maxUses");
+
+        if (expiryField) {
+
+            expiryField.value =
+                type === "premium"
+                    ? data.license.premiumExpiry
+                    : data.license.publicExpiry;
+
+        }
+
+        if (maxUsesField) {
+
+            maxUsesField.value = data.license.maxDevices;
+
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+
+}
+
 if (btn) {
 
     btn.addEventListener("click", () => {
 
         createModal.classList.add("active");
+
+        prefillCreateModalDefaults();
+
+    });
+
+}
+
+const generateKeyBtn = document.getElementById("generateKeyBtn");
+
+if (generateKeyBtn) {
+
+    generateKeyBtn.addEventListener("click", async () => {
+
+        const originalHtml = generateKeyBtn.innerHTML;
+
+        generateKeyBtn.disabled = true;
+
+        generateKeyBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+
+        try {
+
+            const type = getLicenseTypeForPage();
+
+            const response =
+                await apiFetch(`/settings/license/generate-key?type=${type}`);
+
+            const data = await response.json();
+
+            if (data.success) {
+
+                document.getElementById("licenseKey").value = data.key;
+
+            } else {
+
+                showToast("Error", data.message || "Could not generate key", "error");
+
+            }
+
+        } catch (err) {
+
+            console.error(err);
+
+            showToast("Error", "Could not generate key", "error");
+
+        } finally {
+
+            generateKeyBtn.disabled = false;
+
+            generateKeyBtn.innerHTML = originalHtml;
+
+        }
 
     });
 
@@ -536,9 +633,7 @@ const response = await apiFetch(endpoint, {
 
             document.getElementById("licenseKey").value = "";
 
-            document.getElementById("expiryDays").value = 30;
-
-            document.getElementById("maxUses").value = 1;
+            prefillCreateModalDefaults();
 
             if (typeof loadStats === "function") {
     loadStats();

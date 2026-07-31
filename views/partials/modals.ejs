@@ -117,14 +117,28 @@
 
     <label>License Key</label>
 
-    <input
-        type="text"
-        id="licenseKey"
-        placeholder="Enter License Key"
-        maxlength="32"
-        minlength="4"
-        autocomplete="off"
-        required>
+    <div style="display:flex; gap:8px;">
+
+        <input
+            type="text"
+            id="licenseKey"
+            placeholder="Enter License Key"
+            maxlength="32"
+            minlength="4"
+            autocomplete="off"
+            style="flex:1;"
+            required>
+
+        <button
+            type="button"
+            id="generateKeyBtn"
+            title="Generate a random key using License Settings">
+
+            <i class="fa-solid fa-shuffle"></i>
+
+        </button>
+
+    </div>
 
 </div>
 
