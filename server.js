@@ -22,6 +22,8 @@ const settingsRoutes = require("./routes/settings");
 const logsRoutes = require("./routes/logs");
 const createSettings = require("./services/createSettings");
 const bannedDeviceRoutes = require("./routes/bannedDevices");
+const aiRoutes = require("./routes/ai");
+const aiRateLimiter = require("./middleware/aiRateLimiter");
 
 
 const app = express();
@@ -48,7 +50,8 @@ app.use(
 
                 scriptSrc: [
                     "'self'",
-                    "https://challenges.cloudflare.com"
+                    "https://challenges.cloudflare.com",
+                    "https://cdnjs.cloudflare.com"
                 ],
 
                 frameSrc: [
@@ -94,6 +97,7 @@ app.use(rateLimiter, premiumRoutes);
 app.use("/settings", rateLimiter, settingsRoutes);
 app.use("/logs", rateLimiter, logsRoutes);
 app.use("/api/banned-devices", rateLimiter, bannedDeviceRoutes);
+app.use("/api/ai", aiRateLimiter, aiRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {

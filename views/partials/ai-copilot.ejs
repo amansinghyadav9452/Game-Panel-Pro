@@ -1,0 +1,71 @@
+<div id="aiCopilotOverlay" class="ai-copilot-overlay"></div>
+
+<aside id="aiCopilotDrawer" class="ai-copilot-drawer">
+
+    <div class="ai-copilot-header">
+
+        <div class="ai-copilot-title">
+
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+            <span>AI Copilot</span>
+
+        </div>
+
+        <div class="ai-copilot-header-actions">
+
+            <button type="button" id="aiCopilotClearBtn" title="Clear conversation">
+                <i class="fa-solid fa-broom"></i>
+            </button>
+
+            <button type="button" id="aiCopilotCloseBtn" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="aiCopilotMessages" class="ai-copilot-messages">
+
+        <div class="ai-copilot-welcome">
+
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+            <h4>Ask me anything about your panel</h4>
+
+            <p>I can search logs, licenses and devices, explain stats, and (with your confirmation) ban devices or create keys.</p>
+
+            <div class="ai-copilot-suggestions">
+
+                <button type="button" class="ai-suggestion">Show today's dashboard stats</button>
+                <button type="button" class="ai-suggestion">Find failed logins in the last hour</button>
+                <button type="button" class="ai-suggestion">Is any device with a lot of failed attempts suspicious?</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="aiCopilotTyping" class="ai-copilot-typing" style="display:none;">
+
+        <span></span><span></span><span></span>
+
+    </div>
+
+    <form id="aiCopilotForm" class="ai-copilot-input-row">
+
+        <textarea
+            id="aiCopilotInput"
+            rows="1"
+            maxlength="2000"
+            placeholder="Ask the AI Copilot..."></textarea>
+
+        <button type="submit" id="aiCopilotSendBtn" title="Send">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+
+    </form>
+
+</aside>
