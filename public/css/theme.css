@@ -202,8 +202,8 @@ html.light-theme .topbar-row h2{
    On mobile the sidebar isn't a fixed-width column (it stacks
    full-width above the content), so the desktop rule above -
    which is scoped to min-width:769px - never applied here.
-   This gives the same "icon-only" treatment, adapted to a
-   horizontal icon bar since the sidebar spans full width. */
+   This keeps the sidebar's normal vertical stacking, just
+   icon-only (labels hidden) instead of a full-width row. */
 
 @media(max-width:768px){
 
@@ -228,15 +228,13 @@ html.light-theme .topbar-row h2{
     }
 
     html.sidebar-collapsed nav{
-        flex-direction:row;
-        flex-wrap:wrap;
-        justify-content:center;
-        gap:8px;
+        flex-direction:column;
+        align-items:center;
+        gap:10px;
     }
 
     html.sidebar-collapsed nav a,
     html.sidebar-collapsed .ai-copilot-toggle{
-        flex:0 0 auto;
         width:48px;
         height:48px;
         padding:0;

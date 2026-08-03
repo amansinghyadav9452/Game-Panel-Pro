@@ -28,6 +28,7 @@
     top: 0;
     right: 0;
     height: 100vh;
+    height: 100dvh;
     width: 400px;
     max-width: 92vw;
     background: var(--card, #172033);
@@ -154,23 +155,24 @@
 
 /* Chat bubbles (user/assistant messages appended via JS) */
 
-.ai-copilot-msg {
+.ai-msg {
     max-width: 85%;
     padding: 10px 14px;
     border-radius: 12px;
     font-size: 13px;
     line-height: 1.5;
     word-wrap: break-word;
+    overflow-x: auto;
 }
 
-.ai-copilot-msg.user {
+.ai-msg.user {
     align-self: flex-end;
     background: var(--primary, #3bc1f6);
     color: #08111f;
     border-bottom-right-radius: 4px;
 }
 
-.ai-copilot-msg.assistant {
+.ai-msg.assistant {
     align-self: flex-start;
     background: rgba(255,255,255,.06);
     color: var(--text, #F8FAFC);
@@ -182,20 +184,15 @@
    desktop tables) so they fit the narrow drawer instead of
    forcing horizontal overflow. */
 
-.ai-copilot-msg {
-    max-width: 92%;
-    overflow-x: auto;
-}
-
-.ai-copilot-msg table {
+.ai-msg table {
     width: 100%;
     table-layout: auto;
     border-collapse: collapse;
     font-size: 12px;
 }
 
-.ai-copilot-msg th,
-.ai-copilot-msg td {
+.ai-msg th,
+.ai-msg td {
     padding: 6px 8px;
     text-align: left;
     border-bottom: 1px solid rgba(255,255,255,.1);
@@ -203,8 +200,8 @@
     word-break: break-word;
 }
 
-.ai-copilot-msg th:first-child,
-.ai-copilot-msg td:first-child {
+.ai-msg th:first-child,
+.ai-msg td:first-child {
     max-width: 60%;
 }
 
