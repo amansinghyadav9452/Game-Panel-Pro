@@ -162,7 +162,7 @@
     font-size: 13px;
     line-height: 1.5;
     word-wrap: break-word;
-    overflow-x: auto;
+    flex-shrink: 0;
 }
 
 .ai-msg.user {
@@ -185,6 +185,8 @@
    forcing horizontal overflow. */
 
 .ai-msg table {
+    display: block;
+    overflow-x: auto;
     width: 100%;
     table-layout: auto;
     border-collapse: collapse;
