@@ -177,6 +177,37 @@
     border-bottom-left-radius: 4px;
 }
 
+/* Markdown tables inside AI responses - override the global
+   dashboard table/th/td rule (which is sized for full-width
+   desktop tables) so they fit the narrow drawer instead of
+   forcing horizontal overflow. */
+
+.ai-copilot-msg {
+    max-width: 92%;
+    overflow-x: auto;
+}
+
+.ai-copilot-msg table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.ai-copilot-msg th,
+.ai-copilot-msg td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    white-space: normal;
+    word-break: break-word;
+}
+
+.ai-copilot-msg th:first-child,
+.ai-copilot-msg td:first-child {
+    max-width: 60%;
+}
+
 /* ==========================
    TYPING INDICATOR
 ========================== */
@@ -259,4 +290,50 @@
     .ai-copilot-drawer {
         width: 100vw;
     }
+}
+
+/* ==========================
+   SIDEBAR TOGGLE BUTTON
+   (the CSS reset + nav a styling in dashboard.css only
+   targets <a> tags, so this <button> was falling back to
+   the browser's default plain white button style)
+========================== */
+
+.ai-copilot-toggle {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 15px;
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 15px 18px;
+    border-radius: 14px;
+    transition: .25s;
+    cursor: pointer;
+    text-align: left;
+}
+
+.ai-copilot-toggle i {
+    width: 18px;
+    text-align: center;
+    color: var(--primary, #3bc1f6);
+}
+
+.ai-copilot-toggle:hover {
+    background: #1E293B;
+    color: white;
+    transform: translateX(6px);
+}
+
+.ai-copilot-toggle.active {
+    background: linear-gradient(90deg, #2563EB, #3B82F6);
+    color: white;
+}
+
+.ai-copilot-toggle.active i {
+    color: white;
 }
