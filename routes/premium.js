@@ -335,7 +335,18 @@ router.put("/premium/extend/:key", auth, apiAccess("premium"), async (req, res) 
 
     try {
 
-        const { days } = req.body;
+        const mode = req.body.mode === "device" ? "device" : "license";
+
+        const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+
+        if (!Number.isFinite(value) || value <= 0) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Enter a valid positive number."
+            });
+
+        }
 
         const license = await License.findOne({
             key: req.params.key,
@@ -351,6 +362,40 @@ router.put("/premium/extend/:key", auth, apiAccess("premium"), async (req, res) 
 
         }
 
+        if (mode === "device") {
+
+            const addCount = Math.min(100, Math.floor(value));
+
+            license.maxUses = (license.maxUses || 0) + addCount;
+
+            await license.save();
+
+            await logActivity({
+
+                action: "EXTEND",
+
+                licenseKey: license.key,
+
+                licenseType: "premium",
+
+                admin: req.admin.username,
+
+                details: `Device limit +${addCount} (now ${license.maxUses})`
+
+            });
+
+            return res.json({
+
+                success: true,
+
+                message: "Device Limit Extended Successfully",
+
+                maxUses: license.maxUses
+
+            });
+
+        }
+
 const baseDate = new Date(
     license.expiry > new Date()
         ? license.expiry
@@ -358,7 +403,7 @@ const baseDate = new Date(
 );
 
 baseDate.setDate(
-    baseDate.getDate() + Number(days)
+    baseDate.getDate() + Math.floor(value)
 );
 
 license.expiry = baseDate;
@@ -378,7 +423,7 @@ await logActivity({
 
     admin: req.admin.username,
 
-    details: `${days} Days Extended`
+    details: `${Math.floor(value)} Days Extended`
 
 });
 

@@ -526,8 +526,51 @@ document
 
 });
 
+let extendMode = "license";
+
+function setExtendMode(mode) {
+
+    extendMode = mode;
+
+    document.querySelectorAll(".extend-mode-btn").forEach(btn => {
+
+        btn.classList.toggle("active", btn.dataset.mode === mode);
+
+    });
+
+    const licenseGroup = document.getElementById("extendLicenseGroup");
+    const deviceGroup = document.getElementById("extendDeviceGroup");
+    const title = document.getElementById("extendModalTitle");
+    const saveBtn = document.getElementById("saveExtendBtn");
+
+    if (mode === "device") {
+
+        licenseGroup.style.display = "none";
+        deviceGroup.style.display = "block";
+        title.textContent = "Extend Device Limit";
+        saveBtn.textContent = "Extend Device Limit";
+
+    } else {
+
+        licenseGroup.style.display = "block";
+        deviceGroup.style.display = "none";
+        title.textContent = "Extend License";
+        saveBtn.textContent = "Extend License";
+
+    }
+
+}
+
+document.querySelectorAll(".extend-mode-btn").forEach(btn => {
+
+    btn.addEventListener("click", () => setExtendMode(btn.dataset.mode));
+
+});
+
 if(extendBtn){
 extendBtn.addEventListener("click", () => {
+
+    setExtendMode("license");
 
     extendModal.classList.add("active");
 
@@ -665,15 +708,39 @@ const response = await apiFetch(endpoint, {
 
 async function extendLicense() {
 
-    const days = Number(
-        document.getElementById("extendDays").value
-    );
+    let body;
 
-    if (!days || days <= 0) {
+    if (extendMode === "device") {
 
-        showToast("Error", "Enter valid days", "error");
+        const count = Number(
+            document.getElementById("extendDeviceCount").value
+        );
 
-        return;
+        if (!count || count <= 0) {
+
+            showToast("Error", "Enter a valid device count", "error");
+
+            return;
+
+        }
+
+        body = { mode: "device", value: count };
+
+    } else {
+
+        const days = Number(
+            document.getElementById("extendDays").value
+        );
+
+        if (!days || days <= 0) {
+
+            showToast("Error", "Enter valid days", "error");
+
+            return;
+
+        }
+
+        body = { mode: "license", value: days };
 
     }
 
@@ -691,7 +758,7 @@ const response = await apiFetch(
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ days })
+        body: JSON.stringify(body)
     }
 
 );
@@ -706,7 +773,15 @@ const response = await apiFetch(
 
         }
 
-        showToast("Success", "License Extended Successfully");
+        showToast(
+
+            "Success",
+
+            extendMode === "device"
+                ? "Device Limit Extended Successfully"
+                : "License Extended Successfully"
+
+        );
 
         extendModal.classList.remove("active");
 

@@ -244,7 +244,7 @@
 
         <div class="modal-header">
 
-            <h2>Extend License</h2>
+            <h2 id="extendModalTitle">Extend License</h2>
 
             <button id="closeExtendModal">
 
@@ -256,7 +256,19 @@
 
         <div class="modal-body">
 
-            <div class="input-group">
+            <div class="extend-mode-toggle">
+
+                <button type="button" class="extend-mode-btn active" data-mode="license">
+                    <i class="fa-solid fa-calendar-days"></i> License
+                </button>
+
+                <button type="button" class="extend-mode-btn" data-mode="device">
+                    <i class="fa-solid fa-mobile-screen-button"></i> Device
+                </button>
+
+            </div>
+
+            <div class="input-group" id="extendLicenseGroup">
 
                 <label>Extend Days</label>
 
@@ -265,6 +277,23 @@
                     id="extendDays"
                     value="30"
                     min="1">
+
+                <p class="extend-hint">Adds days to the current expiry date.</p>
+
+            </div>
+
+            <div class="input-group" id="extendDeviceGroup" style="display:none;">
+
+                <label>Additional Devices</label>
+
+                <input
+                    type="number"
+                    id="extendDeviceCount"
+                    value="1"
+                    min="1"
+                    max="100">
+
+                <p class="extend-hint">Increases the maximum number of devices allowed on this key.</p>
 
             </div>
 

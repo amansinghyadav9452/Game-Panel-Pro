@@ -303,7 +303,18 @@ router.put("/dashboard/extend/:key", auth, async (req, res) => {
 
     try {
 
-const { days } = req.body;
+const mode = req.body.mode === "device" ? "device" : "license";
+
+const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+
+if (!Number.isFinite(value) || value <= 0) {
+
+    return res.status(400).json({
+        success: false,
+        message: "Enter a valid positive number."
+    });
+
+}
 
 const license = await License.findOne({
     key: req.params.key
@@ -318,6 +329,24 @@ if (!license) {
 
 }
 
+if (mode === "device") {
+
+    const addCount = Math.min(100, Math.floor(value));
+
+    license.maxUses = (license.maxUses || 0) + addCount;
+
+    await license.save();
+
+    return res.json({
+
+        success: true,
+        message: "Device Limit Extended Successfully",
+        maxUses: license.maxUses
+
+    });
+
+}
+
 console.log("Expiry Before:", license.expiry);
 
 const baseDate = new Date(
@@ -326,7 +355,7 @@ const baseDate = new Date(
         : new Date()
 );
 
-baseDate.setDate(baseDate.getDate() + Number(days));
+baseDate.setDate(baseDate.getDate() + Math.floor(value));
 
 license.expiry = baseDate;
 license.status = "active";
