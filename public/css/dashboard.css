@@ -1303,6 +1303,8 @@ TOPBAR
 
     cursor:pointer;
 
+    forced-color-adjust: none;
+
 }
 
 .ban-btn{

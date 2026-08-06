@@ -1,6 +1,11 @@
 :root{
     --accent:#3B82F6;
     --accent-dark:#2563EB;
+    color-scheme: dark;
+}
+
+html{
+    color-scheme: dark;
 }
 
 /* ---------------- Accent color ---------------- */
@@ -180,72 +185,18 @@ html.light-theme .topbar-row h2{
         margin-bottom:16px !important;
     }
 
-    html.sidebar-collapsed nav a,
-    html.sidebar-collapsed .ai-copilot-toggle{
+    html.sidebar-collapsed nav a{
         justify-content:center;
         padding:15px 10px;
         font-size:0;
     }
 
-    html.sidebar-collapsed nav a i,
-    html.sidebar-collapsed .ai-copilot-toggle i{
+    html.sidebar-collapsed nav a i{
         font-size:18px;
     }
 
     html.sidebar-collapsed .content{
         padding:35px 24px;
-    }
-
-}
-
-/* ---------------- Sidebar collapsed (mobile) ----------------
-   On mobile the sidebar isn't a fixed-width column (it stacks
-   full-width above the content), so the desktop rule above -
-   which is scoped to min-width:769px - never applied here.
-   This keeps the sidebar's normal vertical stacking, just
-   icon-only (labels hidden) instead of a full-width row. */
-
-@media(max-width:768px){
-
-    html.sidebar-collapsed .sidebar{
-        padding:14px 12px !important;
-    }
-
-    html.sidebar-collapsed .display-name-wrapper,
-    html.sidebar-collapsed .sidebar-status,
-    html.sidebar-collapsed .sidebar-divider{
-        display:none !important;
-    }
-
-    html.sidebar-collapsed .sidebar-profile{
-        margin-bottom:10px !important;
-    }
-
-    html.sidebar-collapsed .profile-avatar{
-        width:56px !important;
-        height:56px !important;
-        border-radius:14px !important;
-    }
-
-    html.sidebar-collapsed nav{
-        flex-direction:column;
-        align-items:center;
-        gap:10px;
-    }
-
-    html.sidebar-collapsed nav a,
-    html.sidebar-collapsed .ai-copilot-toggle{
-        width:48px;
-        height:48px;
-        padding:0;
-        justify-content:center;
-        font-size:0;
-        border-radius:12px;
-    }
-
-    html.sidebar-collapsed nav a i,
-    html.sidebar-collapsed .ai-copilot-toggle i{
-        font-size:18px;
     }
 
 }
