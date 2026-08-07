@@ -677,3 +677,52 @@ if (resetNewPasswordOk) {
     });
 
 }
+
+/* -------------------------
+   Shield Icon - Random Theme Color
+   (applies automatically on every page load, and again on click)
+-------------------------- */
+
+function applyRandomTheme() {
+
+    const lastHue = Number(localStorage.getItem("panelThemeHue"));
+
+    let hue;
+
+    do {
+
+        hue = Math.floor(Math.random() * 360);
+
+    } while (!Number.isNaN(lastHue) && Math.abs(hue - lastHue) < 40);
+
+    const saturation = (1.1 + Math.random() * 0.5).toFixed(2);
+
+    document.body.style.filter =
+        `hue-rotate(${hue}deg) saturate(${saturation})`;
+
+    localStorage.setItem("panelThemeHue", hue);
+
+}
+
+// Auto-apply a fresh random color every time the login page loads
+applyRandomTheme();
+
+const logoBox = document.querySelector(".logo-box");
+
+if (logoBox) {
+
+    logoBox.style.cursor = "pointer";
+
+    logoBox.addEventListener("click", () => {
+
+        applyRandomTheme();
+
+        logoBox.classList.remove("shield-clicked");
+
+        void logoBox.offsetWidth;
+
+        logoBox.classList.add("shield-clicked");
+
+    });
+
+}

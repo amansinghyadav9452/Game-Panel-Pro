@@ -465,6 +465,48 @@ body::before{
                 LOGO
 =========================================== */
 
+body{
+
+    transition: filter .6s ease;
+
+}
+
+.logo-box{
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+.shield-clicked{
+
+    animation: shieldPop .4s ease;
+
+}
+
+@keyframes shieldPop{
+
+    0%{
+
+        transform: scale(1);
+
+    }
+
+    40%{
+
+        transform: scale(1.15);
+
+    }
+
+    100%{
+
+        transform: scale(1);
+
+    }
+
+}
+
 .logo{
 
     position:relative;
