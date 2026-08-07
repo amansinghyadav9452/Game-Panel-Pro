@@ -292,47 +292,64 @@
 }
 
 /* ==========================
-   SIDEBAR TOGGLE BUTTON
-   (the CSS reset + nav a styling in dashboard.css only
-   targets <a> tags, so this <button> was falling back to
-   the browser's default plain white button style)
+   FLOATING AI COPILOT BUTTON (FAB)
+   Lives in ai-copilot.ejs, which is included once inside
+   sidebar.ejs -> rendered on every page via the main layout.
+   Fixed to the viewport, so it stays put while the page
+   content scrolls, and floats above everything except the
+   drawer/overlay themselves (z-index 999/998) and toast/modal
+   layers (which sit above 998 already).
 ========================== */
 
-.ai-copilot-toggle {
+.ai-copilot-fab {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: none;
     display: flex;
     align-items: center;
-    gap: 14px;
-    width: 100%;
-    background: transparent;
-    border: none;
-    font-family: inherit;
-    font-size: 15px;
-    color: #cbd5e1;
-    text-decoration: none;
-    padding: 15px 18px;
-    border-radius: 14px;
-    transition: .25s;
+    justify-content: center;
+    background: linear-gradient(135deg, #2563EB, #3bc1f6);
+    color: #fff;
+    font-size: 20px;
     cursor: pointer;
-    text-align: left;
+    z-index: 500;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, .45);
+    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
 }
 
-.ai-copilot-toggle i {
-    width: 18px;
-    text-align: center;
-    color: var(--primary, #3bc1f6);
+.ai-copilot-fab i {
+    pointer-events: none;
 }
 
-.ai-copilot-toggle:hover {
-    background: #1E293B;
-    color: white;
-    transform: translateX(6px);
+.ai-copilot-fab:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(37, 99, 235, .55);
 }
 
-.ai-copilot-toggle.active {
-    background: linear-gradient(90deg, #2563EB, #3B82F6);
-    color: white;
+.ai-copilot-fab:active {
+    transform: translateY(0) scale(.96);
 }
 
-.ai-copilot-toggle.active i {
-    color: white;
+/* While the drawer is open, fade the FAB out so it doesn't
+   float on top of the drawer's own close button. */
+.ai-copilot-fab.active {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(.7);
+}
+
+@media (max-width: 480px) {
+
+    .ai-copilot-fab {
+        right: 16px;
+        bottom: 16px;
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+    }
+
 }

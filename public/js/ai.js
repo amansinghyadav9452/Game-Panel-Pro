@@ -213,6 +213,8 @@
 
         drawer.classList.add("show");
 
+        toggleBtn.classList.add("active");
+
         if (!historyLoaded) {
 
             loadHistory();
@@ -228,6 +230,8 @@
         overlay.classList.remove("show");
 
         drawer.classList.remove("show");
+
+        toggleBtn.classList.remove("active");
 
     }
 
