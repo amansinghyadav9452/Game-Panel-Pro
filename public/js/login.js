@@ -679,28 +679,82 @@ if (resetNewPasswordOk) {
 }
 
 /* -------------------------
-   Shield Icon - Random Theme Color
+   Login Page - Random Theme Color
    (applies automatically on every page load, and again on click)
+
+   Sets a handful of CSS custom properties (background gradient,
+   floating glow circles, shield glow) on <html> so the entire
+   page repaints in a new color — not just a CSS filter, which
+   has no visible effect on near-black/grayscale pixels.
 -------------------------- */
+
+// Evenly spaced hues around the color wheel (24 colors) + one
+// "null" entry that restores the original monochrome black
+// look. 25 distinct themes in total.
+const PANEL_THEME_HUES = [
+    0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165,
+    180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345,
+    null
+];
 
 function applyRandomTheme() {
 
-    const lastHue = Number(localStorage.getItem("panelThemeHue"));
+    const stored = localStorage.getItem("panelThemeHue");
+    const lastHue = stored === null ? undefined : (stored === "null" ? null : Number(stored));
 
     let hue;
 
     do {
 
-        hue = Math.floor(Math.random() * 360);
+        hue = PANEL_THEME_HUES[Math.floor(Math.random() * PANEL_THEME_HUES.length)];
 
-    } while (!Number.isNaN(lastHue) && Math.abs(hue - lastHue) < 40);
+    } while (PANEL_THEME_HUES.length > 1 && hue === lastHue);
 
-    const saturation = (1.1 + Math.random() * 0.5).toFixed(2);
+    const root = document.documentElement.style;
 
-    document.body.style.filter =
-        `hue-rotate(${hue}deg) saturate(${saturation})`;
+    if (hue === null) {
 
-    localStorage.setItem("panelThemeHue", hue);
+        // Original all-black theme
+        root.setProperty("--theme-bg-a", "#030303");
+        root.setProperty("--theme-bg-b", "#050505");
+        root.setProperty("--theme-bg-c", "#000000");
+
+        root.setProperty("--theme-glow1", "#1f1f1f");
+        root.setProperty("--theme-glow2", "#262626");
+
+        root.setProperty("--theme-circle1", "#3a3a3a");
+        root.setProperty("--theme-circle2", "#2e2e2e");
+        root.setProperty("--theme-circle3", "#333333");
+
+        root.setProperty("--theme-glow-shadow", "rgba(255,255,255,.45)");
+        root.setProperty("--theme-glow-shadow-soft", "rgba(255,255,255,.40)");
+        root.setProperty("--theme-glow-a", "rgba(255,255,255,.35)");
+        root.setProperty("--theme-glow-b", "rgba(255,255,255,.55)");
+
+    } else {
+
+        const h2 = (hue + 25) % 360;
+        const h3 = (hue - 25 + 360) % 360;
+
+        root.setProperty("--theme-bg-a", `hsl(${hue} 45% 4%)`);
+        root.setProperty("--theme-bg-b", `hsl(${h3} 40% 3%)`);
+        root.setProperty("--theme-bg-c", "#000000");
+
+        root.setProperty("--theme-glow1", `hsl(${hue} 60% 16%)`);
+        root.setProperty("--theme-glow2", `hsl(${h2} 55% 17%)`);
+
+        root.setProperty("--theme-circle1", `hsl(${hue} 65% 24%)`);
+        root.setProperty("--theme-circle2", `hsl(${h2} 60% 20%)`);
+        root.setProperty("--theme-circle3", `hsl(${h3} 62% 22%)`);
+
+        root.setProperty("--theme-glow-shadow", `hsla(${hue}, 85%, 60%, .45)`);
+        root.setProperty("--theme-glow-shadow-soft", `hsla(${hue}, 85%, 60%, .40)`);
+        root.setProperty("--theme-glow-a", `hsla(${hue}, 85%, 60%, .35)`);
+        root.setProperty("--theme-glow-b", `hsla(${hue}, 85%, 65%, .55)`);
+
+    }
+
+    localStorage.setItem("panelThemeHue", hue === null ? "null" : hue);
 
 }
 
