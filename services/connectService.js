@@ -248,19 +248,7 @@ return {
 
         token,
 
-        rng,
-
-        debug: {
-
-            game,
-
-            user_key,
-
-            serial,
-
-            authString
-
-        }
+        rng
 
     }
 
