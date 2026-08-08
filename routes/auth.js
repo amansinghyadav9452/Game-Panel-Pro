@@ -546,19 +546,53 @@ router.post("/login/reset-password/verify-otp", async (req, res) => {
 
         }
 
+        if (
+
+            admin.resetOtpAttempts >= 5
+
+        ) {
+
+            admin.resetOtpCode = "";
+
+            admin.resetOtpExpiresAt = null;
+
+            admin.resetOtpAttempts = 0;
+
+            await admin.save();
+
+            return res.status(429).json({
+
+                success: false,
+
+                message: "Too many incorrect attempts. Please request a new code."
+
+            });
+
+        }
+
         const matched = await compareOtp(otp, admin.resetOtpCode);
 
         if (!matched) {
+
+            admin.resetOtpAttempts = (admin.resetOtpAttempts || 0) + 1;
+
+            await admin.save();
 
             return res.status(401).json({
 
                 success: false,
 
-                message: "Invalid verification code."
+                message: "Invalid verification code.",
+
+                attemptsRemaining: Math.max(0, 5 - admin.resetOtpAttempts)
 
             });
 
         }
+
+        admin.resetOtpAttempts = 0;
+
+        await admin.save();
 
         return res.json({
 
@@ -667,15 +701,45 @@ router.post("/login/reset-password/reset", async (req, res) => {
 
         }
 
+        if (
+
+            admin.resetOtpAttempts >= 5
+
+        ) {
+
+            admin.resetOtpCode = "";
+
+            admin.resetOtpExpiresAt = null;
+
+            admin.resetOtpAttempts = 0;
+
+            await admin.save();
+
+            return res.status(429).json({
+
+                success: false,
+
+                message: "Too many incorrect attempts. Please request a new code."
+
+            });
+
+        }
+
         const matched = await compareOtp(otp, admin.resetOtpCode);
 
         if (!matched) {
+
+            admin.resetOtpAttempts = (admin.resetOtpAttempts || 0) + 1;
+
+            await admin.save();
 
             return res.status(401).json({
 
                 success: false,
 
-                message: "Invalid verification code."
+                message: "Invalid verification code.",
+
+                attemptsRemaining: Math.max(0, 5 - admin.resetOtpAttempts)
 
             });
 
@@ -686,6 +750,8 @@ router.post("/login/reset-password/reset", async (req, res) => {
         admin.resetOtpCode = "";
 
         admin.resetOtpExpiresAt = null;
+
+        admin.resetOtpAttempts = 0;
 
         admin.sessionVersion++;
 
