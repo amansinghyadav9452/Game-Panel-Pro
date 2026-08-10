@@ -813,9 +813,9 @@ nav a:not(.active):nth-child(7) i{
 
     grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
 
-    gap:22px;
+    gap:14px;
 
-    margin-bottom:35px;
+    margin-bottom:24px;
 
 }
 
@@ -835,11 +835,11 @@ nav a:not(.active):nth-child(7) i{
 
     overflow:hidden;
 
-    min-height:260px;
+    min-height:auto;
 
-    padding:26px;
+    padding:16px;
 
-    border-radius:28px;
+    border-radius:18px;
 
     display:flex;
 
@@ -955,9 +955,9 @@ nav a:not(.active):nth-child(7) i{
 
     display:block;
 
-    margin-top:8px;
+    margin-top:6px;
 
-    font-size:54px;
+    font-size:30px;
 
     font-weight:800;
 
@@ -2022,15 +2022,15 @@ table{
 
     position:absolute;
 
-    top:23px;
+    top:16px;
 
-    right:24px;
+    right:14px;
 
-    width:76px;
+    width:38px;
 
-    height:76px;
+    height:38px;
 
-    border-radius:22px;
+    border-radius:14px;
 
     display:flex;
 
@@ -2038,7 +2038,7 @@ table{
 
     align-items:center;
 
-    font-size:30px;
+    font-size:18px;
 
     color:#fff;
 
@@ -2083,73 +2083,13 @@ table{
 
 }
 
-/* ==========================
-   MINI CHART
-========================== */
-
-.mini-chart{
-
-    display:flex;
-
-    align-items:flex-end;
-
-    gap:8px;
-
-    height:70px;
-
-    margin-top:18px;
-
-}
-
-.mini-chart span{
-
-    width:14px;
-
-    border-radius:10px 10px 0 0;
-
-    opacity:.95;
-
-    animation:grow .8s ease;
-
-}
-
-.mini-chart span:nth-child(1){height:16px;}
-.mini-chart span:nth-child(2){height:28px;}
-.mini-chart span:nth-child(3){height:40px;}
-.mini-chart span:nth-child(4){height:56px;}
-.mini-chart span:nth-child(5){height:70px;}
-
-.blue-chart span{
-    background:#55A8FF;
-}
-
-.green-chart span{
-    background:#4ADE80;
-}
-
-.orange-chart span{
-    background:#FBBF24;
-}
-
-.red-chart span{
-    background:#FB7185;
-}
-
-@keyframes grow{
-
-    from{
-
-        height:0;
-
-    }
-
-}
-
 .trend-pill{
 
-    margin-top:18px;
+    margin-top:10px;
 
-    height:54px;
+    height:34px;
+
+    font-size:12px;
 
     border-radius:999px;
 
@@ -2755,6 +2695,24 @@ table{
     backdrop-filter:blur(12px);
 
     border:1px solid rgba(255,255,255,.12);
+
+}
+
+.mini-chart{
+
+    display:none;
+
+}
+
+.trend-pill{
+
+    margin-top:10px;
+
+    height:32px;
+
+    font-size:12px;
+
+    gap:6px;
 
 }
 .search-box input{

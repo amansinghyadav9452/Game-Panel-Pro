@@ -30,7 +30,26 @@ const app = express();
 app.set("trust proxy", 1);
 app.set("view engine","ejs");
 app.set("views","./views/pages");
-app.use(express.static("public"));
+app.use(express.static("public", {
+
+    etag: true,
+
+    lastModified: true,
+
+    setHeaders: (res, filePath) => {
+
+        if (filePath.endsWith(".css") || filePath.endsWith(".js")) {
+
+            // Har request pe browser server se check karega ki file badli hai ya nahi.
+            // Agar nahi badli -> 304 (fast, no re-download). Agar badli -> naya file turant milega.
+            // Isse manual cache-clear ya ?v= bump kabhi nahi karna padega.
+            res.setHeader("Cache-Control", "no-cache");
+
+        }
+
+    }
+
+}));
 
 connectDB().then(async () => {
     await createAdmin();
