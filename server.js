@@ -40,7 +40,41 @@ connectDB().then(async () => {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(sanitizeInput);
-app.use(cors());
+
+const allowedOrigins = (
+    process.env.CORS_ORIGINS ||
+    process.env.WEBAUTHN_ORIGIN ||
+    ""
+)
+    .split(",")
+    .map(o => o.trim())
+    .filter(Boolean);
+
+app.use(
+    cors({
+
+        origin: (origin, callback) => {
+
+            if (!origin) {
+
+                return callback(null, true);
+
+            }
+
+            if (allowedOrigins.includes(origin)) {
+
+                return callback(null, true);
+
+            }
+
+            return callback(new Error("Not allowed by CORS"));
+
+        },
+
+        credentials: true
+
+    })
+);
 
 app.use(
     helmet({

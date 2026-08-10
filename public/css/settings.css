@@ -835,6 +835,34 @@
 
     border:1px solid rgba(34,197,94,.25);
 
+    position:relative;
+
+    box-shadow:0 0 8px rgba(74,222,128,.55);
+
+    animation:badgeGlowPulse 2s ease-in-out infinite;
+
+}
+
+.badge.active::before{
+
+    content:"";
+
+    display:inline-block;
+
+    width:6px;
+
+    height:6px;
+
+    border-radius:50%;
+
+    background:#4ade80;
+
+    margin-right:6px;
+
+    box-shadow:0 0 6px 2px rgba(74,222,128,.9);
+
+    animation:dotPulse 1.4s ease-in-out infinite;
+
 }
 
 .badge.warning{
@@ -845,6 +873,8 @@
 
     border:1px solid rgba(245,158,11,.25);
 
+    box-shadow:0 0 6px rgba(251,191,36,.4);
+
 }
 
 .badge.danger{
@@ -852,6 +882,80 @@
     background:rgba(239,68,68,.18);
 
     color:#f87171;
+
+    box-shadow:0 0 8px rgba(248,113,113,.5);
+
+    animation:badgeGlowPulseRed 2s ease-in-out infinite;
+
+}
+
+@keyframes badgeGlowPulse{
+
+    0%,100%{
+
+        box-shadow:0 0 6px rgba(74,222,128,.35);
+
+    }
+
+    50%{
+
+        box-shadow:0 0 14px rgba(74,222,128,.85);
+
+    }
+
+}
+
+@keyframes badgeGlowPulseRed{
+
+    0%,100%{
+
+        box-shadow:0 0 6px rgba(248,113,113,.35);
+
+    }
+
+    50%{
+
+        box-shadow:0 0 14px rgba(248,113,113,.85);
+
+    }
+
+}
+
+@keyframes dotPulse{
+
+    0%,100%{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+    50%{
+
+        opacity:.5;
+
+        transform:scale(.75);
+
+    }
+
+}
+
+.status-card.status-online{
+
+    border-color:rgba(74,222,128,.35);
+
+}
+
+.status-card.status-online .status-icon{
+
+    box-shadow:0 0 16px rgba(74,222,128,.45);
+
+}
+
+.status-card.status-warn{
+
+    border-color:rgba(251,191,36,.3);
 
 }
 

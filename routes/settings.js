@@ -30,6 +30,98 @@ router.get("/", (req, res) => {
 
 });
 
+router.get("/status", auth, async (req, res) => {
+
+    try {
+
+        const settings = await Settings.findOne();
+
+        const isHttps =
+            req.secure ||
+            req.headers["x-forwarded-proto"] === "https";
+
+        const rateLimit = settings?.api?.rateLimit || 100;
+
+        const environment = process.env.NODE_ENV || "development";
+
+        return res.json({
+
+            success: true,
+
+            jwt: {
+
+                active: true,
+
+                expiry: settings?.security?.jwtExpiry || "1h"
+
+            },
+
+            passwordHashing: {
+
+                algorithm: "bcrypt",
+
+                saltRounds: 12
+
+            },
+
+            https: {
+
+                enabled: isHttps
+
+            },
+
+            helmet: {
+
+                enabled: true
+
+            },
+
+            rateLimiter: {
+
+                active: true,
+
+                limit: rateLimit,
+
+                windowMinutes: 1
+
+            },
+
+            cors: {
+
+                restricted: Boolean(
+                    process.env.CORS_ORIGINS || process.env.WEBAUTHN_ORIGIN
+                )
+
+            },
+
+            securityHeaders: {
+
+                applied: true
+
+            },
+
+            environment
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Internal server error."
+
+        });
+
+    }
+
+});
+
 router.get("/account", async (req, res) => {
 
     try {
