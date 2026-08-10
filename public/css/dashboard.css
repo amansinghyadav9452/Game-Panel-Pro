@@ -731,6 +731,12 @@ nav a:not(.active):nth-child(7) i{
 
     padding:35px;
 
+    padding-top: 35px;
+
+}
+
+.content:has(> .topbar){
+
     padding-top: 100px;
 
 }
@@ -3067,6 +3073,12 @@ table{
         width:100%;
 
         padding:14px;
+
+        padding-top: 20px;
+
+    }
+
+    .content:has(> .topbar){
 
         padding-top: 65px;
 
