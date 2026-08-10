@@ -140,11 +140,23 @@ if (data.remaining) {
 
 }
 
+if (typeof turnstile !== "undefined") {
+
+    turnstile.reset();
+
+}
+
 }
 
     } catch (err) {
 
         showMessage("Server Connection Failed", false);
+
+        if (typeof turnstile !== "undefined") {
+
+            turnstile.reset();
+
+        }
 
     }
 
