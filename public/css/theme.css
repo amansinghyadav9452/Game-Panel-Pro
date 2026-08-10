@@ -1,6 +1,7 @@
 :root{
-    --accent:#3B82F6;
-    --accent-dark:#2563EB;
+    --accent:#7C5CFC;
+    --accent-dark:#5B3DE0;
+    --accent-gradient:linear-gradient(135deg,#8B5CF6,#3B82F6);
     color-scheme: dark;
 }
 
@@ -12,20 +13,24 @@ html{
 
 .save-btn,
 .action-btn:not(:disabled):not(.danger-btn){
-    background:var(--accent) !important;
+    background:var(--accent-gradient) !important;
+    box-shadow:0 8px 24px rgba(124,92,252,.35) !important;
+    transition:transform .2s ease, box-shadow .2s ease !important;
 }
 
 .save-btn:hover,
 .action-btn:not(:disabled):not(.danger-btn):hover{
-    background:var(--accent-dark) !important;
+    transform:translateY(-2px) !important;
+    box-shadow:0 12px 30px rgba(124,92,252,.5) !important;
 }
 
 nav a.active{
-    background:linear-gradient(90deg,var(--accent-dark),var(--accent)) !important;
+    background:var(--accent-gradient) !important;
+    box-shadow:0 8px 22px rgba(124,92,252,.4) !important;
 }
 
 .badge.success{
-    background:rgba(59,130,246,.15) !important;
+    background:rgba(124,92,252,.15) !important;
     color:var(--accent) !important;
 }
 
@@ -34,6 +39,7 @@ select:focus,
 textarea:focus{
     border-color:var(--accent) !important;
     outline-color:var(--accent) !important;
+    box-shadow:0 0 0 3px rgba(124,92,252,.15) !important;
 }
 
 /* ---------------- Light theme ---------------- */
