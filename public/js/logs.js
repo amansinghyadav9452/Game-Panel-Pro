@@ -14,6 +14,7 @@ initAutoLogout();
 let currentPage = 1;
 let allLogs = [];
 let bannedDevices = [];
+let lastRenderSignature = null;
 const limit = 100;
 
 function getLastSeen(date) {
@@ -42,7 +43,7 @@ function getLastSeen(date) {
 
 }
 
-async function loadLogs(page = currentPage) {
+async function loadLogs(page = currentPage, isAutoRefresh = false) {
 
     currentPage = page;
 
@@ -74,7 +75,6 @@ async function loadLogs(page = currentPage) {
 });
 
 const bannedData = await bannedResponse.json();
-console.log("Banned Devices:", bannedData);
 
 bannedDevices = bannedData.map(device => device.serial);
         allLogs = data.logs;
@@ -112,6 +112,21 @@ const uniqueDevices = new Set(
             return;
 
         }
+
+        // Naya data purane rendered data se compare karo.
+        // Agar kuch nahi badla to DOM ko touch hi mat karo -
+        // isse har 10 sec ke auto-refresh pe list "blink" nahi karegi.
+        const signature = JSON.stringify({
+            page: data.currentPage,
+            banned: bannedDevices,
+            logs: data.logs.map(l => `${l.serial}-${l.status}-${l.createdAt}`)
+        });
+
+        if (isAutoRefresh && signature === lastRenderSignature) {
+            return;
+        }
+
+        lastRenderSignature = signature;
 
         const start = ((data.currentPage - 1) * limit) + 1;
 
@@ -541,6 +556,6 @@ loadLogs(1);
 
 setInterval(() => {
 
-    loadLogs(currentPage);
+    loadLogs(currentPage, true);
 
 }, 10000);
