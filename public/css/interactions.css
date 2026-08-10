@@ -1,0 +1,191 @@
+/* ===========================================
+   GLOBAL INTERACTION LAYER
+   Loaded once via partials/head.ejs, applies to
+   every panel page. Works together with
+   public/js/interactions.js.
+
+   Respects the existing "Animations" toggle in
+   Settings > Appearance: html.no-animations *
+   already forces transition/animation:none via
+   theme.css, so nothing extra is needed here.
+=========================================== */
+
+/* ---------------- Ripple ---------------- */
+
+.gp-ripple {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, .45);
+
+    transform: scale(0);
+
+    opacity: 1;
+
+    pointer-events: none;
+
+    animation: gp-ripple-anim .6s ease-out;
+
+    z-index: 5;
+
+}
+
+@keyframes gp-ripple-anim {
+
+    to {
+
+        transform: scale(1);
+
+        opacity: 0;
+
+    }
+
+}
+
+/* ---------------- Skeleton shimmer ---------------- */
+
+.gp-skeleton {
+
+    color: transparent !important;
+
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, .06) 25%,
+        rgba(255, 255, 255, .16) 37%,
+        rgba(255, 255, 255, .06) 63%
+    );
+
+    background-size: 400% 100%;
+
+    animation: gp-shimmer 1.4s ease infinite;
+
+    border-radius: 8px;
+
+    display: inline-block;
+
+    min-width: 46px;
+
+}
+
+.gp-skeleton-line {
+
+    height: 14px;
+
+    border-radius: 7px;
+
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, .05) 25%,
+        rgba(255, 255, 255, .13) 37%,
+        rgba(255, 255, 255, .05) 63%
+    );
+
+    background-size: 400% 100%;
+
+    animation: gp-shimmer 1.4s ease infinite;
+
+    margin-bottom: 10px;
+
+}
+
+@keyframes gp-shimmer {
+
+    0% {
+
+        background-position: 100% 0;
+
+    }
+
+    100% {
+
+        background-position: 0 0;
+
+    }
+
+}
+
+/* ---------------- Copy button success morph ---------------- */
+
+.gp-copied {
+
+    color: #22c55e !important;
+
+    border-color: rgba(34, 197, 94, .45) !important;
+
+}
+
+.gp-copy-pop {
+
+    animation: gp-pop .35s ease;
+
+}
+
+@keyframes gp-pop {
+
+    0% {
+
+        transform: scale(1);
+
+    }
+
+    40% {
+
+        transform: scale(1.22);
+
+    }
+
+    100% {
+
+        transform: scale(1);
+
+    }
+
+}
+
+/* ---------------- Error shake (login card etc.) ---------------- */
+
+.gp-shake {
+
+    animation: gp-shake-anim .45s ease;
+
+}
+
+@keyframes gp-shake-anim {
+
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-5px); }
+    40%, 60% { transform: translateX(5px); }
+
+}
+
+/* ---------------- Row remove (unban / delete etc.) ---------------- */
+
+.gp-removing {
+
+    transition:
+        opacity .35s ease,
+        transform .35s ease,
+        max-height .35s ease,
+        margin .35s ease,
+        padding .35s ease;
+
+    opacity: 0;
+
+    transform: scale(.94);
+
+    max-height: 0 !important;
+
+    margin-top: 0 !important;
+
+    margin-bottom: 0 !important;
+
+    padding-top: 0 !important;
+
+    padding-bottom: 0 !important;
+
+    overflow: hidden;
+
+}

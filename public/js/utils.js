@@ -11,11 +11,39 @@ function formatDate(date) {
 
 }
 
-function copyText(text) {
+function copyText(text, btnEl) {
 
     navigator.clipboard.writeText(text);
 
     showToast("Success", "Copied Successfully");
+
+    if (typeof gpHaptic === "function") {
+        gpHaptic(15);
+    }
+
+    if (btnEl) {
+
+        const icon = btnEl.querySelector("i");
+
+        const originalIconClass = icon ? icon.className : null;
+
+        btnEl.classList.add("gp-copy-pop", "gp-copied");
+
+        if (icon) {
+            icon.className = "fa-solid fa-check";
+        }
+
+        setTimeout(() => {
+
+            btnEl.classList.remove("gp-copy-pop", "gp-copied");
+
+            if (icon && originalIconClass) {
+                icon.className = originalIconClass;
+            }
+
+        }, 900);
+
+    }
 
 }
 

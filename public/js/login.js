@@ -175,6 +175,28 @@ function showMessage(text, success) {
 
     message.style.color = success ? "#22C55E" : "#EF4444";
 
+    if (typeof gpHaptic === "function") {
+
+        gpHaptic(success ? 15 : [20, 40, 20]);
+
+    }
+
+    if (!success) {
+
+        const card = document.querySelector(".login-card");
+
+        if (card) {
+
+            card.classList.remove("gp-shake");
+
+            void card.offsetWidth;
+
+            card.classList.add("gp-shake");
+
+        }
+
+    }
+
 }
 
 function startLockCountdown(seconds) {

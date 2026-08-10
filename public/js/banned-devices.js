@@ -32,11 +32,11 @@ async function loadBannedDevices() {
 
         let html = "";
 
-        devices.forEach(device => {
+        devices.forEach((device, index) => {
 
             html += `
 
-<div class="log-card">
+<div class="log-card" style="animation-delay:${index * 60}ms;">
 
     <div class="log-title">
 
@@ -90,7 +90,7 @@ async function loadBannedDevices() {
 
             button.addEventListener("click", () => {
 
-                unbanDevice(button.dataset.serial);
+                unbanDevice(button.dataset.serial, button.closest(".log-card"));
 
             });
 
@@ -104,28 +104,60 @@ async function loadBannedDevices() {
 
 }
 
-async function unbanDevice(serial) {
+async function unbanDevice(serial, cardEl) {
 
-    if (!confirm("Unban this device?")) {
-        return;
-    }
+    showConfirm(
+        "Unban Device",
+        "Are you sure you want to unban this device?",
+        async () => {
 
-    const response = await fetch(`/api/banned-devices/${serial}`, {
+            const response = await fetch(`/api/banned-devices/${serial}`, {
 
-        method: "DELETE",
+                method: "DELETE",
 
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+
+                if (typeof gpHaptic === "function") {
+                    gpHaptic(15);
+                }
+
+                showToast("Success", "Device unbanned successfully");
+
+                if (cardEl && typeof gpRemoveRow === "function") {
+
+                    gpRemoveRow(cardEl, () => {
+
+                        if (!document.querySelector("#bannedDevicesContainer .log-card")) {
+
+                            document.getElementById("bannedDevicesContainer").innerHTML = `
+                                <p>No banned devices found.</p>
+                            `;
+
+                        }
+
+                    });
+
+                } else {
+
+                    loadBannedDevices();
+
+                }
+
+            } else {
+
+                showToast("Error", result.message || "Failed to unban device", "error");
+
+            }
+
         }
-
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-
-        loadBannedDevices();
-
-    }
+    );
 
 }

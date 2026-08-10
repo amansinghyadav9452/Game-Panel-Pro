@@ -22,17 +22,13 @@ if (!data.success) {
 
 }
 
-        document.getElementById("totalKeys").textContent =
-            data.stats.totalKeys;
+        animateCounter(document.getElementById("totalKeys"), data.stats.totalKeys);
 
-        document.getElementById("activeKeys").textContent =
-            data.stats.activeKeys;
+        animateCounter(document.getElementById("activeKeys"), data.stats.activeKeys);
 
-        document.getElementById("expiredKeys").textContent =
-            data.stats.expiredKeys;
+        animateCounter(document.getElementById("expiredKeys"), data.stats.expiredKeys);
 
-        document.getElementById("bannedKeys").textContent =
-            data.stats.bannedKeys;
+        animateCounter(document.getElementById("bannedKeys"), data.stats.bannedKeys);
 
     } catch (err) {
 
@@ -109,7 +105,7 @@ async function loadRecentActivities() {
 
 };
 
-data.activities.forEach((activity) => {
+data.activities.forEach((activity, index) => {
 
     const action =
         actionMap[activity.action] || {
@@ -130,7 +126,7 @@ if (activity.action === "CREATE") {
 
     container.innerHTML += `
 
-        <div class="activity-item">
+        <div class="activity-item" style="animation-delay:${index * 60}ms;">
 
             <div class="activity-title">
 

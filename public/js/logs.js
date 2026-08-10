@@ -210,14 +210,14 @@ let html = `
 
 `;
 
-        data.logs.forEach(log => {
+        data.logs.forEach((log, index) => {
 const success = log.status === "success";
 
 const isBanned = bannedDevices.includes(log.serial);
 
 html += `
 
-<div class="log-card ${success ? "success" : "failed"}">
+<div class="log-card ${success ? "success" : "failed"}" style="animation-delay:${index * 45}ms;">
 
     <div class="status-line"></div>
 

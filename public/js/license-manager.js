@@ -302,7 +302,7 @@ document.addEventListener("click", (e) => {
 
     if (copyBtn) {
 
-        copyText(copyBtn.dataset.key);
+        copyText(copyBtn.dataset.key, copyBtn);
 
     }
 
