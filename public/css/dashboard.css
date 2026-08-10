@@ -642,23 +642,13 @@ nav a i{
 
     transition:transform .25s ease;
 
-    width:38px;
+    width:22px;
 
-    height:38px;
+    font-size:18px;
 
-    min-width:38px;
+    text-align:center;
 
-    border-radius:11px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:15px;
-
-    color:#fff;
+    color:#94a3b8;
 
 }
 
@@ -680,7 +670,11 @@ nav a.active{
 
 nav a.active i{
 
-    animation:gp-nav-icon-pop .4s ease, gp-nav-glow-pulse 2.2s ease-in-out infinite;
+    color:#fff;
+
+    animation:gp-nav-icon-pop .4s ease;
+
+    filter:drop-shadow(0 0 6px rgba(255,255,255,.85));
 
 }
 
@@ -696,98 +690,39 @@ nav a.active i{
       Sidebar Nav Icon Colors + Glow
 ========================= */
 
-nav a:nth-child(1) i{
-
-    background:linear-gradient(135deg,#3b82f6,#2563eb);
-
-    box-shadow:0 0 10px rgba(59,130,246,.55);
-
+nav a:not(.active):nth-child(1) i{
+    color:#60a5fa;
+    filter:drop-shadow(0 0 5px rgba(96,165,250,.75));
 }
 
-nav a:nth-child(2) i{
-
-    background:linear-gradient(135deg,#eab308,#ca8a04);
-
-    box-shadow:0 0 10px rgba(234,179,8,.55);
-
+nav a:not(.active):nth-child(2) i{
+    color:#fbbf24;
+    filter:drop-shadow(0 0 5px rgba(251,191,36,.75));
 }
 
-nav a:nth-child(3) i{
-
-    background:linear-gradient(135deg,#a855f7,#7c3aed);
-
-    box-shadow:0 0 10px rgba(168,85,247,.55);
-
+nav a:not(.active):nth-child(3) i{
+    color:#c084fc;
+    filter:drop-shadow(0 0 5px rgba(192,132,252,.75));
 }
 
-nav a:nth-child(4) i{
-
-    background:linear-gradient(135deg,#14b8a6,#0d9488);
-
-    box-shadow:0 0 10px rgba(20,184,166,.55);
-
+nav a:not(.active):nth-child(4) i{
+    color:#2dd4bf;
+    filter:drop-shadow(0 0 5px rgba(45,212,191,.75));
 }
 
-nav a:nth-child(5) i{
-
-    background:linear-gradient(135deg,#ef4444,#dc2626);
-
-    box-shadow:0 0 10px rgba(239,68,68,.55);
-
+nav a:not(.active):nth-child(5) i{
+    color:#f87171;
+    filter:drop-shadow(0 0 5px rgba(248,113,113,.75));
 }
 
-nav a:nth-child(6) i{
-
-    background:linear-gradient(135deg,#64748b,#475569);
-
-    box-shadow:0 0 10px rgba(100,116,139,.55);
-
+nav a:not(.active):nth-child(6) i{
+    color:#94a3b8;
+    filter:drop-shadow(0 0 5px rgba(148,163,184,.6));
 }
 
-nav a:nth-child(7) i{
-
-    background:linear-gradient(135deg,#f97316,#ea580c);
-
-    box-shadow:0 0 10px rgba(249,115,22,.55);
-
-}
-
-nav a i{
-
-    animation:gp-nav-icon-glow 2.6s ease-in-out infinite;
-
-}
-
-@keyframes gp-nav-icon-glow{
-
-    0%,100%{
-
-        filter:brightness(1);
-
-    }
-
-    50%{
-
-        filter:brightness(1.25);
-
-    }
-
-}
-
-@keyframes gp-nav-glow-pulse{
-
-    0%,100%{
-
-        box-shadow:0 0 10px rgba(255,255,255,.35);
-
-    }
-
-    50%{
-
-        box-shadow:0 0 18px rgba(255,255,255,.75);
-
-    }
-
+nav a:not(.active):nth-child(7) i{
+    color:#fb923c;
+    filter:drop-shadow(0 0 5px rgba(251,146,60,.75));
 }
 
 .content{
