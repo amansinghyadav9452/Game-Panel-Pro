@@ -1664,7 +1664,11 @@ font-size:8px;
 
         justify-content:center;
 
-        overflow-x:auto;
+        overflow:hidden;
+
+        transform:scale(.92);
+
+        transform-origin:top center;
    }
 
 }
