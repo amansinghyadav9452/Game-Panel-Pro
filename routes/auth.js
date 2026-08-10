@@ -66,11 +66,17 @@ if (admin && admin.lockUntil && admin.lockUntil > Date.now()) {
         (admin.lockUntil - Date.now()) / 60000
     );
 
+    const remainingSeconds = Math.ceil(
+        (admin.lockUntil - Date.now()) / 1000
+    );
+
     return res.status(423).json({
 
         success: false,
 
-        message: `Account locked. Try again in ${remainingMinutes} minute(s).`
+        message: `Account locked. Try again in ${remainingMinutes} minute(s).`,
+
+        remaining: remainingSeconds
 
     });
 
