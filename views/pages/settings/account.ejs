@@ -129,11 +129,11 @@
 
                     <label>Active Sessions</label>
 
-                    <button class="danger-btn" id="logoutAllBtn">
+                    <button class="action-btn" id="viewSessionsBtn" type="button">
 
-                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <i class="fa-solid fa-display"></i>
 
-                        Logout All Devices
+                        View All Sessions
 
                     </button>
 
@@ -242,6 +242,54 @@
 
 </div>
 
+<div id="sessionsModal" class="modal">
+
+    <div class="modal-box sessions-modal-box">
+
+        <div class="modal-header">
+
+            <h2>
+
+                Active Sessions
+
+            </h2>
+
+            <button
+                id="closeSessionsModal">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div id="sessionsList" class="sessions-list">
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="danger-btn"
+                id="logoutAllBtn"
+                type="button">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                Logout All Devices
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
     </main>
 
 </div>
@@ -254,6 +302,7 @@
 <script src="/js/password-modal.js"></script>
 <script src="/js/otp-modal.js"></script>
 <script src="/js/account.js"></script>
+<script src="/js/sessions.js"></script>
 
 </body>
 

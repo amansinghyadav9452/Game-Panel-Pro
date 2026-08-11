@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
+const Session = require("../models/Session");
 
 async function auth(req, res, next) {
 
@@ -50,6 +51,38 @@ if (decoded.sessionVersion !== admin.sessionVersion) {
         message:"Session expired. Please login again."
 
     });
+
+}
+
+// Older tokens issued before session-tracking was added won't carry a
+// sessionId - skip the check for those so existing logins don't break.
+if (decoded.sessionId) {
+
+    const session = await Session.findOne({
+
+        sessionId: decoded.sessionId,
+
+        adminId: admin._id
+
+    });
+
+    if (!session) {
+
+        return res.status(401).json({
+
+            success:false,
+
+            message:"Session expired. Please login again."
+
+        });
+
+    }
+
+    session.lastActiveAt = new Date();
+
+    session.save().catch(() => {});
+
+    req.sessionId = decoded.sessionId;
 
 }
 

@@ -171,7 +171,7 @@ if (settings?.security?.forceSingleLogin) {
 
 }
 
-        const token = await generateToken(admin);
+        const token = await generateToken(admin, req);
 
         res.json({
 
@@ -305,7 +305,7 @@ router.post("/login/2fa/verify", async (req, res) => {
 
         await admin.save();
 
-        const token = await generateToken(admin);
+        const token = await generateToken(admin, req);
 
         return res.json({
 

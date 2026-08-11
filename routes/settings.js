@@ -8,6 +8,8 @@ const Settings = require("../models/Settings");
 const License = require("../models/License");
 const Activity = require("../models/Activity");
 const UserLog = require("../models/UserLog");
+const Session = require("../models/Session");
+const { getDeviceLabel } = require("../services/deviceLabel");
 const uploadProfile = require("../middleware/uploadProfile");
 const cloudinary = require("../services/cloudinary");
 const streamifier = require("streamifier");
@@ -1011,11 +1013,113 @@ if (!passwordRegex.test(newPassword)) {
 
 });
 
+router.get("/account/sessions",  auth, async (req, res) => {
+
+try {
+
+    const sessions = await Session.find({
+
+        adminId: req.admin._id
+
+    }).sort({ lastActiveAt: -1 });
+
+    res.json({
+
+        success: true,
+
+        sessions: sessions.map(s => ({
+
+            id: s.sessionId,
+
+            deviceLabel: s.deviceLabel || getDeviceLabel(s.userAgent),
+
+            ip: s.ip,
+
+            createdAt: s.createdAt,
+
+            lastActiveAt: s.lastActiveAt,
+
+            current: s.sessionId === req.sessionId
+
+        }))
+
+    });
+
+}
+
+catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+
+        success: false,
+
+        message: "Internal server error."
+
+    });
+
+}
+
+});
+
+router.delete("/account/sessions/:sessionId",  auth, async (req, res) => {
+
+try {
+
+    const deleted = await Session.findOneAndDelete({
+
+        sessionId: req.params.sessionId,
+
+        adminId: req.admin._id
+
+    });
+
+    if (!deleted) {
+
+        return res.status(404).json({
+
+            success: false,
+
+            message: "Session not found."
+
+        });
+
+    }
+
+    res.json({
+
+        success: true,
+
+        message: "Session terminated."
+
+    });
+
+}
+
+catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+
+        success: false,
+
+        message: "Internal server error."
+
+    });
+
+}
+
+});
+
 router.post("/account/logout-all",  auth, async (req, res) => {
 
 req.admin.sessionVersion++;
 
 await req.admin.save();
+
+await Session.deleteMany({ adminId: req.admin._id });
 
     res.json({
 

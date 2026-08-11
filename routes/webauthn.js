@@ -400,7 +400,7 @@ if (!admin) {
 
             await admin.save();
 
-            const token = await generateToken(admin);
+            const token = await generateToken(admin, req);
 
             res.json({
 

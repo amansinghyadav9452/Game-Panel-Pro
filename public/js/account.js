@@ -379,77 +379,8 @@ if (saveBtn) {
 
 }
 
-const logoutAllBtn = document.getElementById("logoutAllBtn");
-
-if (logoutAllBtn) {
-
-    logoutAllBtn.addEventListener("click", () => {
-
-        showConfirm(
-
-            "Logout All Devices",
-
-            "This will sign you out on this device and every other device. Continue?",
-
-            async () => {
-
-                const token = localStorage.getItem("token");
-
-                try {
-
-                    const response = await fetch(
-
-                        "/settings/account/logout-all",
-
-                        {
-
-                            method: "POST",
-
-                            headers: {
-
-                                Authorization: `Bearer ${token}`
-
-                            }
-
-                        }
-
-                    );
-
-                    const data = await response.json();
-
-                    if (data.success) {
-
-                        localStorage.removeItem("token");
-
-                        localStorage.removeItem("logoutAt");
-
-                        window.location.replace("/login");
-
-                    }
-
-                    else {
-
-                        alert(data.message || "Something went wrong.");
-
-                    }
-
-                }
-
-                catch (error) {
-
-                    console.error(error);
-
-                    alert("Something went wrong.");
-
-                }
-
-            }
-
-        );
-
-    });
-
-}
+/* Logout-all handling now lives in sessions.js (inside the
+   Active Sessions modal) so it isn't wired twice. */
 
 /* ==========================
    CHANGE PASSWORD MODAL
