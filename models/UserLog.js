@@ -18,6 +18,8 @@ const userLogSchema = new mongoose.Schema({
 
     appVersion: String,
 
+    playerName: String,
+
     serial: String,
 
     ip: String,

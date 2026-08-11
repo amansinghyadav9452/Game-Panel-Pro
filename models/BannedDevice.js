@@ -34,6 +34,11 @@ const bannedDeviceSchema = new mongoose.Schema({
         default: ""
     },
 
+    playerName: {
+        type: String,
+        default: ""
+    },
+
     bannedBy: {
         type: String,
         default: "Admin"

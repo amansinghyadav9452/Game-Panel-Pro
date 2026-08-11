@@ -368,6 +368,7 @@ async function saveClientLog(body) {
     const deviceBrand = body.device_brand || "";
     const androidVersion = body.android_version || "";
     const appVersion = body.app_version || "";
+    const playerName = body.player_name || "";
 
     const resolved = await resolveMarketingName(deviceModel);
     const deviceMarketingName = resolved?.marketingName || "";
@@ -423,6 +424,10 @@ async function saveClientLog(body) {
         existingLog.androidVersion = androidVersion;
         existingLog.appVersion = appVersion;
 
+        if (playerName) {
+            existingLog.playerName = playerName;
+        }
+
         if (serial) {
             existingLog.serial = serial;
         }
@@ -456,6 +461,8 @@ async function saveClientLog(body) {
         androidVersion,
 
         appVersion,
+
+        playerName,
 
         status: body.status || "success",
 

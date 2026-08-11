@@ -130,7 +130,8 @@ router.get("/export", auth, async (req, res) => {
             "Device Model",
             "Device Brand",
             "Android Version",
-            "App Version"
+            "App Version",
+            "Player Name"
         ].join(",");
 
         const rows = logs.map((log) => [
@@ -144,7 +145,8 @@ router.get("/export", auth, async (req, res) => {
             log.deviceModel,
             log.deviceBrand,
             log.androidVersion,
-            log.appVersion
+            log.appVersion,
+            log.playerName
         ].map(escape).join(","));
 
         const csv = [header, ...rows].join("\n");

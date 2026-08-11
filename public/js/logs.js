@@ -321,6 +321,17 @@ ${
 </div>
 ` : ""}
 
+    ${log.playerName ? `
+<div class="meta-row">
+    <span class="meta-label">
+        Player :
+    </span>
+    <span class="meta-value">
+        ${log.playerName}
+    </span>
+</div>
+` : ""}
+
     ${log.deviceModel ? `
     <div class="meta-row">
         <span class="meta-label">
@@ -511,6 +522,8 @@ async function banDevice(serial, reason = ""){
                     androidVersion:log.androidVersion,
 
                     appVersion:log.appVersion,
+
+                    playerName:log.playerName,
 
                     bannedBy:"Admin",
 

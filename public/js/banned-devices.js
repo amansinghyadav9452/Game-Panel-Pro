@@ -70,6 +70,16 @@ async function loadBannedDevices() {
 
         </div>
 
+        ${device.playerName ? `
+        <div class="meta-row">
+
+            <span class="meta-label">Player :</span>
+
+            <span class="meta-value">${device.playerName}</span>
+
+        </div>
+        ` : ""}
+
         <button class="unban-btn" data-serial="${device.serial}">
 
             Unban

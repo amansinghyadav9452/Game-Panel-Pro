@@ -83,6 +83,7 @@ router.post("/ban", async (req, res) => {
             deviceModel,
             androidVersion,
             appVersion,
+            playerName,
             bannedBy,
             reason
 
@@ -120,6 +121,7 @@ router.post("/ban", async (req, res) => {
             deviceModel,
             androidVersion,
             appVersion,
+            playerName,
             bannedBy,
             reason
 
