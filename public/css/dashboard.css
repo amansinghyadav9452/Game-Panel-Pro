@@ -1764,7 +1764,7 @@ table{
 
     padding:14px 0;
 
-    border-bottom:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid var(--border);
 
     animation:gp-activity-in .4s ease both;
 
