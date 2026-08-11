@@ -105,6 +105,24 @@
 
     font-size:15px;
 
+    -webkit-appearance:none;
+
+    appearance:none;
+
+}
+
+/* Global theme rules (theme.css) put a border/background on every
+   input for form fields elsewhere — this search box has its own pill
+   wrapper, so it must never show an inner box in either theme. */
+html.light-theme .settings-search input,
+.settings-search input{
+
+    border:none !important;
+
+    background:transparent !important;
+
+    box-shadow:none !important;
+
 }
 
 .settings-search input::placeholder{

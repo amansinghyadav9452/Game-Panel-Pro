@@ -79,7 +79,7 @@ html.light-theme .modal-box{
 html.light-theme input,
 html.light-theme select,
 html.light-theme textarea{
-    background:wheat !important;
+    background:var(--card) !important;
     color:var(--text) !important;
     border:1px solid var(--border) !important;
 }
@@ -118,7 +118,7 @@ html.light-theme .back-btn:hover{
 }
 
 html.light-theme .system-status{
-    background:wheat !important;
+    background:var(--card) !important;
     border:1px solid var(--border) !important;
 }
 
