@@ -160,6 +160,44 @@
 
 }
 
+.clear-logs-options{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    margin-bottom:14px;
+
+}
+
+.confirm-btn.primary{
+
+    background:var(--accent-gradient, linear-gradient(135deg,#8B5CF6,#3B82F6));
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    flex:none;
+
+    width:100%;
+
+}
+
+.confirm-btn.primary:hover{
+
+    filter:brightness(1.08);
+
+}
+
 @media(max-width:500px){
 
     .confirm-actions{

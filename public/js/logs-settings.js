@@ -157,3 +157,92 @@ if (saveBtn) {
     });
 
 }
+
+const deleteLogsBtn = document.getElementById("deleteLogsBtn");
+
+if (deleteLogsBtn) {
+
+    deleteLogsBtn.addEventListener("click", async () => {
+
+        const choice = await requestLogsToClear();
+
+        if (!choice) {
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+
+        if (choice === "user") {
+
+            const currentPassword = await requestPassword();
+
+            if (!currentPassword) {
+                return;
+            }
+
+            try {
+
+                const response = await fetch("/logs/user", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ currentPassword })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message);
+                }
+
+                showToast("Success", "User logs deleted successfully.", "success");
+
+            } catch (error) {
+
+                console.error(error);
+                showToast("Error", error.message || "Something went wrong.", "error");
+
+            }
+
+            return;
+
+        }
+
+        // choice === "admin"
+        showConfirm(
+            "Clear Admin Logs",
+            "This will permanently delete all admin activity logs shown on the dashboard. Continue?",
+            async () => {
+
+                try {
+
+                    const response = await fetch("/activity/clear", {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message);
+                    }
+
+                    showToast("Success", "Admin logs cleared successfully.", "success");
+
+                } catch (error) {
+
+                    console.error(error);
+                    showToast("Error", error.message || "Something went wrong.", "error");
+
+                }
+
+            }
+        );
+
+    });
+
+}

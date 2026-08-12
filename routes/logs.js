@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 
 const UserLog = require("../models/UserLog");
 const Settings = require("../models/Settings");
@@ -175,6 +176,58 @@ router.get("/export", auth, async (req, res) => {
 
             message: "Server Error"
 
+        });
+
+    }
+
+});
+
+// Deletes ALL user logs (client/device data). Password-gated since this
+// is irreversible and wipes real user history.
+router.delete("/user", auth, async (req, res) => {
+
+    try {
+
+        const { currentPassword } = req.body;
+
+        if (!currentPassword) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Current password is required."
+            });
+
+        }
+
+        const matched = await bcrypt.compare(
+            currentPassword,
+            req.admin.password
+        );
+
+        if (!matched) {
+
+            return res.status(401).json({
+                success: false,
+                message: "Current password is incorrect."
+            });
+
+        }
+
+        const result = await UserLog.deleteMany({});
+
+        res.json({
+            success: true,
+            message: "User logs deleted successfully.",
+            deletedCount: result.deletedCount
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
         });
 
     }

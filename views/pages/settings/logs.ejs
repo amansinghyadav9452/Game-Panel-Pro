@@ -17,6 +17,8 @@
 
 <%- include("../../partials/toast") %>
 <%- include("../../partials/confirm-modal") %>
+<%- include("../../partials/password-modal") %>
+<%- include("../../partials/clear-logs-modal") %>
 
 <div class="layout">
 
@@ -122,7 +124,7 @@ Download Errors
 
 <label>Clear All Logs</label>
 
-<button class="danger-btn">
+<button id="deleteLogsBtn" class="danger-btn">
 
 <i class="fa-solid fa-trash"></i>
 
@@ -149,6 +151,8 @@ Save Changes
 </div>
 
 <script src="/js/utils.js"></script>
+<script src="/js/password-modal.js"></script>
+<script src="/js/clear-logs-modal.js"></script>
 <script src="/js/logs-settings.js"></script>
 
 </body>
