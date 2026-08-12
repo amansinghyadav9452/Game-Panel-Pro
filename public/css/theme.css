@@ -158,6 +158,24 @@ html.light-theme .topbar-row h2{
     color:var(--text) !important;
 }
 
+/* Dashboard "Welcome Back" hero: the card background is a semi-transparent
+   dark gradient, so it blends with whatever sits behind it. On dark theme
+   that stays dark; on light theme it blends toward white and washes out —
+   which made the #94A3B8 subtitle text almost invisible. Give the card its
+   own solid-enough background and a darker subtitle color in light mode. */
+html.light-theme .dashboard-hero{
+    background:linear-gradient(135deg, rgba(59,130,246,.14), rgba(30,41,59,.92)) !important;
+}
+
+html.light-theme .hero-left h1,
+html.light-theme .hero-chip{
+    color:#F8FAFC !important;
+}
+
+html.light-theme .hero-left p{
+    color:#E2E8F0 !important;
+}
+
 @media(min-width:769px){
 
     html.sidebar-collapsed .sidebar{

@@ -168,4 +168,18 @@
 
     }
 
+    /* flex:1 hijacks height on the main axis once the container becomes
+       column-direction — that's why "Continue" rendered taller than
+       "Cancel" on mobile even though both had height:50px. Pin the
+       height explicitly here instead of relying on flex-grow. */
+    .confirm-btn{
+
+        flex:none;
+
+        width:100%;
+
+        height:50px;
+
+    }
+
 }
