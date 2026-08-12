@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const rateLimit = require("express-rate-limit");
 
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
@@ -10,7 +11,57 @@ const { sendOtpEmail } = require("../services/mailer");
 const router = express.Router();
 const fetch = global.fetch;
 
-router.post("/login", async (req, res) => {
+// ===== RATE LIMITERS =====
+
+// Strict limiter for login attempts (brute-force protection)
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,                   // max 10 attempts per IP per window
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many login attempts from this IP. Please try again later."
+    }
+});
+
+// Slightly looser limiter for OTP verify (user may need a couple retries for typos)
+const otpVerifyLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 15,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many verification attempts from this IP. Please try again later."
+    }
+});
+
+// Strict limiter for OTP resend (prevents email/SMS bombing)
+const otpResendLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 3,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many resend requests from this IP. Please try again later."
+    }
+});
+
+// Strict limiter for password reset flow (prevents abuse/enumeration)
+const resetLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many password reset requests from this IP. Please try again later."
+    }
+});
+
+router.post("/login", loginLimiter, async (req, res) => {
 
     try {
 
@@ -197,7 +248,7 @@ if (settings?.security?.forceSingleLogin) {
 
 });
 
-router.post("/login/2fa/verify", async (req, res) => {
+router.post("/login/2fa/verify", otpVerifyLimiter, async (req, res) => {
 
     try {
 
@@ -333,7 +384,7 @@ router.post("/login/2fa/verify", async (req, res) => {
 
 });
 
-router.post("/login/2fa/resend", async (req, res) => {
+router.post("/login/2fa/resend", otpResendLimiter, async (req, res) => {
 
     try {
 
@@ -420,7 +471,7 @@ router.get("/login", async (req, res) => {
     });
 
 });
-router.post("/login/reset-password/send-otp", async (req, res) => {
+router.post("/login/reset-password/send-otp", resetLimiter, async (req, res) => {
 
     try {
 
@@ -500,7 +551,7 @@ router.post("/login/reset-password/send-otp", async (req, res) => {
 
 });
 
-router.post("/login/reset-password/verify-otp", async (req, res) => {
+router.post("/login/reset-password/verify-otp", resetLimiter, async (req, res) => {
 
     try {
 
@@ -626,7 +677,7 @@ router.post("/login/reset-password/verify-otp", async (req, res) => {
 
 });
 
-router.post("/login/reset-password/reset", async (req, res) => {
+router.post("/login/reset-password/reset", resetLimiter, async (req, res) => {
 
     try {
 
