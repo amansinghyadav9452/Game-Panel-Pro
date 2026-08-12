@@ -33,6 +33,37 @@ async function syncLicenseStatus(license) {
 
 }
 
+// Same effect as calling syncLicenseStatus() on every matching license, but
+// as two bulk updateMany() calls instead of N sequential find + save round
+// trips. `scope` can narrow it to a type (e.g. { type: "premium" }).
+async function bulkSyncLicenseStatuses(scope = {}) {
+
+    const now = new Date();
+
+    await Promise.all([
+
+        License.updateMany(
+            {
+                ...scope,
+                status: "active",
+                expiry: { $lte: now }
+            },
+            { $set: { status: "expired" } }
+        ),
+
+        License.updateMany(
+            {
+                ...scope,
+                status: "expired",
+                expiry: { $gt: now }
+            },
+            { $set: { status: "active" } }
+        )
+
+    ]);
+
+}
+
 async function createLicense(key, type, expiryDays, maxUses, admin) {
 
     const exists = await License.findOne({ key });
@@ -67,19 +98,14 @@ if (exists) {
 
 async function listLicenses(type) {
 
-    const licenses = await License.find({
+    // One bulk update instead of a save() per license.
+    await bulkSyncLicenseStatuses({ type });
+
+    return await License.find({
         type
     }).sort({
         createdAt: -1
     });
-
-    for (const license of licenses) {
-
-        await syncLicenseStatus(license);
-
-    }
-
-    return licenses;
 
 }
 
@@ -116,6 +142,8 @@ module.exports = {
 
     deleteLicense,
 
-    syncLicenseStatus
+    syncLicenseStatus,
+
+    bulkSyncLicenseStatuses
 
 };

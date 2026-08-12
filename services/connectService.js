@@ -86,7 +86,7 @@ if (license.status === "banned") {
         status: false,
         reason: "License Banned"
     };
-} 
+}
 
 if (!serial) {
 
@@ -162,7 +162,7 @@ if (!game || !user_key) {
     };
 
 }
-  
+
     const alreadyRegistered = license.devices.includes(serial);
 
 if (!alreadyRegistered) {
@@ -252,12 +252,6 @@ async function verifyPublicLicense(body, req) {
     return verifyLicense(body, req, "public");
 }
 
-// Handles the alternate /connect protocol used by some client builds,
-// where the request body is { encryptedData: "<base64>" } instead of
-// plain { game, user_key, serial } fields. Internally this decrypts the
-// envelope, then delegates to the same verifyLicense() used by every
-// other build, so license rules / device limits / logging all stay
-// identical - only the wire format differs.
 async function verifyEncryptedConnect(body, req) {
 
     try {
@@ -377,7 +371,6 @@ async function saveClientLog(body) {
 
     if (serial) {
 
-        // Exact match: same license key + same device serial.
         existingLog = await UserLog.findOne({
 
             licenseKey: userKey,
@@ -392,8 +385,6 @@ async function saveClientLog(body) {
 
     if (!existingLog) {
 
-        // Fallback for older clients that don't send a serial yet:
-        // merge into the most recent unmatched success log for this key.
         const recentCutoff = new Date(Date.now() - 5 * 60 * 1000);
 
         existingLog = await UserLog.findOne({
@@ -470,15 +461,14 @@ async function saveClientLog(body) {
 
     });
 
-    
     return {
-        
+
         status: true,
-        
+
         message: "Log Saved"
-        
+
     };
-    
+
 }
 
 module.exports = {

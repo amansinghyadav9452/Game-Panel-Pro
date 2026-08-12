@@ -2,14 +2,15 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const License = require("../models/License");
 const {
-    syncLicenseStatus
+    syncLicenseStatus,
+    listLicenses,
+    bulkSyncLicenseStatuses
 } = require("../services/licenseService");
-const { listLicenses } = require("../services/licenseService");
 
 const router = express.Router();
 const logActivity = require("../services/activityLogger");
-const deleteExpiredLicenses =
-require("../services/licenseCleanup");
+// Expired-license deletion now runs on a background schedule (see server.js)
+// instead of blocking every page load — see services/licenseCleanup.js.
 
 router.get("/panel", (req, res) => {
 
@@ -50,32 +51,33 @@ router.get("/dashboard", auth, async (req, res) => {
 
     try {
 
-        await deleteExpiredLicenses();
-        const licenses = await License.find();
+        // Bulk-flip any active<->expired licenses in ONE update per
+        // direction (was: fetch every license, then save() each one
+        // individually — the main reason this page felt slow).
+        await bulkSyncLicenseStatuses();
+
+        const counts = await License.aggregate([
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
 
         let activeKeys = 0;
         let expiredKeys = 0;
         let bannedKeys = 0;
 
-for (const license of licenses) {
+        for (const row of counts) {
 
-    await syncLicenseStatus(license);
+            if (row._id === "banned") bannedKeys = row.count;
+            else if (row._id === "expired") expiredKeys = row.count;
+            else if (row._id === "active") activeKeys = row.count;
 
-    if (license.status === "banned") {
+        }
 
-        bannedKeys++;
-
-    } else if (license.status === "expired") {
-
-        expiredKeys++;
-
-    } else {
-
-        activeKeys++;
-
-    }
-
-}
+        const totalKeys = activeKeys + expiredKeys + bannedKeys;
 
         res.json({
 
@@ -83,7 +85,7 @@ for (const license of licenses) {
 
             stats: {
 
-                totalKeys: licenses.length,
+                totalKeys,
 
                 activeKeys,
 
@@ -115,7 +117,6 @@ router.get("/dashboard/licenses", auth, async (req, res) => {
 
     try {
 
-        await deleteExpiredLicenses();
         const licenses = await listLicenses("public");
 
         res.json({

@@ -113,9 +113,6 @@ const uniqueDevices = new Set(
 
         }
 
-        // Naya data purane rendered data se compare karo.
-        // Agar kuch nahi badla to DOM ko touch hi mat karo -
-        // isse har 10 sec ke auto-refresh pe list "blink" nahi karegi.
         const signature = JSON.stringify({
             page: data.currentPage,
             banned: bannedDevices,

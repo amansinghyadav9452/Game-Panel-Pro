@@ -35,4 +35,9 @@ const userLogSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// /logs/recent filters by createdAt range + sorts by it (compound index
+// covers both). /logs/export filters by status.
+userLogSchema.index({ createdAt: -1 });
+userLogSchema.index({ status: 1, createdAt: -1 });
+
 module.exports = mongoose.model("UserLog", userLogSchema);

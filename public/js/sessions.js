@@ -157,8 +157,6 @@ function attachSwipeHandlers() {
 
             const delta = e.clientX - startX;
 
-            // Sirf left-to-right (rightward) swipe allowed - terminate
-            // strip left side pe reveal hoti hai.
             currentX = Math.max(0, Math.min(delta, revealWidth));
 
             content.style.transform = `translateX(${currentX}px)`;

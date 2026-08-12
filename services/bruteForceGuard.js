@@ -1,18 +1,8 @@
-/*
- * Lightweight in-memory brute-force guard for the public license-check
- * API (/connect, /connect-premium). Tracks failed attempts per IP in a
- * sliding window and temporarily blocks IPs that exceed the threshold.
- *
- * In-memory is intentional here (single-process deployment) - no Redis
- * dependency needed. State resets on restart, which is acceptable for
- * this use case (abuse detection, not permanent banning).
- */
+const WINDOW_MS = 5 * 60 * 1000;
+const MAX_FAILURES = 15;
+const BLOCK_DURATION_MS = 15 * 60 * 1000;
 
-const WINDOW_MS = 5 * 60 * 1000;      // 5 minute sliding window
-const MAX_FAILURES = 15;              // failures allowed in the window
-const BLOCK_DURATION_MS = 15 * 60 * 1000; // 15 minute block once tripped
-
-const attempts = new Map(); // ip -> { failures: [timestamps], blockedUntil: number }
+const attempts = new Map();
 
 function getEntry(ip) {
 
@@ -74,7 +64,6 @@ function recordSuccess(ip) {
 
 }
 
-// Periodic cleanup so the map doesn't grow forever.
 setInterval(() => {
 
     const now = Date.now();

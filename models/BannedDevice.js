@@ -56,6 +56,9 @@ const bannedDeviceSchema = new mongoose.Schema({
 
 });
 
+// The list route always sorts by bannedAt desc.
+bannedDeviceSchema.index({ bannedAt: -1 });
+
 module.exports = mongoose.model(
     "BannedDevice",
     bannedDeviceSchema

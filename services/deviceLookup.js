@@ -1,16 +1,10 @@
-// Resolves a raw Android "ro.product.model" code (e.g. "22041216I")
-// into a human-readable marketing name (e.g. "Redmi K50i") using the
-// publicly available, daily auto-updated Google Play certified device
-// database maintained at:
-// https://github.com/androidtrackers/certified-android-devices
-
 const SOURCE_URL =
     "https://raw.githubusercontent.com/androidtrackers/certified-android-devices/master/by_model.json";
 
-const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
-let modelIndex = null;      // Map<original model code, {brand, name, device}>
-let lowerModelIndex = null; // Map<lowercase model code, {brand, name, device}>
+let modelIndex = null;
+let lowerModelIndex = null;
 let lastFetchedAt = 0;
 let fetchingPromise = null;
 
@@ -33,7 +27,6 @@ async function fetchDeviceDatabase() {
 
         if (!Array.isArray(entries) || !entries.length) continue;
 
-        // Multiple devices can share a model code (rare) - keep the first.
         const entry = entries[0];
 
         const value = {
@@ -77,8 +70,6 @@ async function ensureLoaded() {
 
             console.error("Device DB refresh failed:", error.message);
 
-            // Keep serving the stale cache (if any) rather than crashing.
-
         })
 
         .finally(() => {
@@ -91,7 +82,6 @@ async function ensureLoaded() {
 
 }
 
-// Returns { marketingName, brand } or null if unresolved / lookup unavailable.
 async function resolveMarketingName(modelCode) {
 
     if (!modelCode) return null;

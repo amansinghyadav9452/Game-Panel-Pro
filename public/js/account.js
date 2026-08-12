@@ -379,13 +379,6 @@ if (saveBtn) {
 
 }
 
-/* Logout-all handling now lives in sessions.js (inside the
-   Active Sessions modal) so it isn't wired twice. */
-
-/* ==========================
-   CHANGE PASSWORD MODAL
-========================== */
-
 const passwordModal = document.getElementById("passwordModal");
 
 const changePasswordBtn = document.getElementById("changePasswordBtn");

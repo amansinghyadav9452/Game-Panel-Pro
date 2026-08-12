@@ -65,11 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!overlay) return;
 
-    /* Intentionally NO backdrop click-to-close and NO Escape-key
-       handler here — this modal can only be dismissed via the
-       explicit Cancel button, so a stray click/keypress can never
-       let someone slip past 2FA. */
-
     if (cancelBtn) {
 
         cancelBtn.addEventListener("click", () => {

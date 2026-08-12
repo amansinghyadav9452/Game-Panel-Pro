@@ -1,10 +1,3 @@
-/*
- * Recursively strips any object key starting with "$" or containing "."
- * from request input. Prevents NoSQL / MongoDB operator injection, e.g.
- * a client sending { "user_key": { "$ne": null } } to bypass a
- * License.findOne({ key: user_key }) check.
- */
-
 function sanitizeValue(value) {
 
     if (Array.isArray(value)) {

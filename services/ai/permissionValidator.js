@@ -1,10 +1,8 @@
 const crypto = require("crypto");
 const { isDestructive, toolExists } = require("./toolRegistry");
 
-const ACTION_TTL_MS = 2 * 60 * 1000; // 2 minutes to confirm
+const ACTION_TTL_MS = 2 * 60 * 1000;
 
-// In-memory only — matches "temporary session memory" from the spec.
-// pendingActions: token -> { adminId, tool, args, createdAt }
 const pendingActions = new Map();
 
 setInterval(() => {
@@ -33,10 +31,6 @@ function validateToolRequest(name) {
 
 }
 
-/**
- * Registers a destructive action as "pending" and returns a one-time
- * token. The action is NOT executed here.
- */
 function createPendingAction(adminId, tool, args) {
 
     const token = crypto.randomBytes(24).toString("hex");
@@ -54,11 +48,6 @@ function createPendingAction(adminId, tool, args) {
 
 }
 
-/**
- * Redeems a pending-action token. Must belong to the same admin that
- * created it, and can only ever be redeemed once (removed immediately,
- * regardless of whether the caller reports success).
- */
 function consumePendingAction(adminId, token) {
 
     const action = pendingActions.get(token);

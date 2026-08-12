@@ -27,7 +27,6 @@ if (!header || !header.startsWith("Bearer ")) {
             process.env.JWT_SECRET
         );
 
-        
         const admin = await Admin.findById(decoded.id);
 
 if (!admin) {
@@ -54,8 +53,6 @@ if (decoded.sessionVersion !== admin.sessionVersion) {
 
 }
 
-// Older tokens issued before session-tracking was added won't carry a
-// sessionId - skip the check for those so existing logins don't break.
 if (decoded.sessionId) {
 
     const session = await Session.findOne({

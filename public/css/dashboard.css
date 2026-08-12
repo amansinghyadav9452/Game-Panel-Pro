@@ -78,8 +78,6 @@ body{
 
 }
 
-
-
 .layout{
 
     display:flex;
@@ -107,10 +105,6 @@ body{
     top:0;
 
 }
-
-/* ==========================
-   SIDEBAR PROFILE
-========================== */
 
 .sidebar-profile{
 
@@ -348,10 +342,6 @@ body{
 
 }
 
-/* ==========================
-   PROFILE MENU
-========================== */
-
 .profile-menu{
 
     position:absolute;
@@ -480,10 +470,6 @@ body{
 
 }
 
-/* ==========================
-   PROFILE VIEWER
-========================== */
-
 .profile-viewer{
 
     position:fixed;
@@ -573,8 +559,6 @@ body{
     transform:rotate(90deg);
 
 }
-
-
 
 .logo{
 
@@ -687,10 +671,6 @@ nav a.active i{
     100%{transform:scale(1);}
 
 }
-
-/* =========================
-      Sidebar Nav Icon Colors + Glow
-========================= */
 
 nav a:not(.active):nth-child(1) i{
     color:#60a5fa;
@@ -1059,12 +1039,6 @@ th,td{
 
 }
 
-
-
-/* ======================
-TOPBAR
-====================== */
-
 .left-section{
 
     display:flex;
@@ -1122,10 +1096,6 @@ TOPBAR
     cursor:pointer;
 
 }
-
-/* ==========================
-   Overlay
-========================== */
 
 #overlay{
 
@@ -1228,8 +1198,6 @@ TOPBAR
     border-radius: 12px;
 
     font-weight: 600;
-
-
 
 }
 
@@ -1436,10 +1404,6 @@ TOPBAR
     color:white;
 
 }
-
-/* ==========================
-   TOAST
-========================== */
 
 #toast{
 
@@ -1820,10 +1784,6 @@ table{
 
 }
 
-/* ==========================
-   DASHBOARD HERO
-========================== */
-
 .dashboard-hero{
 
     display:flex;
@@ -1972,10 +1932,6 @@ table{
     }
 
 }
-
-/* ==========================
-   DASHBOARD CARD THEMES
-========================== */
 
 .cards .card:nth-child(1){
 
@@ -2143,7 +2099,6 @@ table{
     color:#FF7E7E;
 
 }
-
 
 .card:hover .card-icon{
 
@@ -3042,7 +2997,7 @@ table{
     .search-box{
 
         display: none !important;
-        
+
     }
 
     .content{

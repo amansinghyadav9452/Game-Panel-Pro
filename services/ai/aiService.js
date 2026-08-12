@@ -77,16 +77,6 @@ function assertConfigured() {
 
 }
 
-/**
- * Single call point to the LLM. Used both for the tool-deciding step and
- * for the final natural-language answer - the model naturally returns
- * `content` with no `tool_calls` once it's done using tools.
- *
- * Non-streaming by design: this is a network call to a third-party API
- * we can't dry-run here, so we favor a response we can fully validate
- * over parsing a live SSE stream blind. The controller pseudo-streams
- * the returned text back to the browser for a smooth typing UX.
- */
 async function chatCompletion(messages) {
 
     assertConfigured();

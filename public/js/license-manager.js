@@ -30,7 +30,6 @@ async function loadLicenses(endpoint = currentEndpoint) {
 
 }
 
-
 function initLicenseManager(endpoint) {
 
     currentEndpoint = endpoint;
@@ -356,21 +355,21 @@ const response = await apiFetch(
     loadStats();
 }
             loadLicenses();
-            
+
         }else{
-            
+
             showToast("Error", data.message, "error");
-            
+
         }
-        
+
     }catch(err){
-        
+
         console.error(err);
-        
+
         showToast("Error", "Server Error", "error");
-        
+
     }
-    
+
 }
 
 const createModal =
@@ -681,10 +680,9 @@ const response = await apiFetch(endpoint, {
             if (typeof loadStats === "function") {
     loadStats();
 }
-    
+
             loadLicenses();
         }
-        
 
         else {
 

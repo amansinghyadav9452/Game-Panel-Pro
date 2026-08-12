@@ -1,13 +1,3 @@
-/*
- * Global interaction layer.
- * Loaded once via partials/head.ejs (non-deferred, right after
- * theme.js) so every page-specific script that runs afterwards
- * (dashboard.js, license-manager.js, banned-devices.js, ...) can
- * safely call the helpers below. Nothing here depends on the DOM
- * being fully parsed yet — click delegation and function
- * definitions both work before <body> exists.
- */
-
 function gpAnimationsDisabled() {
 
     return document.documentElement.classList.contains("no-animations");
@@ -21,19 +11,12 @@ function gpHaptic(ms = 12) {
         try {
             navigator.vibrate(ms);
         } catch (err) {
-            /* no-op — vibration not supported/allowed */
+
         }
 
     }
 
 }
-
-/* ---------------------------------------------
-   Ripple effect
-   Delegated on document so it works for buttons
-   rendered dynamically (license rows, device
-   cards, etc.) without any per-page wiring.
---------------------------------------------- */
 
 document.addEventListener("click", function (e) {
 
@@ -79,14 +62,6 @@ document.addEventListener("click", function (e) {
 
 }, true);
 
-/* ---------------------------------------------
-   Animated number counters
-   Used for dashboard stat cards (Total, Active,
-   Expired, Banned) instead of a plain textContent
-   jump. Falls back to an instant set when the
-   user has disabled animations.
---------------------------------------------- */
-
 function animateCounter(el, targetValue, duration = 900) {
 
     if (!el) return;
@@ -129,13 +104,6 @@ function animateCounter(el, targetValue, duration = 900) {
 
 }
 
-/* ---------------------------------------------
-   Smooth row removal
-   Collapses an element (height/opacity/margin)
-   before removing it from the DOM — used when a
-   device is unbanned, a key is deleted, etc.
---------------------------------------------- */
-
 function gpRemoveRow(el, callback) {
 
     if (!el) return;
@@ -154,8 +122,6 @@ function gpRemoveRow(el, callback) {
 
     el.style.overflow = "hidden";
 
-    // Force a reflow so the browser registers the starting
-    // max-height before we switch to the collapsed state.
     void el.offsetHeight;
 
     el.classList.add("gp-removing");

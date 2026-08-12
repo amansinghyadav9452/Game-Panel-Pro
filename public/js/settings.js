@@ -20,7 +20,7 @@ const cards = document.querySelectorAll(".setting-item");
 
         searchInput.focus();
 
-    } 
+    }
 
     document.addEventListener("keydown", (e) => {
 

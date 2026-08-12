@@ -1,10 +1,3 @@
-/*
- * NOTE: showToast(title, message, type) is defined in toast.js,
- * which is loaded globally on every page via partials/head.ejs.
- * It is intentionally not redefined here to avoid two conflicting
- * global implementations.
- */
-
 function formatDate(date) {
 
     return new Date(date).toLocaleDateString();
@@ -108,7 +101,6 @@ function initAutoLogout(timeout = 15 * 60 * 1000) {
         }, 1000);
 
     }
-
 
     function resetTimer() {
 
@@ -239,7 +231,7 @@ async function loadProfilePhoto() {
         const data = await res.json();
 
         if (!data.success) return;
-        
+
 const img = avatar.querySelector(".profile-photo");
 if (data.admin.profileImage) {
 
@@ -282,7 +274,6 @@ if (displayName) {
 
     displayName.textContent =
         data.admin.displayName || "Administrator";
-
 
 }
 

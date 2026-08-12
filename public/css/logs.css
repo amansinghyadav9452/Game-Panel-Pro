@@ -31,10 +31,6 @@
     background:rgba(255,255,255,.04);
 }
 
-/* ==========================
-        LOGS INFO
-========================== */
-
 .logs-info{
 
     display:flex;
@@ -52,10 +48,6 @@
     font-weight:500;
 
 }
-
-/* ==========================
-      PAGINATION
-========================== */
 
 .logs-pagination{
 
@@ -154,10 +146,6 @@
     border-radius:999px;
 
 }
-
-/* ==========================
-        LOGS CARDS
-========================== */
 
 .logs-list{
 
@@ -524,7 +512,6 @@
 
 }
 
-
 .license-badge.premium{
 
     background:rgba(168,85,247,.15);
@@ -853,10 +840,6 @@
     opacity:.55;
 
 }
-
-/* Light theme: the dark-glass look (transparent bg + white text glow)
-   loses all contrast on a light page, so give it a proper solid card
-   surface with dark text instead of white gradient text. */
 
 html.light-theme .stat-card{
 

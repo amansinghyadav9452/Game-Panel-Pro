@@ -50,4 +50,7 @@ const activitySchema = new mongoose.Schema({
 
 });
 
+// The /activity/recent route always sorts by createdAt desc.
+activitySchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model("Activity", activitySchema);

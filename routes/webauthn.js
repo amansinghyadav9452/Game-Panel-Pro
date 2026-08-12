@@ -8,7 +8,6 @@ const { TextEncoder } = require("util");
 
 const auth = require("../middleware/auth");
 
-
 const {
     generateAuthenticationOptions,
     generateRegistrationOptions,

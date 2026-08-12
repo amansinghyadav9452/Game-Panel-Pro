@@ -7,6 +7,8 @@ const morgan = require("morgan");
 
 const connectDB = require("./config/database");
 const createAdmin = require("./services/createAdmin");
+const deleteExpiredLicenses = require("./services/licenseCleanup");
+const { bulkSyncLicenseStatuses } = require("./services/licenseService");
 const authRoutes = require("./routes/auth");
 const dashboardRoutes = require("./routes/dashboard");
 const webauthnRoutes = require("./routes/webauthn");
@@ -25,7 +27,6 @@ const bannedDeviceRoutes = require("./routes/bannedDevices");
 const aiRoutes = require("./routes/ai");
 const aiRateLimiter = require("./middleware/aiRateLimiter");
 
-
 const app = express();
 app.set("trust proxy", 1);
 app.set("view engine","ejs");
@@ -40,10 +41,11 @@ app.use(express.static("public", {
 
         if (filePath.endsWith(".css") || filePath.endsWith(".js")) {
 
-            // Har request pe browser server se check karega ki file badli hai ya nahi.
-            // Agar nahi badli -> 304 (fast, no re-download). Agar badli -> naya file turant milega.
-            // Isse manual cache-clear ya ?v= bump kabhi nahi karna padega.
-            res.setHeader("Cache-Control", "no-cache");
+            // Was "no-cache", which forces a revalidation round-trip for
+            // every CSS/JS file on every single page load. A short
+            // max-age lets the browser reuse the file instantly while
+            // still picking up changes within a minute of a deploy.
+            res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
 
         }
 
@@ -54,6 +56,21 @@ app.use(express.static("public", {
 connectDB().then(async () => {
     await createAdmin();
     await createSettings();
+
+    // Background maintenance: used to run inline on every dashboard/
+    // public/premium list request (that's what made pages slow). Now it
+    // runs on its own schedule instead, so page loads never wait on it.
+    const runLicenseMaintenance = () => {
+        bulkSyncLicenseStatuses().catch((err) =>
+            console.error("License status sync failed:", err)
+        );
+        deleteExpiredLicenses().catch((err) =>
+            console.error("Expired license cleanup failed:", err)
+        );
+    };
+
+    runLicenseMaintenance();
+    setInterval(runLicenseMaintenance, 15 * 60 * 1000); // every 15 minutes
 });
 
 app.use(express.json());

@@ -10,10 +10,8 @@ const {
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_HISTORY_MESSAGES = 20;
 const MAX_TOOL_HOPS = 5;
-const SESSION_IDLE_MS = 30 * 60 * 1000; // 30 min
+const SESSION_IDLE_MS = 30 * 60 * 1000;
 
-// Temporary, in-memory only - never persisted to the database.
-// sessions: adminId -> { messages: [...], updatedAt }
 const sessions = new Map();
 
 setInterval(() => {
@@ -69,18 +67,12 @@ async function pseudoStream(res, text) {
 
         writeEvent(res, { type: "token", text: word });
 
-        // Small delay for a natural typing feel without a second API call.
         await new Promise(r => setTimeout(r, 12));
 
     }
 
 }
 
-/**
- * POST /api/ai/chat
- * body: { message: string }
- * Streams newline-delimited JSON events: token | tool_running | confirm_required | error | done
- */
 async function handleChat(req, res) {
 
     res.setHeader("Content-Type", "application/x-ndjson");
@@ -136,8 +128,6 @@ async function handleChat(req, res) {
 
             }
 
-            // Record the assistant's tool-call request in history so the
-            // API has correct context on the next hop.
             session.messages.push({
 
                 role: "assistant",
@@ -188,9 +178,6 @@ async function handleChat(req, res) {
 
                     });
 
-                    // Remove the dangling tool_call from history since it
-                    // has no result yet - we'll append the real exchange
-                    // once/if the admin confirms via /api/ai/confirm.
                     session.messages.pop();
 
                     pausedForConfirmation = true;
@@ -273,12 +260,6 @@ function describeAction(tool, args) {
 
 }
 
-/**
- * POST /api/ai/confirm
- * body: { actionToken: string }
- * Executes a previously-proposed destructive action, but only if the
- * token is valid, unexpired, single-use, and belongs to this admin.
- */
 async function handleConfirm(req, res) {
 
     const adminId = String(req.admin._id);
@@ -335,11 +316,6 @@ async function handleConfirm(req, res) {
 
 }
 
-/**
- * POST /api/ai/cancel
- * body: { actionToken: string }
- * Discards a pending confirmation without running anything.
- */
 async function handleCancel(req, res) {
 
     const adminId = String(req.admin._id);

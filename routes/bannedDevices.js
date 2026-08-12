@@ -6,10 +6,6 @@ const auth = require("../middleware/auth");
 
 router.use(auth);
 
-/*
-    GET ALL
-*/
-
 router.get("/", async (req, res) => {
 
     try {
@@ -29,10 +25,6 @@ router.get("/", async (req, res) => {
     }
 
 });
-
-/*
-    GET SINGLE DEVICE
-*/
 
 router.get("/:serial", async (req, res) => {
 
@@ -66,10 +58,6 @@ router.get("/:serial", async (req, res) => {
     }
 
 });
-
-/*
-    BAN DEVICE
-*/
 
 router.post("/ban", async (req, res) => {
 
@@ -146,10 +134,6 @@ router.post("/ban", async (req, res) => {
     }
 
 });
-
-/*
-    UNBAN DEVICE
-*/
 
 router.delete("/:serial", async (req, res) => {
 

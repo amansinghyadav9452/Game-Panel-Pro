@@ -1,11 +1,5 @@
 const Settings = require("../models/Settings");
 
-/*
- * Same checks as middleware/apiAccess.js (maintenance mode, public/premium
- * API enabled) but responds using the { status, reason } shape that the
- * game client already expects from /connect and /connect-premium -
- * keeping the response contract consistent no matter why a request fails.
- */
 function connectApiAccess(type) {
 
     return async (req, res, next) => {

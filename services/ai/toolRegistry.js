@@ -5,18 +5,6 @@ const Settings = require("../../models/Settings");
 const generateKey = require("../keyGenerator");
 const { createLicense } = require("../licenseService");
 
-/*
- * Every tool below is:
- *  - Read-only or a single well-defined write (never arbitrary queries)
- *  - Parameter-validated (numbers clamped, strings length-capped, enums checked)
- *  - Marked `destructive: true` if it changes data — the AI controller
- *    NEVER executes a destructive tool directly; it always routes through
- *    the two-step confirmation flow in aiController.js first.
- *
- * This file has no knowledge of the AI/LLM at all — it's just safe,
- * ordinary backend functions, which is what makes it safe to expose.
- */
-
 function clampString(value, maxLength = 100) {
 
     if (typeof value !== "string") return "";
@@ -48,26 +36,39 @@ const tools = {
 
         async execute() {
 
-            const licenses = await License.find();
+            // Aggregate in the DB instead of pulling every license
+            // document into Node just to count them.
+            const [byStatus, byType, bannedDevices] = await Promise.all([
 
-            let activeKeys = 0, expiredKeys = 0, bannedKeys = 0, publicKeys = 0, premiumKeys = 0;
+                License.aggregate([
+                    { $group: { _id: "$status", count: { $sum: 1 } } }
+                ]),
 
-            for (const license of licenses) {
+                License.aggregate([
+                    { $group: { _id: "$type", count: { $sum: 1 } } }
+                ]),
 
-                if (license.status === "banned") bannedKeys++;
-                else if (license.status === "expired") expiredKeys++;
-                else activeKeys++;
+                BannedDevice.countDocuments()
 
-                if (license.type === "premium") premiumKeys++;
-                else publicKeys++;
+            ]);
 
+            let activeKeys = 0, expiredKeys = 0, bannedKeys = 0;
+            let publicKeys = 0, premiumKeys = 0;
+
+            for (const row of byStatus) {
+                if (row._id === "banned") bannedKeys = row.count;
+                else if (row._id === "expired") expiredKeys = row.count;
+                else if (row._id === "active") activeKeys = row.count;
             }
 
-            const bannedDevices = await BannedDevice.countDocuments();
+            for (const row of byType) {
+                if (row._id === "premium") premiumKeys = row.count;
+                else if (row._id === "public") publicKeys = row.count;
+            }
 
             return {
 
-                totalKeys: licenses.length,
+                totalKeys: activeKeys + expiredKeys + bannedKeys,
                 activeKeys,
                 expiredKeys,
                 bannedKeys,

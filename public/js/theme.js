@@ -1,11 +1,3 @@
-/*
- * Global theme engine.
- * Applies Appearance settings (dark/light, accent color, sidebar
- * collapsed, animations) to every page. Loaded on every page via
- * partials/head.ejs so a change made once in Settings > Appearance
- * reflects everywhere immediately.
- */
-
 const ACCENT_COLORS = {
     blue: { base: "#3B82F6", dark: "#2563EB" },
     purple: { base: "#8B5CF6", dark: "#7C3AED" },

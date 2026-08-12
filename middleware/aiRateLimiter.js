@@ -1,10 +1,5 @@
 const rateLimit = require("express-rate-limit");
 
-/*
- * AI Copilot has its own strict, independent budget. Kept separate from
- * the general admin rateLimiter so a burst of AI chat messages can never
- * eat into normal panel API usage (or vice versa).
- */
 const aiRateLimiter = rateLimit({
 
     windowMs: 60 * 1000,

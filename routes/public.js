@@ -6,7 +6,7 @@ const License = require("../models/License");
 const Settings = require("../models/Settings");
 const generateKey = require("../services/keyGenerator");
 const apiAccess = require("../middleware/apiAccess");
-const deleteExpiredLicenses = require("../services/licenseCleanup");
+// Expired-license deletion runs on a background schedule (see server.js).
 
 const {
 
@@ -128,7 +128,6 @@ router.get("/public/list", auth, apiAccess("public"), async (req, res) => {
 
     try {
 
-        await deleteExpiredLicenses();
         const licenses = await listLicenses("public");
 
         res.json({

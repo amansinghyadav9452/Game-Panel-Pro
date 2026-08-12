@@ -12,10 +12,6 @@ const message = document.getElementById("message");
 
 let pendingUsername = "";
 
-/* -------------------------
-   Show / Hide Password
--------------------------- */
-
 togglePassword.addEventListener("click", () => {
 
     const icon = togglePassword.querySelector("i");
@@ -40,10 +36,6 @@ togglePassword.addEventListener("click", () => {
 
 });
 
-/* -------------------------
-   Login
--------------------------- */
-
 form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
@@ -56,7 +48,6 @@ form.addEventListener("submit", async (e) => {
         `<i class="fa-solid fa-spinner fa-spin"></i> Signing In...`;
 
     message.innerHTML = "";
-    
 
     try {
 
@@ -160,7 +151,6 @@ if (typeof turnstile !== "undefined") {
 
     }
 
-    
 if (!data || !data.remaining) {
 
     loginBtn.disabled = false;
@@ -170,10 +160,6 @@ if (!data || !data.remaining) {
 
 }}
 );
-
-/* -------------------------
-   Message
--------------------------- */
 
 function showMessage(text, success) {
 
@@ -397,9 +383,6 @@ window.location.href = "/panel";
     });
 
 }
-/* -------------------------
-   Reset Password (3-step)
--------------------------- */
 
 const openResetPasswordBtn = document.getElementById("openResetPasswordBtn");
 
@@ -712,19 +695,6 @@ if (resetNewPasswordOk) {
 
 }
 
-/* -------------------------
-   Login Page - Random Theme Color
-   (applies automatically on every page load, and again on click)
-
-   Sets a handful of CSS custom properties (background gradient,
-   floating glow circles, shield glow) on <html> so the entire
-   page repaints in a new color — not just a CSS filter, which
-   has no visible effect on near-black/grayscale pixels.
--------------------------- */
-
-// Evenly spaced hues around the color wheel (24 colors) + one
-// "null" entry that restores the original monochrome black
-// look. 25 distinct themes in total.
 const PANEL_THEME_HUES = [
     0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165,
     180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345,
@@ -748,7 +718,6 @@ function applyRandomTheme() {
 
     if (hue === null) {
 
-        // Original all-black theme
         root.setProperty("--theme-bg-a", "#030303");
         root.setProperty("--theme-bg-b", "#050505");
         root.setProperty("--theme-bg-c", "#000000");
@@ -792,7 +761,6 @@ function applyRandomTheme() {
 
 }
 
-// Auto-apply a fresh random color every time the login page loads
 applyRandomTheme();
 
 const logoBox = document.querySelector(".logo-box");

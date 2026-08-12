@@ -73,4 +73,10 @@ const licenseSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Speeds up: type-filtered lists (listLicenses), status/expiry sync queries,
+// the expired-license cleanup job, and "recent first" sorting.
+licenseSchema.index({ type: 1, status: 1 });
+licenseSchema.index({ status: 1, expiry: 1 });
+licenseSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model("License", licenseSchema);
