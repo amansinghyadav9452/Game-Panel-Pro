@@ -131,8 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 confirmBtn.innerHTML = `<i class="fa-solid fa-check"></i> Success`;
 
+                const destination =
+                    data.role === "developer" ? "/messenger" : "/panel";
+
                 setTimeout(() => {
-                    window.location.href = "/panel";
+                    window.location.href = destination;
                 }, 600);
 
                 return;

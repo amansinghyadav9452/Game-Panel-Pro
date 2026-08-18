@@ -1,0 +1,57 @@
+<div id="devChatOverlay" class="dev-chat-overlay">
+
+    <div id="devChatPanel" class="dev-chat-panel">
+
+        <div class="dev-chat-header">
+
+            <div class="dev-chat-header-left">
+
+                <button id="devChatClose" class="dev-chat-icon-btn" type="button" title="Close">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+
+                <div class="dev-chat-avatar">
+                    <i class="fa-solid fa-comments"></i>
+                    <span id="devChatPresenceDot" class="dev-chat-presence-dot"></span>
+                </div>
+
+                <div>
+                    <div class="dev-chat-title" id="devChatPeerTitle">Messenger</div>
+                    <div class="dev-chat-status">
+                        <span id="devChatStatusText">Connecting...</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="devChatMessages" class="dev-chat-messages">
+            <p class="dev-chat-empty">No messages yet. Say hi 👋</p>
+        </div>
+
+        <div id="devChatTypingRow" class="dev-chat-typing" style="display:none;">
+            Typing...
+        </div>
+
+        <div class="dev-chat-input-row">
+            <input
+                id="devChatInput"
+                type="text"
+                placeholder="Type a message..."
+                maxlength="2000"
+                autocomplete="off">
+            <button id="devChatSend" type="button">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="devChatMsgMenu" class="dev-chat-msg-menu">
+    <button id="devChatUnsendBtn" type="button">
+        <i class="fa-solid fa-trash-can"></i> Unsend
+    </button>
+</div>

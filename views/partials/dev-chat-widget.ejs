@@ -1,66 +1,9 @@
 <button id="devChatToggle" class="dev-chat-toggle" type="button">
-
     <i class="fa-solid fa-headset"></i>
-
     <span id="devChatBadge" class="dev-chat-badge" style="display:none;">0</span>
-
 </button>
 
-<div id="devChatPanel" class="dev-chat-panel">
-
-    <div class="dev-chat-header">
-
-        <div>
-
-            <div class="dev-chat-title">
-
-                <i class="fa-solid fa-headset"></i>
-
-                Message Developer
-
-            </div>
-
-            <div class="dev-chat-status">
-
-                <span id="devChatStatusDot" class="dev-chat-status-dot"></span>
-
-                <span id="devChatStatusText">Connecting...</span>
-
-            </div>
-
-        </div>
-
-        <button id="devChatClose" type="button">
-
-            <i class="fa-solid fa-xmark"></i>
-
-        </button>
-
-    </div>
-
-    <div id="devChatMessages" class="dev-chat-messages">
-
-        <p class="dev-chat-empty">No messages yet. Say hi 👋</p>
-
-    </div>
-
-    <div class="dev-chat-input-row">
-
-        <input
-            id="devChatInput"
-            type="text"
-            placeholder="Type a message..."
-            maxlength="2000">
-
-        <button id="devChatSend" type="button">
-
-            <i class="fa-solid fa-paper-plane"></i>
-
-        </button>
-
-    </div>
-
-</div>
+<%- include("./messenger-modal") %>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/dev-chat.js"></script>

@@ -28,6 +28,7 @@ const createSettings = require("./services/createSettings");
 const bannedDeviceRoutes = require("./routes/bannedDevices");
 const aiRoutes = require("./routes/ai");
 const aiRateLimiter = require("./middleware/aiRateLimiter");
+const messengerRoutes = require("./routes/messenger");
 const registerDevChat = require("./sockets/devChat");
 
 const app = express();
@@ -190,14 +191,11 @@ app.use("/settings", rateLimiter, settingsRoutes);
 app.use("/logs", rateLimiter, logsRoutes);
 app.use("/api/banned-devices", rateLimiter, bannedDeviceRoutes);
 app.use("/api/ai", aiRateLimiter, aiRoutes);
+app.use(rateLimiter, messengerRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {
     res.redirect("/login");
-});
-
-app.get("/dev-chat", (req, res) => {
-    res.render("dev-chat");
 });
 
 const PORT = process.env.PORT || 3000;

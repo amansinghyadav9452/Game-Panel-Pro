@@ -29,6 +29,26 @@ const chatMessageSchema = new mongoose.Schema({
         default: false
     },
 
+    // Timestamp jab doosre role ne is message ko dekh liya (WhatsApp
+    // jaisa "Seen at" dikhane ke liye). Sirf ek hi baar set hota hai.
+    seenAt: {
+        type: Date,
+        default: null
+    },
+
+    // Unsend / delete support - text DB me hamesha rehta hai taaki
+    // doosra role (jise msg mila tha) ye dekh sake ki unsend kiya gaya
+    // msg tha kya. Sirf UI is flag ko dekh kar alag render karti hai.
+    unsent: {
+        type: Boolean,
+        default: false
+    },
+
+    unsentAt: {
+        type: Date,
+        default: null
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

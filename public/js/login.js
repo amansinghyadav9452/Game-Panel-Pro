@@ -131,9 +131,14 @@ if (data.success && data.twoFactorRequired) {
     loginBtn.innerHTML =
         `<i class="fa-solid fa-check"></i> Success`;
 
+    // Developer role sirf Messenger dekhega, admin role full panel me
+    // jayega.
+    const destination =
+        data.role === "developer" ? "/messenger" : "/panel";
+
     setTimeout(() => {
 
-        window.location.href = "/panel";
+        window.location.href = destination;
 
     }, 700);
 

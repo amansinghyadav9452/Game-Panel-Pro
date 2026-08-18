@@ -228,7 +228,9 @@ if (settings?.security?.forceSingleLogin) {
 
             success: true,
 
-            token
+            token,
+
+            role: admin.role
 
         });
 
@@ -362,7 +364,9 @@ router.post("/login/2fa/verify", otpVerifyLimiter, async (req, res) => {
 
             success: true,
 
-            token
+            token,
+
+            role: admin.role
 
         });
 
