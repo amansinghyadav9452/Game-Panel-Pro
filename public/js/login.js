@@ -131,10 +131,9 @@ if (data.success && data.twoFactorRequired) {
     loginBtn.innerHTML =
         `<i class="fa-solid fa-check"></i> Success`;
 
-    // Developer role sirf Messenger dekhega, admin role full panel me
-    // jayega.
-    const destination =
-        data.role === "developer" ? "/messenger" : "/panel";
+    // Developer role ab admin jaisa full panel access rakhta hai, isliye
+    // sabko /panel par bhej rahe hain.
+    const destination = "/panel";
 
     setTimeout(() => {
 

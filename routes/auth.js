@@ -142,6 +142,19 @@ if (!admin) {
 
 }
 
+// Reject oversized passwords before they ever reach bcrypt. Without this,
+// an attacker can send a very large password string on every request and
+// force the server to spend CPU/memory hashing it (password DoS), since
+// bcrypt.compare() has no built-in length cap.
+if (typeof password !== "string" || password.length > 128) {
+
+    return res.status(400).json({
+        success: false,
+        message: "Invalid username or password."
+    });
+
+}
+
         const match = await bcrypt.compare(
 
             password,
@@ -716,13 +729,13 @@ router.post("/login/reset-password/reset", resetLimiter, async (req, res) => {
 
         }
 
-        if (newPassword.length < 6) {
+        if (newPassword.length < 6 || newPassword.length > 128) {
 
             return res.status(400).json({
 
                 success: false,
 
-                message: "Password must be at least 6 characters."
+                message: "Password must be between 6 and 128 characters."
 
             });
 

@@ -131,8 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 confirmBtn.innerHTML = `<i class="fa-solid fa-check"></i> Success`;
 
-                const destination =
-                    data.role === "developer" ? "/messenger" : "/panel";
+                // Developer role ab admin jaisa full panel access rakhta hai.
+                const destination = "/panel";
 
                 setTimeout(() => {
                     window.location.href = destination;

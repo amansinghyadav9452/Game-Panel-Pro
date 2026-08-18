@@ -53,20 +53,10 @@ if (decoded.sessionVersion !== admin.sessionVersion) {
 
 }
 
-// Developer role sirf Messenger ke liye hai - admin panel ke kisi bhi
-// route (dashboard, settings, logs, keys, banned devices, AI, etc.)
-// tak iski pahuch nahi honi chahiye.
-if (admin.role === "developer") {
-
-    return res.status(403).json({
-
-        success:false,
-
-        message:"Developers only have access to Messenger."
-
-    });
-
-}
+// NOTE: Developers were previously restricted to Messenger only (blocked
+// here from dashboard, settings, logs, keys, banned devices, AI, etc.).
+// Per request, the "developer" role now has the same full access as
+// "admin" through this middleware — no role check left here at all.
 
 if (decoded.sessionId) {
 

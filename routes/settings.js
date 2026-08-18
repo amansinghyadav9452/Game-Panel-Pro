@@ -902,6 +902,21 @@ router.put("/account/password",  auth, async (req, res) => {
 
         }
 
+        // Cap currentPassword length before it reaches bcrypt.compare() below —
+        // even on an authenticated route, an oversized string forces unnecessary
+        // hashing work (password DoS).
+        if (currentPassword.length > 128) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid current password."
+
+            });
+
+        }
+
         if (newPassword !== confirmPassword) {
 
             return res.status(400).json({

@@ -6,7 +6,25 @@ const { resolveMarketingName } = require("./deviceLookup");
 const { encryptAES, decryptAES, generateSignature } = require("./cryptoBridge");
 require("dotenv").config();
 
-const ENCRYPTION_CODE = "@Im_Nawaab";
+// Never hardcode this key in source — this repo is public, so a literal
+// value here is a leaked secret the moment it's committed. It must be
+// supplied via the environment (see .env.example) and rotated if it was
+// ever hardcoded previously.
+function getEncryptionCode() {
+
+    const code = process.env.CONNECT_ENCRYPTION_KEY;
+
+    if (!code) {
+
+        throw new Error(
+            "CONNECT_ENCRYPTION_KEY Missing — set it in the server's .env file."
+        );
+
+    }
+
+    return code;
+
+}
 
 async function verifyLicense(body, req, expectedType = "public") {
 
@@ -252,6 +270,46 @@ async function verifyPublicLicense(body, req) {
     return verifyLicense(body, req, "public");
 }
 
+// --- Anti-replay guard -----------------------------------------------
+// The client's encrypted payload is deterministic (same key+device always
+// produces the same ciphertext) and carries no nonce/timestamp of its
+// own, so a captured request can otherwise be resent verbatim by an
+// attacker at any rate. Since we don't control the client, we can't
+// require a nonce there — instead we track the last time each decrypted
+// (userKey, uuid) pair was processed and reject repeats inside a short
+// cooldown window. This blocks rapid-fire replay of a captured request
+// while still allowing normal, infrequent periodic license re-checks
+// from the real client.
+const REPLAY_WINDOW_MS = 5000;
+const recentConnectRequests = new Map();
+
+function isReplay(fingerprint) {
+
+    const now = Date.now();
+    const last = recentConnectRequests.get(fingerprint);
+
+    // Opportunistically clear old entries so the map doesn't grow forever.
+    if (recentConnectRequests.size > 5000) {
+
+        for (const [key, ts] of recentConnectRequests) {
+
+            if (now - ts > REPLAY_WINDOW_MS) recentConnectRequests.delete(key);
+
+        }
+
+    }
+
+    if (last && now - last < REPLAY_WINDOW_MS) {
+
+        return true;
+
+    }
+
+    recentConnectRequests.set(fingerprint, now);
+    return false;
+
+}
+
 async function verifyEncryptedConnect(body, req) {
 
     try {
@@ -267,7 +325,7 @@ async function verifyEncryptedConnect(body, req) {
 
         }
 
-        const decryptedBase64 = decryptAES(encryptedData, ENCRYPTION_CODE);
+        const decryptedBase64 = decryptAES(encryptedData, getEncryptionCode());
 
         const decoded = Buffer.from(decryptedBase64, "base64").toString("utf8");
 
@@ -284,6 +342,15 @@ async function verifyEncryptedConnect(body, req) {
 
         const userKey = decoded.slice(0, separatorIndex);
         const uuid = decoded.slice(separatorIndex + 1);
+
+        if (isReplay(`${userKey}:${uuid}`)) {
+
+            return {
+                status: false,
+                reason: "Duplicate request detected. Please wait a moment and try again."
+            };
+
+        }
 
         const result = await verifyLicense(
             { game: "PUBG", user_key: userKey, serial: uuid, ...body },
@@ -314,9 +381,10 @@ async function verifyEncryptedConnect(body, req) {
 
         };
 
+        const encryptionCode = getEncryptionCode();
         const dataString = JSON.stringify(data);
         const timestamp = Date.now();
-        const signature = generateSignature(dataString, timestamp, ENCRYPTION_CODE);
+        const signature = generateSignature(dataString, timestamp, encryptionCode);
 
         const payload = {
             timestamp,
@@ -327,7 +395,7 @@ async function verifyEncryptedConnect(body, req) {
 
         const encryptedResponse = encryptAES(
             JSON.stringify(payload),
-            ENCRYPTION_CODE
+            encryptionCode
         );
 
         return {
