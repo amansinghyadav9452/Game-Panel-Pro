@@ -4,14 +4,18 @@ const Settings = require("../models/Settings");
 const Session = require("../models/Session");
 const { getDeviceLabel } = require("./deviceLabel");
 
-async function generateToken(admin, req) {
+async function generateToken(admin, req, deviceId) {
 
 const settings = await Settings.findOne();
 
 const jwtExpiry =
     settings?.security?.jwtExpiry || "1h";
 
-const sessionId = crypto.randomUUID();
+// deviceId aata hai browser ke localStorage se (persist rehta hai) -
+// isliye same device ka har login isi ek session-row ko update karta
+// hai, naya row nahi banta. deviceId na mile (purana client / API
+// caller) to purane behaviour jaisa random id use ho jaata hai.
+const sessionId = deviceId || crypto.randomUUID();
 
 if (req) {
 
@@ -24,13 +28,27 @@ if (req) {
 
     try {
 
-        await Session.create({
-            adminId: admin._id,
-            sessionId,
-            userAgent,
-            ip,
-            deviceLabel: getDeviceLabel(userAgent)
-        });
+        await Session.findOneAndUpdate(
+
+            { adminId: admin._id, sessionId },
+
+            {
+                $set: {
+                    userAgent,
+                    ip,
+                    deviceLabel: getDeviceLabel(userAgent),
+                    lastActiveAt: new Date()
+                },
+                $setOnInsert: {
+                    adminId: admin._id,
+                    sessionId,
+                    createdAt: new Date()
+                }
+            },
+
+            { upsert: true }
+
+        );
 
     }
 

@@ -319,7 +319,7 @@ router.post(
 
         try {
 
-            const { username, authenticationResponse } = req.body;
+            const { username, authenticationResponse, deviceId } = req.body;
 
 const admin = await Admin.findOne({ username });
 
@@ -399,7 +399,7 @@ if (!admin) {
 
             await admin.save();
 
-            const token = await generateToken(admin, req);
+            const token = await generateToken(admin, req, deviceId);
 
             res.json({
 

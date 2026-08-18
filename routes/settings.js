@@ -1023,6 +1023,8 @@ try {
 
     }).sort({ lastActiveAt: -1 });
 
+    const ACTIVE_WINDOW_MS = 2 * 60 * 1000;
+
     res.json({
 
         success: true,
@@ -1039,7 +1041,12 @@ try {
 
             lastActiveAt: s.lastActiveAt,
 
-            current: s.sessionId === req.sessionId
+            current: s.sessionId === req.sessionId,
+
+            status:
+                (Date.now() - new Date(s.lastActiveAt).getTime()) < ACTIVE_WINDOW_MS
+                    ? "active"
+                    : "offline"
 
         }))
 

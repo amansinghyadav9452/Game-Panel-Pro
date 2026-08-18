@@ -108,7 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     username: otpPendingUsername,
 
-                    otp
+                    otp,
+
+                    deviceId: getDeviceId()
 
                 })
 

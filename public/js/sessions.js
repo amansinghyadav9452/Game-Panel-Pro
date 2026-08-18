@@ -99,7 +99,13 @@ async function loadSessions() {
 
                         <div class="session-meta">
 
-                            ${s.ip ? s.ip + " &bull; " : ""}${timeAgo(s.lastActiveAt)}
+                            <span class="session-status-dot ${s.status === "active" ? "is-active" : ""}"></span>
+
+                            ${s.status === "active"
+                                ? "Active now"
+                                : "Offline &bull; " + timeAgo(s.lastActiveAt)}
+
+                            ${s.ip ? " &bull; " + s.ip : ""}
 
                         </div>
 

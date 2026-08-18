@@ -1,3 +1,21 @@
+function getDeviceId() {
+
+    let deviceId = localStorage.getItem("gp_device_id");
+
+    if (!deviceId) {
+
+        deviceId =
+            (crypto.randomUUID && crypto.randomUUID()) ||
+            `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+        localStorage.setItem("gp_device_id", deviceId);
+
+    }
+
+    return deviceId;
+
+}
+
 const form = document.getElementById("loginForm");
 
 const username = document.getElementById("username");
@@ -66,6 +84,8 @@ body: JSON.stringify({
     username: username.value.trim(),
 
     password: password.value,
+
+    deviceId: getDeviceId(),
 
     turnstileToken:
     document.querySelector(
@@ -330,7 +350,9 @@ if (biometricBtn) {
 
                             username,
 
-                            authenticationResponse
+                            authenticationResponse,
+
+                            deviceId: getDeviceId()
 
                         })
 

@@ -65,7 +65,7 @@ router.post("/login", loginLimiter, async (req, res) => {
 
     try {
 
-        const { username, password, turnstileToken } = req.body;
+        const { username, password, turnstileToken, deviceId } = req.body;
         const settings = await Settings.findOne();
 
 if (settings?.security?.turnstileEnabled) {
@@ -222,7 +222,7 @@ if (settings?.security?.forceSingleLogin) {
 
 }
 
-        const token = await generateToken(admin, req);
+        const token = await generateToken(admin, req, deviceId);
 
         res.json({
 
@@ -252,7 +252,7 @@ router.post("/login/2fa/verify", otpVerifyLimiter, async (req, res) => {
 
     try {
 
-        const { username, otp } = req.body;
+        const { username, otp, deviceId } = req.body;
 
         if (!username || !otp) {
 
@@ -356,7 +356,7 @@ router.post("/login/2fa/verify", otpVerifyLimiter, async (req, res) => {
 
         await admin.save();
 
-        const token = await generateToken(admin, req);
+        const token = await generateToken(admin, req, deviceId);
 
         return res.json({
 
