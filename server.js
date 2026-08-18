@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -26,6 +28,7 @@ const createSettings = require("./services/createSettings");
 const bannedDeviceRoutes = require("./routes/bannedDevices");
 const aiRoutes = require("./routes/ai");
 const aiRateLimiter = require("./middleware/aiRateLimiter");
+const registerDevChat = require("./sockets/devChat");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -112,6 +115,19 @@ app.use(
     })
 );
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+
+    cors: {
+        origin: allowedOrigins.length ? allowedOrigins : true,
+        credentials: true
+    }
+
+});
+
+registerDevChat(io);
+
 app.use(
     helmet({
         contentSecurityPolicy: {
@@ -140,6 +156,12 @@ app.use(
                     "'self'",
                     "https://fonts.gstatic.com",
                     "https://cdnjs.cloudflare.com"
+                ],
+
+                connectSrc: [
+                    "'self'",
+                    "ws:",
+                    "wss:"
                 ],
                                 imgSrc: [
 
@@ -174,8 +196,12 @@ app.get("/", (req, res) => {
     res.redirect("/login");
 });
 
+app.get("/dev-chat", (req, res) => {
+    res.render("dev-chat");
+});
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Developer Chat</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet" href="/css/dev-chat.css">
+
+    <style>
+        *{ box-sizing:border-box; margin:0; }
+        body{ font-family:"Plus Jakarta Sans",sans-serif; }
+    </style>
+
+</head>
+
+<body>
+
+<div class="dev-chat-page">
+
+    <div id="devGateBox" class="dev-gate-box">
+
+        <i class="fa-solid fa-headset dev-gate-icon"></i>
+
+        <h1>Developer Access</h1>
+
+        <p>Enter the access key to open the chat with the admin.</p>
+
+        <input id="devGateInput" type="password" placeholder="Access key" autocomplete="off">
+
+        <button id="devGateBtn" type="button">Continue</button>
+
+        <p id="devGateError" class="dev-gate-error">Invalid access key.</p>
+
+    </div>
+
+    <div id="devChatStandaloneBox" class="dev-chat-standalone-box">
+
+        <div class="dev-chat-header">
+
+            <div>
+
+                <div class="dev-chat-title">
+
+                    <i class="fa-solid fa-user-shield"></i>
+
+                    Message Admin
+
+                </div>
+
+                <div class="dev-chat-status">
+
+                    <span id="devChatStatusDot" class="dev-chat-status-dot"></span>
+
+                    <span id="devChatStatusText">Connecting...</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="devChatMessages" class="dev-chat-messages">
+
+            <p class="dev-chat-empty">No messages yet. Say hi 👋</p>
+
+        </div>
+
+        <div class="dev-chat-input-row">
+
+            <input id="devChatInput" type="text" placeholder="Type a message..." maxlength="2000">
+
+            <button id="devChatSend" type="button">
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/dev-chat-standalone.js"></script>
+
+</body>
+
+</html>
