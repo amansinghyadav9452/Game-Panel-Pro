@@ -118,11 +118,20 @@ body::before{
 
     border-radius:50%;
 
-    filter:blur(90px);
+    /* Was blur(90px) — cost of a CSS blur filter scales sharply with
+       radius, and this ran on 3 large elements continuously, forever,
+       on every visit to the login page. This is the single biggest
+       thing making the page feel heavy. */
+    filter:blur(55px);
 
     opacity:.8;
 
     animation:float 14s ease-in-out infinite;
+
+    /* Hint the compositor to keep this on its own layer so the
+       (expensive) blur doesn't get re-rasterized against the rest of
+       the page every frame. */
+    will-change:transform;
 
 }
 
@@ -176,19 +185,24 @@ body::before{
 
     0%{
 
-        transform:translateY(0) scale(1);
+        transform:translateY(0);
 
     }
 
     50%{
 
-        transform:translateY(-35px) scale(1.08);
+        /* Removed the scale() that used to be paired with translateY.
+           Scaling a blurred element forces the browser to recompute
+           the blur at a new size every frame; a pure translate stays
+           on the compositor and is essentially free by comparison —
+           same floaty visual, far less GPU work. */
+        transform:translateY(-35px);
 
     }
 
     100%{
 
-        transform:translateY(0) scale(1);
+        transform:translateY(0);
 
     }
 
@@ -1610,4 +1624,26 @@ font-size:8px;
 
     }
 
+}
+/* --------------------------------------------------------------
+   Perf: while the login request (and Turnstile verification) is in
+   flight, pause every purely-decorative animation on the page. This
+   is exactly the window the user is staring at "Signing In...", and
+   it's also when Turnstile itself is doing real work — freeing up
+   the GPU/main-thread here removes the stutter that combo caused.
+   -------------------------------------------------------------- */
+body.form-busy .circle{
+    animation-play-state:paused;
+}
+
+body.form-busy .particles span{
+    animation-play-state:paused;
+}
+
+body.form-busy .login-card::after{
+    animation-play-state:paused;
+}
+
+body.form-busy .logo h1{
+    animation-play-state:paused;
 }

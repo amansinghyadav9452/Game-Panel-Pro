@@ -13,6 +13,13 @@
     const typingRow = document.getElementById("devChatTypingRow");
     const msgMenu = document.getElementById("devChatMsgMenu");
     const unsendBtn = document.getElementById("devChatUnsendBtn");
+    const moreBtn = document.getElementById("devChatMoreBtn");
+    const moreMenu = document.getElementById("devChatMoreMenu");
+    const clearChatBtn = document.getElementById("devChatClearChatBtn");
+    const clearOverlay = document.getElementById("devChatClearOverlay");
+    const clearForMeBtn = document.getElementById("devChatClearForMeBtn");
+    const clearForEveryoneBtn = document.getElementById("devChatClearForEveryoneBtn");
+    const clearCancelBtn = document.getElementById("devChatClearCancelBtn");
 
     if (!toggleBtn || typeof io === "undefined") return;
 
@@ -242,6 +249,9 @@
 
     document.addEventListener("click", (e) => {
         if (!msgMenu.contains(e.target)) closeMsgMenu();
+        if (moreMenu && !moreMenu.contains(e.target) && e.target !== moreBtn) {
+            moreMenu.classList.remove("show");
+        }
     });
 
     unsendBtn.addEventListener("click", () => {
@@ -253,6 +263,81 @@
         closeMsgMenu();
 
     });
+
+    function showEmptyState() {
+
+        messagesBox.innerHTML =
+            `<p class="dev-chat-empty">No messages yet. Say hi 👋</p>`;
+
+    }
+
+    function clearLocalChat() {
+
+        messagesBox.innerHTML = "";
+        messageCache.clear();
+        showEmptyState();
+        unreadCount = 0;
+        updateBadge();
+
+    }
+
+    function openClearSheet() {
+        clearOverlay.classList.add("show");
+    }
+
+    function closeClearSheet() {
+        clearOverlay.classList.remove("show");
+    }
+
+    if (moreBtn && moreMenu) {
+
+        moreBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            moreMenu.classList.toggle("show");
+        });
+
+    }
+
+    if (clearChatBtn) {
+
+        clearChatBtn.addEventListener("click", () => {
+            moreMenu.classList.remove("show");
+            openClearSheet();
+        });
+
+    }
+
+    if (clearCancelBtn) {
+        clearCancelBtn.addEventListener("click", closeClearSheet);
+    }
+
+    if (clearForMeBtn) {
+
+        clearForMeBtn.addEventListener("click", () => {
+
+            if (socket) socket.emit("chat:clear-for-me");
+            closeClearSheet();
+
+        });
+
+    }
+
+    if (clearForEveryoneBtn) {
+
+        clearForEveryoneBtn.addEventListener("click", () => {
+
+            const sure = window.confirm(
+                "Delete this entire conversation for everyone? This can't be undone."
+            );
+
+            if (!sure) return;
+
+            if (socket) socket.emit("chat:clear-for-everyone");
+            closeClearSheet();
+
+        });
+
+    }
 
     function setPeerPresence(online) {
 
@@ -356,8 +441,11 @@
 
             if (!history.length) {
 
-                messagesBox.innerHTML =
-                    `<p class="dev-chat-empty">No messages yet. Say hi 👋</p>`;
+                showEmptyState();
+
+                // Nothing to be unread about.
+                unreadCount = 0;
+                updateBadge();
 
                 return;
 
@@ -365,7 +453,30 @@
 
             history.forEach(renderMessage);
 
-            if (isOpen) socket.emit("chat:mark-seen");
+            if (isOpen) {
+
+                socket.emit("chat:mark-seen");
+
+            } else {
+
+                // Badge ab yahan se accurately set hota hai - server ab
+                // connect hote hi messages ko chup-chaap "seen" mark
+                // nahi karta, isliye history me jo bhi doosre role ka
+                // bheja hua aur abhi tak humari taraf se unread hai,
+                // wahi count hota hai. Ye fix karta hai wo case jahan
+                // panel band tha jab dusra msg aaya tha aur page baad
+                // me reload/reopen hui - pehle badge hamesha 0 dikhata
+                // tha is situation me.
+                const readField =
+                    myRole === "admin" ? "readByAdmin" : "readByDeveloper";
+
+                unreadCount = history.filter(
+                    (m) => m.sender !== myRole && !m[readField]
+                ).length;
+
+                updateBadge();
+
+            }
 
         });
 
@@ -411,6 +522,20 @@
         socket.on("chat:unsent", ({ messageId, unsentAt, unsentBy }) => {
 
             updateMessage(messageId, { unsent: true, unsentAt });
+
+        });
+
+        socket.on("chat:cleared", ({ scope }) => {
+
+            // scope "me" only reaches the account that triggered it;
+            // scope "everyone" is broadcast to both roles.
+            clearLocalChat();
+
+            if (typeof showToast === "function" && scope === "everyone") {
+
+                showToast("Messenger", "Chat cleared for everyone.", "info");
+
+            }
 
         });
 

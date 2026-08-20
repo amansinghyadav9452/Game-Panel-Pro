@@ -24,6 +24,20 @@
 
             </div>
 
+            <div class="dev-chat-header-right">
+
+                <button id="devChatMoreBtn" class="dev-chat-icon-btn" type="button" title="More options">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+
+                <div id="devChatMoreMenu" class="dev-chat-more-menu">
+                    <button id="devChatClearChatBtn" type="button">
+                        <i class="fa-solid fa-broom"></i> Clear Chat
+                    </button>
+                </div>
+
+            </div>
+
         </div>
 
         <div id="devChatMessages" class="dev-chat-messages">
@@ -54,4 +68,33 @@
     <button id="devChatUnsendBtn" type="button">
         <i class="fa-solid fa-trash-can"></i> Unsend
     </button>
+</div>
+
+<div id="devChatClearOverlay" class="dev-chat-clear-overlay">
+
+    <div class="dev-chat-clear-sheet">
+
+        <div class="dev-chat-clear-title">Clear this chat?</div>
+        <div class="dev-chat-clear-subtitle">Choose how you want to clear it.</div>
+
+        <button id="devChatClearForMeBtn" type="button" class="dev-chat-clear-option">
+            <i class="fa-solid fa-eye-slash"></i>
+            <div>
+                <div class="dev-chat-clear-option-title">Delete for me</div>
+                <div class="dev-chat-clear-option-desc">Only removes messages from your view. The other person still sees them.</div>
+            </div>
+        </button>
+
+        <button id="devChatClearForEveryoneBtn" type="button" class="dev-chat-clear-option danger">
+            <i class="fa-solid fa-trash-can"></i>
+            <div>
+                <div class="dev-chat-clear-option-title">Delete for everyone</div>
+                <div class="dev-chat-clear-option-desc">Permanently deletes the entire conversation for both sides.</div>
+            </div>
+        </button>
+
+        <button id="devChatClearCancelBtn" type="button" class="dev-chat-clear-cancel">Cancel</button>
+
+    </div>
+
 </div>

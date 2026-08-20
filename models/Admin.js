@@ -133,6 +133,14 @@ resetOtpAttempts:{
         default: "admin"
     },
 
+    // "Delete for me" cutoff for the admin<->developer chat widget —
+    // messages created before this timestamp are hidden from this
+    // account's history, without affecting the other side's view.
+    chatClearedAt: {
+        type: Date,
+        default: null
+    },
+
 failedAttempts: {
     type: Number,
     default: 0

@@ -18,6 +18,8 @@ if (!data.success) {
 
     showToast("Error", data.message, "error");
 
+    stopStatSkeletons();
+
     return;
 
 }
@@ -34,7 +36,31 @@ if (!data.success) {
 
         console.error(err);
 
+        // Without this, a failed/hung request leaves the 4 stat boxes
+        // stuck showing their loading skeleton forever — which keeps
+        // an infinite shimmer animation running on all 4 permanently,
+        // making the dashboard feel laggy just by sitting there.
+        stopStatSkeletons();
+
     }
+
+}
+
+function stopStatSkeletons() {
+
+    ["totalKeys", "activeKeys", "expiredKeys", "bannedKeys"].forEach((id) => {
+
+        const el = document.getElementById(id);
+
+        if (!el) return;
+
+        el.classList.remove("gp-skeleton");
+
+        if (el.textContent.trim() === "0" || el.textContent.trim() === "") {
+            el.textContent = "—";
+        }
+
+    });
 
 }
 

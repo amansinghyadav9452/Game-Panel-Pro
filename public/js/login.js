@@ -62,6 +62,13 @@ form.addEventListener("submit", async (e) => {
 
     loginBtn.disabled = true;
 
+    // Pause the decorative background animations (blurred blobs,
+    // border glow, particles) for the duration of the request. They
+    // don't add anything while the user is staring at "Signing In...",
+    // and freeing up the GPU/main-thread here is exactly what removes
+    // the stutter that shows up while Turnstile is verifying.
+    document.body.classList.add("form-busy");
+
     loginBtn.innerHTML =
         `<i class="fa-solid fa-spinner fa-spin"></i> Signing In...`;
 
@@ -182,7 +189,13 @@ if (!data || !data.remaining) {
     loginBtn.innerHTML =
         `<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In`;
 
-}}
+}
+
+// Always resume animations once the request settles — even during an
+// account-lockout countdown there's no reason to keep them paused.
+document.body.classList.remove("form-busy");
+
+}
 );
 
 function showMessage(text, success) {

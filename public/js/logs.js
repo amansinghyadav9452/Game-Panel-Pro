@@ -566,6 +566,11 @@ loadLogs(1);
 
 setInterval(() => {
 
+    // Don't poll while the tab/app is backgrounded — no point re-rendering
+    // a list nobody is looking at, and it avoids a burst of layout work
+    // the moment the user comes back to the app.
+    if (document.visibilityState !== "visible") return;
+
     loadLogs(currentPage, true);
 
 }, 10000);

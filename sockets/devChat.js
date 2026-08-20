@@ -48,6 +48,8 @@ function registerDevChat(io) {
             }
 
             socket.role = admin.role;
+            socket.adminId = admin._id;
+            socket.chatClearedAt = admin.chatClearedAt || null;
             socket.senderLabel =
                 admin.role === "developer"
                     ? "Developer"
@@ -96,42 +98,33 @@ function registerDevChat(io) {
 
             try {
 
-                const history = await ChatMessage.find({})
+                // "Delete for me" ke baad us admin account ko purane
+                // messages dikhna band ho jaate hain - unki apni
+                // chatClearedAt se pehle wale messages history me hi
+                // nahi bhejte.
+                const query = {};
+
+                if (socket.chatClearedAt) {
+                    query.createdAt = { $gt: socket.chatClearedAt };
+                }
+
+                const history = await ChatMessage.find(query)
                     .sort({ createdAt: -1 })
                     .limit(HISTORY_LIMIT)
                     .lean();
 
                 socket.emit("chat:history", history.reverse());
 
-                const readField =
-                    socket.role === "admin" ? "readByAdmin" : "readByDeveloper";
-
-                const otherSender =
-                    socket.role === "admin" ? "developer" : "admin";
-
-                const now = new Date();
-
-                const toMark = await ChatMessage.find({
-                    sender: otherSender,
-                    [readField]: false
-                }).select("_id").lean();
-
-                if (toMark.length > 0) {
-
-                    const ids = toMark.map((m) => m._id);
-
-                    await ChatMessage.updateMany(
-                        { _id: { $in: ids } },
-                        { $set: { [readField]: true, seenAt: now } }
-                    );
-
-                    nsp.to(otherSender).emit("chat:seen", {
-                        by: socket.role,
-                        at: now,
-                        messageIds: ids.map((id) => id.toString())
-                    });
-
-                }
+                // NOTE: Messages are intentionally NOT auto-marked as
+                // seen here anymore. This connection fires on every
+                // page load across the whole panel (the chat widget is
+                // global), so marking everything "seen" the instant the
+                // socket connects — even though the chat panel was
+                // never opened — was silently clearing the unread
+                // badge before the user ever saw the message. Seen
+                // status is now only updated via the explicit
+                // "chat:mark-seen" event, which the client sends when
+                // the chat panel is actually opened.
 
             }
 
@@ -263,6 +256,62 @@ function registerDevChat(io) {
 
             socket.to(socket.role === "admin" ? "developer" : "admin")
                 .emit("chat:typing", { from: socket.role });
+
+        });
+
+        // "Delete for me" - sirf is account ki apni view khaali ho
+        // jaati hai. Dusre role ko kuch farak nahi padta, unhe saare
+        // messages waise hi dikhte rehte hain. Hum actual messages
+        // delete nahi karte, bas is account ke liye ek cutoff
+        // timestamp save kar dete hain aur history fetch usी se filter
+        // hoti hai (upar dekho).
+        socket.on("chat:clear-for-me", async () => {
+
+            try {
+
+                const now = new Date();
+
+                await Admin.findByIdAndUpdate(socket.adminId, {
+                    chatClearedAt: now
+                });
+
+                socket.chatClearedAt = now;
+
+                socket.emit("chat:cleared", { scope: "me" });
+
+            }
+
+            catch (error) {
+
+                console.error("dev-chat clear-for-me error:", error.message);
+
+            }
+
+        });
+
+        // "Delete for everyone" - poori conversation dono taraf se
+        // hamesha ke liye delete ho jaati hai (DB se hi remove).
+        socket.on("chat:clear-for-everyone", async () => {
+
+            try {
+
+                await ChatMessage.deleteMany({});
+
+                // Ab chatClearedAt ki bhi zaroorat nahi (kuch bacha hi
+                // nahi), dono admin accounts ke liye reset kar do taaki
+                // future messages phir se sahi tarike se history me
+                // aayein.
+                await Admin.updateMany({}, { chatClearedAt: null });
+
+                nsp.emit("chat:cleared", { scope: "everyone", by: socket.role });
+
+            }
+
+            catch (error) {
+
+                console.error("dev-chat clear-for-everyone error:", error.message);
+
+            }
 
         });
 

@@ -148,4 +148,10 @@ async function loadSecurityStatus() {
 
 loadSecurityStatus();
 
-setInterval(loadSecurityStatus, 15000);
+setInterval(() => {
+
+    if (document.visibilityState !== "visible") return;
+
+    loadSecurityStatus();
+
+}, 15000);

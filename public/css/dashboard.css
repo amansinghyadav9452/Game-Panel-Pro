@@ -840,6 +840,14 @@ nav a:not(.active):nth-child(7) i{
 
     -webkit-backdrop-filter:blur(28px);
 
+    /* Isolate this element's paint/compositing from the rest of the
+       page — without this, every blurred card forces the browser to
+       repaint a much larger region on scroll/resize, which is the
+       main source of jank on this screen. */
+    contain:layout style paint;
+
+    will-change:transform;
+
     border:1px solid rgba(255,255,255,.18);
 
     box-shadow:
@@ -3043,6 +3051,51 @@ table{
     width:100%;
     margin-top:16px;
 }
+
+}
+
+/* --------------------------------------------------------------
+   Perf: lighter blur on small/mobile screens.
+   backdrop-filter's GPU cost scales sharply with blur radius, and
+   phones are exactly where the dashboard cards, sidebar and modals
+   were feeling laggy. Cutting the radius here keeps the same glassy
+   look at a fraction of the compositing cost, and is the single
+   biggest lever for smoothing out scroll/animation jank on mobile.
+   -------------------------------------------------------------- */
+@media(max-width:768px){
+
+    .sidebar{
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+    }
+
+    .card{
+        backdrop-filter:blur(14px);
+        -webkit-backdrop-filter:blur(14px);
+    }
+
+    /* The 4 dashboard stat boxes (Total/Active/Expired/Banned) sit on
+       screen together and permanently, unlike a modal or menu that
+       only exists briefly — so even a reduced blur here is 4x the
+       constant cost. Dropping backdrop-filter entirely for just these
+       and compensating with a slightly stronger tint keeps a very
+       similar "glass card" look with none of the blur-sampling cost,
+       which is what was making the dashboard feel heavy just sitting
+       there / while scrolling. */
+    .cards .card{
+
+        backdrop-filter:none;
+        -webkit-backdrop-filter:none;
+
+        background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.10),
+            rgba(255,255,255,.04)
+        ),
+        rgba(17,24,39,.92);
+
+    }
 
 }
 
