@@ -3,6 +3,7 @@ const UserLog = require("../models/UserLog");
 const BannedDevice = require("../models/BannedDevice");
 const KeyIndex = require("../models/KeyIndex");
 const Customer = require("../models/Customer");
+const GameApplication = require("../models/GameApplication");
 const md5 = require("md5");
 const { resolveMarketingName } = require("./deviceLookup");
 const { encryptAES, decryptAES, generateSignature } = require("./cryptoBridge");
@@ -40,13 +41,22 @@ async function resolveLicenseDoc(key, type, gameId) {
         return { doc: null, ownerCustomer: null };
     }
 
+    const application = await GameApplication.findOne({
+        gameId: normalizedGameId,
+        status: "active"
+    }).lean();
+
+    if (!application) {
+        return { doc: null, ownerCustomer: null };
+    }
+
     const adminLicense = await License.findOne({
         key,
         type,
         gameId: normalizedGameId
     });
 
-    if (adminLicense) {
+    if (adminLicense && application.ownerType === "admin") {
 
         return { doc: adminLicense, ownerCustomer: null };
 
@@ -454,8 +464,17 @@ async function verifyEncryptedConnect(body, req) {
 
         }
 
+        const gameId = String(body.game || "").trim().toUpperCase();
+
+        if (!gameId) {
+            return {
+                status: false,
+                reason: "Invalid Application"
+            };
+        }
+
         const result = await verifyLicense(
-            { game: "PUBG", user_key: userKey, serial: uuid, ...body },
+            { game: gameId, user_key: userKey, serial: uuid, ...body },
             req,
             "public"
         );
@@ -466,7 +485,7 @@ async function verifyEncryptedConnect(body, req) {
 
         }
 
-        const license = (await resolveLicenseDoc(userKey, "public", body.game)).doc;
+        const license = (await resolveLicenseDoc(userKey, "public", gameId)).doc;
 
         const data = {
 
