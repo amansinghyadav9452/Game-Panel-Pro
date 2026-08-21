@@ -1,0 +1,153 @@
+/* ============================================================
+   ACCESS CONSOLE DATA LOADING STATES
+   Local, flat loading feedback. No blur, no ambient glow.
+============================================================ */
+
+.gp-loading-host{
+    position:relative;
+}
+
+.gp-loading-block,
+.gp-loading-line,
+.gp-loading-stat,
+.gp-loading-card,
+.gp-loading-input{
+    position:relative;
+    overflow:hidden;
+    background:var(--surface-2, #1A1E26);
+    border:1px solid var(--hairline, #262B33);
+    color:transparent !important;
+}
+
+.gp-loading-block::after,
+.gp-loading-line::after,
+.gp-loading-stat::after,
+.gp-loading-card::after,
+.gp-loading-input::after{
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:-42%;
+    width:34%;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(201,151,74,.18),
+        transparent
+    );
+    animation:gp-loading-scan 1.15s linear infinite;
+    pointer-events:none;
+}
+
+.gp-loading-line{
+    height:14px;
+    border-radius:6px;
+    margin-bottom:10px;
+}
+
+.gp-loading-stat{
+    height:94px;
+    border-radius:14px;
+}
+
+.gp-loading-card{
+    min-height:112px;
+    border-radius:16px;
+}
+
+.gp-loading-input{
+    width:100%;
+    min-height:44px;
+    border-radius:10px;
+}
+
+.gp-loading-table-row td{
+    padding:14px !important;
+}
+
+.gp-loading-table-cell{
+    display:block;
+    height:16px;
+    border-radius:5px;
+}
+
+.gp-loading-license-card{
+    min-height:210px;
+    border-radius:18px;
+    margin-bottom:14px;
+}
+
+.gp-loading-status-badge{
+    display:inline-block;
+    width:82px;
+    height:26px;
+    border-radius:999px;
+}
+
+.badge.gp-loading{
+    color:transparent !important;
+    background:var(--surface-2, #1A1E26) !important;
+    border:1px solid var(--hairline, #262B33) !important;
+    position:relative;
+    overflow:hidden;
+}
+
+.badge.gp-loading::after{
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:-55%;
+    width:45%;
+    background:linear-gradient(90deg, transparent, rgba(201,151,74,.2), transparent);
+    animation:gp-loading-scan 1.15s linear infinite;
+}
+
+@keyframes gp-loading-scan{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(310%); }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gp-loading-block::after,
+    .gp-loading-line::after,
+    .gp-loading-stat::after,
+    .gp-loading-card::after,
+    .gp-loading-input::after,
+    .badge.gp-loading::after{
+        animation:none;
+    }
+}
+
+
+/* Existing dashboard skeleton hooks use the same terminal scan treatment. */
+.gp-skeleton,
+.gp-skeleton-line{
+    position:relative;
+    overflow:hidden;
+    color:transparent !important;
+    background:var(--surface-2, #1A1E26) !important;
+    border:1px solid var(--hairline, #262B33);
+    animation:none !important;
+}
+
+.gp-skeleton::after,
+.gp-skeleton-line::after{
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:-42%;
+    width:34%;
+    background:linear-gradient(90deg, transparent, rgba(201,151,74,.18), transparent);
+    animation:gp-loading-scan 1.15s linear infinite;
+    pointer-events:none;
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gp-skeleton::after,
+    .gp-skeleton-line::after{
+        animation:none;
+    }
+}

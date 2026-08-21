@@ -50,6 +50,10 @@ async function loadLogs(page = currentPage, isAutoRefresh = false) {
     const container =
         document.getElementById("userLogsContainer");
 
+    if (container && !isAutoRefresh && window.GPLoading) {
+        GPLoading.show(container, "logs");
+    }
+
     try {
 
         const token =

@@ -52,17 +52,22 @@ async function loadAboutInfo() {
         const environment = document.getElementById("environment");
         const serverUptime = document.getElementById("serverUptime");
 
-        if (panelVersion) panelVersion.value = data.panelVersion;
-        if (nodeVersion) nodeVersion.value = data.nodeVersion;
-        if (dbStatus) dbStatus.value = data.dbConnected ? "Connected" : "Disconnected";
-        if (environment) environment.value = data.environment;
-        if (serverUptime) serverUptime.value = formatUptime(data.uptime);
+        if (panelVersion) { panelVersion.value = data.panelVersion; panelVersion.classList.remove("gp-loading-input"); }
+        if (nodeVersion) { nodeVersion.value = data.nodeVersion; nodeVersion.classList.remove("gp-loading-input"); }
+        if (dbStatus) { dbStatus.value = data.dbConnected ? "Connected" : "Disconnected"; dbStatus.classList.remove("gp-loading-input"); }
+        if (environment) { environment.value = data.environment; environment.classList.remove("gp-loading-input"); }
+        if (serverUptime) { serverUptime.value = formatUptime(data.uptime); serverUptime.classList.remove("gp-loading-input"); }
 
     }
 
     catch (error) {
 
         console.error(error);
+
+        document.querySelectorAll(".gp-loading-input").forEach((input) => {
+            input.value = "Unavailable";
+            input.classList.remove("gp-loading-input");
+        });
 
     }
 

@@ -10,6 +10,29 @@ document.querySelectorAll(".filter-btn");
 
 async function loadLicenses(endpoint = currentEndpoint) {
 
+    if (window.GPLoading) {
+
+        const table = document.getElementById("licenseTable");
+        const mobileList = document.getElementById("mobileLicenseList");
+
+        if (table) {
+            table.innerHTML = Array.from({ length: 6 }, () => `
+                <tr class="gp-loading-table-row">
+                    <td><span class="gp-loading-table-cell" style="width:78%"></span></td>
+                    <td><span class="gp-loading-table-cell" style="width:62%"></span></td>
+                    <td><span class="gp-loading-table-cell" style="width:70%"></span></td>
+                    <td><span class="gp-loading-table-cell" style="width:45%"></span></td>
+                    <td><span class="gp-loading-table-cell" style="width:72%"></span></td>
+                </tr>
+            `).join("");
+        }
+
+        if (mobileList) {
+            mobileList.innerHTML = Array.from({ length: 3 }, () => `<div class="gp-loading-license-card gp-loading-card"></div>`).join("");
+        }
+
+    }
+
     try {
 
         const response = await apiFetch(endpoint);

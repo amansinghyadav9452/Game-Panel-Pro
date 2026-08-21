@@ -6,6 +6,12 @@ loadBannedDevices();
 
 async function loadBannedDevices() {
 
+    const container = document.getElementById("bannedDevicesContainer");
+
+    if (container && window.GPLoading) {
+        GPLoading.show(container, "banned");
+    }
+
     try {
 
         const response = await fetch("/api/banned-devices", {
@@ -17,8 +23,6 @@ async function loadBannedDevices() {
         });
 
         const devices = await response.json();
-
-        const container = document.getElementById("bannedDevicesContainer");
 
         if (!devices.length) {
 
