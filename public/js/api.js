@@ -1,13 +1,6 @@
 async function apiFetch(url, options = {}) {
 
-    // The panel is entirely token-driven (no server session): whichever
-    // token is present in localStorage decides which login this request
-    // is authenticated as, so admin-only and customer-only requests
-    // never cross-contaminate each other's session on a 401.
-    const isCustomer = !localStorage.getItem("token") && !!localStorage.getItem("customerToken");
-    const tokenKey = isCustomer ? "customerToken" : "token";
-
-    const token = localStorage.getItem(tokenKey);
+    const token = localStorage.getItem("token");
 
     const headers = {
 
@@ -27,7 +20,7 @@ async function apiFetch(url, options = {}) {
 
 if (response.status === 401) {
 
-    localStorage.removeItem(tokenKey);
+    localStorage.removeItem("token");
     localStorage.removeItem("logoutAt");
 
     showToast("Error", "Session Expired", "error");

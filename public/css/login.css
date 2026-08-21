@@ -31,10 +31,12 @@
     --theme-circle2:#2e2e2e;
     --theme-circle3:#333333;
 
-    --theme-glow-shadow:rgba(255,255,255,.45);
-    --theme-glow-shadow-soft:rgba(255,255,255,.40);
-    --theme-glow-a:rgba(255,255,255,.35);
-    --theme-glow-b:rgba(255,255,255,.55);
+    /* Brass glow instead of plain white — ties the login page into the
+       same "Access Console" identity as the rest of the panel. */
+    --theme-glow-shadow:rgba(201,151,74,.45);
+    --theme-glow-shadow-soft:rgba(201,151,74,.32);
+    --theme-glow-a:rgba(201,151,74,.30);
+    --theme-glow-b:rgba(224,180,113,.5);
 
 }
 
@@ -867,14 +869,14 @@ body::before{
 
     linear-gradient(
         135deg,
-        #ffffff,
-        #e5e5e5,
-        #d4d4d4
+        #E0B471,
+        #C9974A,
+        #A9772E
     );
 
     background-size:250% 250%;
 
-    color:#0a0a0a;
+    color:#1A1206;
 
     font-size:17px;
 
@@ -890,7 +892,7 @@ body::before{
 
     box-shadow:
 
-        0 15px 40px rgba(255,255,255,.35);
+        0 15px 40px rgba(201,151,74,.3);
 
 }
 
@@ -1646,70 +1648,4 @@ body.form-busy .login-card::after{
 
 body.form-busy .logo h1{
     animation-play-state:paused;
-}
-
-/* -------------------------------------
-   Login options row (Reset Password / Customer Access)
-   Previously these two links had no layout rule at all, so they
-   just ran into each other. Give them proper spacing, a divider,
-   and let them wrap cleanly on small screens.
-------------------------------------- */
-.login-options{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:10px 16px;
-    margin:14px 0 6px;
-    text-align:center;
-}
-
-.login-options a{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    text-decoration:none;
-    padding:6px 10px;
-    border-radius:8px;
-    transition:background .2s ease, opacity .2s ease;
-    white-space:nowrap;
-    font-size:13.5px;
-    font-weight:600;
-}
-
-.login-options a:hover{
-    background:rgba(255,255,255,.06);
-    opacity:.9;
-}
-
-.login-options a i{
-    font-size:12px;
-}
-
-.login-option-reset{
-    color:#60a5fa;
-}
-
-.login-option-customer{
-    color:#A78BFA;
-}
-
-/* Explicit divider dot between the two links (a real element, not a
-   pseudo-element, so it always renders regardless of stylesheet
-   load order) - hidden automatically when the links wrap to
-   separate lines on narrow screens. */
-.login-option-sep{
-    color:rgba(255,255,255,.25);
-    font-size:12px;
-    user-select:none;
-}
-
-@media (max-width:380px){
-    .login-options{
-        flex-direction:column;
-        gap:6px;
-    }
-    .login-option-sep{
-        display:none;
-    }
 }

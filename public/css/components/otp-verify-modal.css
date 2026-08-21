@@ -214,13 +214,13 @@
 
     background:linear-gradient(
         135deg,
-        #60A5FA,
-        #2563EB
+        #E0B471,
+        #9C7431
     );
 
-    color:#FFFFFF;
+    color:#1A1206;
 
-    box-shadow:0 10px 24px rgba(59,130,246,.35);
+    box-shadow:0 10px 24px rgba(201,151,74,.3);
 
 }
 
@@ -228,7 +228,7 @@
 
     transform:translateY(-2px);
 
-    box-shadow:0 14px 30px rgba(59,130,246,.45);
+    box-shadow:0 14px 30px rgba(201,151,74,.4);
 
 }
 

@@ -367,9 +367,9 @@
 
 #savePassword{
 
-    background:#2563EB;
+    background:#C9974A;
 
-    color:#fff;
+    color:#1A1206;
 
 }
 
@@ -585,11 +585,11 @@ padding:22px;
 
     font-size:16px;
 
-    color:#8B5CF6;
+    color:#E0B471;
 
-    background:rgba(139,92,246,.15);
+    background:rgba(224,180,113,.15);
 
-    border:1px solid rgba(139,92,246,.3);
+    border:1px solid rgba(224,180,113,.3);
 
 }
 

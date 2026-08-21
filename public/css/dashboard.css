@@ -66,7 +66,7 @@ body{
 
 ::-webkit-scrollbar-thumb{
 
-    background:#3B82F6;
+    background:#C9974A;
 
     border-radius:999px;
 
@@ -74,7 +74,7 @@ body{
 
 ::-webkit-scrollbar-thumb:hover{
 
-    background:#60A5FA;
+    background:#E0B471;
 
 }
 
@@ -92,11 +92,12 @@ body{
 
     min-height:100vh;
 
-    background:rgba(17,24,39,.82);
+    /* Flat panel instead of frosted glass — no backdrop-filter here
+       at all, which also removes a constant, always-on blur cost
+       that ran on every single page. */
+    background:var(--surface);
 
-    backdrop-filter:blur(22px);
-
-    border-right:1px solid var(--border);
+    border-right:1px solid var(--hairline);
 
     padding:20px;
 
@@ -258,7 +259,7 @@ body{
 
     color:white;
 
-    background:linear-gradient(135deg,#3B82F6,#7C3AED);
+    background:linear-gradient(135deg,#C9974A,#9C7431);
 
 }
 
@@ -278,7 +279,7 @@ body{
 
     border-radius:14px;
 
-    background:#2563EB;
+    background:#9C7431;
 
     color:#fff;
 
@@ -354,13 +355,11 @@ body{
 
     width:235px;
 
-    background:rgba(17,24,39,.97);
+    background:var(--surface-2);
 
-    backdrop-filter:blur(18px);
+    border:1px solid var(--hairline);
 
-    border:1px solid rgba(255,255,255,.08);
-
-    border-radius:18px;
+    border-radius:14px;
 
     overflow:hidden;
 
@@ -466,7 +465,7 @@ body{
 
     width:18px;
 
-    color:#60A5FA;
+    color:#E0B471;
 
 }
 
@@ -646,7 +645,7 @@ nav a:hover i{
 
 nav a.active{
 
-    background:linear-gradient(90deg,#2563EB,#3B82F6);
+    background:linear-gradient(90deg,#9C7431,#C9974A);
 
     color:white;
 
@@ -674,7 +673,7 @@ nav a.active i{
 
 nav a:not(.active):nth-child(1) i{
     color:#60a5fa;
-    filter:drop-shadow(0 0 5px rgba(96,165,250,.75));
+    filter:drop-shadow(0 0 5px rgba(201,151,74,.75));
 }
 
 nav a:not(.active):nth-child(2) i{
@@ -819,9 +818,9 @@ nav a:not(.active):nth-child(7) i{
 
     min-height:auto;
 
-    padding:16px;
+    padding:18px;
 
-    border-radius:18px;
+    border-radius:14px;
 
     display:flex;
 
@@ -829,33 +828,20 @@ nav a:not(.active):nth-child(7) i{
 
     justify-content:space-between;
 
-    background:
-    linear-gradient(
-        145deg,
-        rgba(255,255,255,.18),
-        rgba(255,255,255,.05)
-    );
+    /* Flat "status plate" instead of frosted glass — a subtle two-stop
+       gradient for depth, a crisp hairline border, no blur sampling
+       at all. Same premium read, none of the always-on GPU cost. */
+    background:linear-gradient(165deg, var(--surface-2), var(--surface));
 
-    backdrop-filter:blur(28px);
-
-    -webkit-backdrop-filter:blur(28px);
-
-    /* Isolate this element's paint/compositing from the rest of the
-       page — without this, every blurred card forces the browser to
-       repaint a much larger region on scroll/resize, which is the
-       main source of jank on this screen. */
-    contain:layout style paint;
-
-    will-change:transform;
-
-    border:1px solid rgba(255,255,255,.18);
+    border:1px solid var(--hairline);
 
     box-shadow:
-        inset 0 1px 1px rgba(255,255,255,.15),
-        0 15px 40px rgba(0,0,0,.35),
-        0 0 0 1px rgba(255,255,255,.04);
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 10px 24px rgba(0,0,0,.35);
 
-    transition:.45s ease;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+
+    contain:layout style paint;
 
     isolation:isolate;
 
@@ -869,41 +855,48 @@ nav a:not(.active):nth-child(7) i{
 
 .cards .card:nth-child(1):hover{
 
+    border-color:rgba(91,141,239,.4);
+
     box-shadow:
-    0 25px 60px rgba(59,130,246,.35);
+    0 16px 34px rgba(91,141,239,.18);
 
 }
 
 .cards .card:nth-child(2):hover{
 
+    border-color:rgba(47,190,143,.45);
+
     box-shadow:
-    0 25px 60px rgba(34,197,94,.35);
+    0 16px 34px rgba(47,190,143,.18);
 
 }
 
 .cards .card:nth-child(3):hover{
 
+    border-color:rgba(201,151,74,.5);
+
     box-shadow:
-    0 25px 60px rgba(245,158,11,.35);
+    0 16px 34px rgba(201,151,74,.2);
 
 }
 
 .cards .card:nth-child(4):hover{
 
+    border-color:rgba(214,83,74,.45);
+
     box-shadow:
-    0 25px 60px rgba(239,68,68,.35);
+    0 16px 34px rgba(214,83,74,.18);
 
 }
 
 .card:hover{
 
-    transform:translateY(-10px);
+    /* A restrained lift instead of the old -10px/glow-blob combo —
+       reads as premium precision rather than a toy bounce. */
+    transform:translateY(-4px);
 
     box-shadow:
-
-        0 25px 55px rgba(0,0,0,.45),
-
-        0 0 45px rgba(255,255,255,.08);
+        0 16px 34px rgba(0,0,0,.4);
 
 }
 
@@ -924,7 +917,7 @@ nav a:not(.active):nth-child(7) i{
     background:linear-gradient(
         90deg,
         transparent,
-        rgba(255,255,255,.14),
+        rgba(224,180,113,.10),
         transparent
     );
 
@@ -950,16 +943,15 @@ nav a:not(.active):nth-child(7) i{
 
     font-size:30px;
 
-    font-weight:800;
+    font-weight:700;
 
-    letter-spacing:-2px;
+    letter-spacing:-1px;
 
     line-height:1;
 
-    color:#fff;
+    color:#F4F1EA;
 
-    text-shadow:
-    0 2px 10px rgba(255,255,255,.08);
+    text-shadow:none;
 
 }
 
@@ -969,15 +961,21 @@ nav a:not(.active):nth-child(7) i{
 
     margin-top:14px;
 
-    background:rgba(34,197,94,.15);
+    background:var(--surface-2);
 
-    color:#22C55E;
+    color:#9AA3AF;
 
-    padding:6px 12px;
+    border:1px solid var(--hairline);
 
-    border-radius:999px;
+    padding:5px 11px;
 
-    font-size:12px;
+    border-radius:6px;
+
+    font-size:11.5px;
+
+    font-weight:600;
+
+    letter-spacing:.2px;
 
 }
 
@@ -1191,7 +1189,7 @@ th,td{
 
     border:none;
 
-    background:#2563EB;
+    background:#9C7431;
 
     color:white;
 
@@ -1268,9 +1266,9 @@ th,td{
 
 .extend-mode-btn.active{
 
-    background:rgba(96,165,250,.15);
-    border-color:#60A5FA;
-    color:#60A5FA;
+    background:rgba(201,151,74,.15);
+    border-color:#E0B471;
+    color:#E0B471;
 
 }
 
@@ -1286,7 +1284,7 @@ th,td{
 
     background:#1E293B;
     border:1px solid rgba(255,255,255,.08);
-    color:#60A5FA;
+    color:#E0B471;
     border-radius:10px;
     width:44px;
     flex-shrink:0;
@@ -1395,7 +1393,7 @@ th,td{
 
 .extend-btn{
 
-    background:#3B82F6;
+    background:#C9974A;
 
 }
 
@@ -1433,7 +1431,7 @@ th,td{
 
     color:white;
 
-    border-left:5px solid #3B82F6;
+    border-left:5px solid #C9974A;
 
     box-shadow:0 15px 35px rgba(0,0,0,.35);
 
@@ -1510,7 +1508,7 @@ th,td{
 
     border-radius:14px;
 
-    background:#2563EB;
+    background:#9C7431;
 
     color:white;
 
@@ -1562,7 +1560,7 @@ table{
 
     gap:10px;
 
-    background:linear-gradient(135deg,#3B82F6,#2563EB);
+    background:linear-gradient(135deg,#C9974A,#9C7431);
 
     color:#fff;
 
@@ -1686,7 +1684,7 @@ table{
 
 .filter-btn:hover{
 
-    background:#2563EB;
+    background:#9C7431;
 
     color:white;
 
@@ -1694,7 +1692,7 @@ table{
 
 .filter-btn.active{
 
-    background:#2563EB;
+    background:#9C7431;
 
     color:white;
 
@@ -1776,7 +1774,7 @@ table{
 
     font-family:monospace;
 
-    color:#60A5FA;
+    color:#E0B471;
 
     margin-bottom:6px;
 
@@ -1806,16 +1804,14 @@ table{
 
     padding:28px;
 
-    border-radius:24px;
+    border-radius:18px;
 
     background:
     linear-gradient(135deg,
-    rgba(59,130,246,.16),
-    rgba(30,41,59,.65));
+    rgba(201,151,74,.10),
+    var(--surface-2));
 
-    border:1px solid rgba(255,255,255,.08);
-
-    backdrop-filter:blur(20px);
+    border:1px solid var(--hairline);
 
     position:relative;
 
@@ -1993,11 +1989,11 @@ table{
 
     right:14px;
 
-    width:38px;
+    width:34px;
 
-    height:38px;
+    height:34px;
 
-    border-radius:14px;
+    border-radius:10px;
 
     display:flex;
 
@@ -2005,48 +2001,51 @@ table{
 
     align-items:center;
 
-    font-size:18px;
+    font-size:15px;
 
-    color:#fff;
+    color:#0E0B04;
 
     z-index:5;
 
-    border:1px solid rgba(255,255,255,.18);
-
-    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.14);
 
     box-shadow:
-        0 12px 30px rgba(0,0,0,.30),
-        inset 0 1px 1px rgba(255,255,255,.20);
+        0 8px 18px rgba(0,0,0,.35),
+        inset 0 1px 1px rgba(255,255,255,.25);
 
-    transition:.35s;
+    transition:transform .25s ease;
 }
 
 .blue{
 
     background:
-    linear-gradient(145deg,#3B82F6,#2563EB);
+    linear-gradient(145deg,#7BA3F5,#5B8DEF);
+
+    color:#0B1526;
 
 }
 
 .green{
 
     background:
-    linear-gradient(145deg,#22C55E,#16A34A);
+    linear-gradient(145deg,#4FE3B0,#2FBE8F);
+
+    color:#052A20;
 
 }
 
 .orange{
 
-    background:
-    linear-gradient(145deg,#F59E0B,#EA580C);
+    background:var(--brass-gradient);
 
 }
 
 .red{
 
     background:
-    linear-gradient(145deg,#F43F5E,#DC2626);
+    linear-gradient(145deg,#E97169,#D6534A);
+
+    color:#2A0906;
 
 }
 
@@ -2054,11 +2053,11 @@ table{
 
     margin-top:10px;
 
-    height:34px;
+    height:32px;
 
     font-size:12px;
 
-    border-radius:999px;
+    border-radius:8px;
 
     display:flex;
 
@@ -2066,51 +2065,55 @@ table{
 
     justify-content:center;
 
-    gap:12px;
+    gap:10px;
 
     font-weight:600;
 
-    backdrop-filter:blur(16px);
+    font-family:var(--font-mono);
 
-    border:1px solid rgba(255,255,255,.12);
+    letter-spacing:.2px;
+
+    border:1px solid var(--hairline);
 
 }
 
 .blue-pill{
 
-    background:rgba(59,130,246,.18);
+    background:rgba(91,141,239,.12);
 
-    color:#7CC5FF;
+    color:#9DBBF7;
 
 }
 
 .green-pill{
 
-    background:rgba(34,197,94,.18);
+    background:rgba(47,190,143,.12);
 
-    color:#62F19A;
+    color:var(--signal-green-bright);
 
 }
 
 .orange-pill{
 
-    background:rgba(245,158,11,.18);
+    background:rgba(201,151,74,.14);
 
-    color:#FFC14A;
+    color:var(--brass-bright);
 
 }
 
 .red-pill{
 
-    background:rgba(239,68,68,.18);
+    background:rgba(214,83,74,.12);
 
-    color:#FF7E7E;
+    color:var(--signal-red-bright);
 
 }
 
 .card:hover .card-icon{
 
-    transform:translateY(-4px) rotate(-8deg) scale(1.05);
+    /* Was a "rotate -8deg + scale" wiggle — cute, but it undercuts a
+       premium feel. A precise, straight lift reads more deliberate. */
+    transform:translateY(-3px);
 
 }
 
@@ -2134,32 +2137,28 @@ table{
 
     width:100%;
 
-    height:4px;
+    height:2px;
 
 }
 
 .top-accent.blue{
 
-    background:linear-gradient(90deg,#60A5FA,#2563EB);
-
+    background:linear-gradient(90deg,var(--signal-blue),transparent);
 }
 
 .top-accent.green{
 
-    background:linear-gradient(90deg,#4ADE80,#16A34A);
-
+    background:linear-gradient(90deg,var(--signal-green),transparent);
 }
 
 .top-accent.orange{
 
-    background:linear-gradient(90deg,#FBBF24,#EA580C);
-
+    background:linear-gradient(90deg,var(--brass),transparent);
 }
 
 .top-accent.red{
 
-    background:linear-gradient(90deg,#FB7185,#DC2626);
-
+    background:linear-gradient(90deg,var(--signal-red),transparent);
 }
 
 .card-glow{
@@ -2321,7 +2320,7 @@ table{
 
 .edit-display-btn:hover{
 
-    color:#60A5FA;
+    color:#E0B471;
 
     transform:scale(1.1);
 
@@ -3051,51 +3050,6 @@ table{
     width:100%;
     margin-top:16px;
 }
-
-}
-
-/* --------------------------------------------------------------
-   Perf: lighter blur on small/mobile screens.
-   backdrop-filter's GPU cost scales sharply with blur radius, and
-   phones are exactly where the dashboard cards, sidebar and modals
-   were feeling laggy. Cutting the radius here keeps the same glassy
-   look at a fraction of the compositing cost, and is the single
-   biggest lever for smoothing out scroll/animation jank on mobile.
-   -------------------------------------------------------------- */
-@media(max-width:768px){
-
-    .sidebar{
-        backdrop-filter:blur(12px);
-        -webkit-backdrop-filter:blur(12px);
-    }
-
-    .card{
-        backdrop-filter:blur(14px);
-        -webkit-backdrop-filter:blur(14px);
-    }
-
-    /* The 4 dashboard stat boxes (Total/Active/Expired/Banned) sit on
-       screen together and permanently, unlike a modal or menu that
-       only exists briefly — so even a reduced blur here is 4x the
-       constant cost. Dropping backdrop-filter entirely for just these
-       and compensating with a slightly stronger tint keeps a very
-       similar "glass card" look with none of the blur-sampling cost,
-       which is what was making the dashboard feel heavy just sitting
-       there / while scrolling. */
-    .cards .card{
-
-        backdrop-filter:none;
-        -webkit-backdrop-filter:none;
-
-        background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.10),
-            rgba(255,255,255,.04)
-        ),
-        rgba(17,24,39,.92);
-
-    }
 
 }
 

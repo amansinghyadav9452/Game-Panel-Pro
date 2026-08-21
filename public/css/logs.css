@@ -95,7 +95,7 @@
 
 .page-btn:hover:not(:disabled){
 
-    background:#3B82F6;
+    background:#C9974A;
 
     transform:translateY(-2px);
 
@@ -141,7 +141,7 @@
 
 .logs-table-wrapper::-webkit-scrollbar-thumb{
 
-    background:#3B82F6;
+    background:#C9974A;
 
     border-radius:999px;
 
@@ -282,8 +282,8 @@
 
         linear-gradient(
             135deg,
-            #3B82F6,
-            #7C3AED
+            #E0B471,
+            #9C7431
         );
 
     box-shadow:

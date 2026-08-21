@@ -47,9 +47,9 @@ function paramsToJsonSchema(parameters) {
 
 }
 
-function buildToolsPayload(toolDefs) {
+function buildToolsPayload() {
 
-    return toolDefs.map(t => ({
+    return listToolDefinitions().map(t => ({
 
         type: "function",
 
@@ -77,16 +77,9 @@ function assertConfigured() {
 
 }
 
-// `overrides` lets a different caller (e.g. the customer-facing
-// copilot) swap in its own, much more restricted tool list and system
-// prompt without touching the default admin behaviour below, which
-// stays exactly as it was when both params are omitted.
-async function chatCompletion(messages, overrides = {}) {
+async function chatCompletion(messages) {
 
     assertConfigured();
-
-    const toolDefs = overrides.toolDefs || listToolDefinitions();
-    const systemPrompt = overrides.systemPrompt || SYSTEM_PROMPT;
 
     const response = await fetch(`${API_BASE}/chat/completions`, {
 
@@ -100,8 +93,8 @@ async function chatCompletion(messages, overrides = {}) {
         body: JSON.stringify({
 
             model: MODEL,
-            messages: [{ role: "system", content: systemPrompt }, ...messages],
-            tools: buildToolsPayload(toolDefs),
+            messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+            tools: buildToolsPayload(),
             tool_choice: "auto",
             temperature: 0.3,
             max_tokens: 800

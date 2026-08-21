@@ -1,4 +1,4 @@
-if (!localStorage.getItem("token") && !localStorage.getItem("customerToken")) {
+if (!localStorage.getItem("token")) {
     window.location.replace("/login");}
 
 if (typeof initSidebar === "function") {
@@ -6,13 +6,11 @@ if (typeof initSidebar === "function") {
 }
 initAutoLogout();
 
-const __dashRole = (typeof getPanelRole === "function") ? getPanelRole() : (localStorage.getItem("token") ? "admin" : "customer");
-
 async function loadStats() {
 
     try {
 
-const response = await apiFetch(__dashRole === "customer" ? "/customer/dashboard/stats" : "/dashboard");
+const response = await apiFetch("/dashboard");
 
         const data = await response.json();
 
@@ -72,7 +70,7 @@ async function loadRecentActivities() {
 
     try {
 
-        const response = await apiFetch(__dashRole === "customer" ? "/customer/dashboard/recent-activity" : "/activity/recent");
+        const response = await apiFetch("/activity/recent");
 
         const data = await response.json();
 

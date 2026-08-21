@@ -16,20 +16,6 @@ router.get("/messenger", (req, res) => {
 // page/JS works for both admin and developer without hardcoding.
 router.get("/messenger/session", messengerAuth, (req, res) => {
 
-    if (req.role === "customer") {
-
-        return res.json({
-
-            success: true,
-
-            role: "customer",
-
-            displayName: req.customer.username
-
-        });
-
-    }
-
     res.json({
 
         success: true,

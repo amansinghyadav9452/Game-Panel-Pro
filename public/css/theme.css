@@ -1,7 +1,42 @@
 :root{
-    --accent:#7C5CFC;
-    --accent-dark:#5B3DE0;
-    --accent-gradient:linear-gradient(135deg,#8B5CF6,#3B82F6);
+    /* ============================================================
+       "Access Console" design system — a flat, security-terminal
+       aesthetic built around the product's real subject: license
+       keys, access control, bans. Replaces the old purple-gradient
+       glassmorphism (which was both generic-looking and, with 4+
+       simultaneous backdrop-filter blurs, the main cause of the lag
+       reported on the dashboard, login and messenger screens).
+       ============================================================ */
+
+    --void:#0A0C10;
+    --surface:#14171D;
+    --surface-2:#1A1E26;
+    --hairline:#262B33;
+    --hairline-soft:rgba(255,255,255,.06);
+
+    --brass:#C9974A;
+    --brass-bright:#E0B471;
+    --brass-dark:#9C7431;
+    --brass-gradient:linear-gradient(135deg,#E0B471,#C9974A 55%,#9C7431);
+
+    --signal-green:#2FBE8F;
+    --signal-green-bright:#4FE3B0;
+    --signal-red:#D6534A;
+    --signal-red-bright:#E97169;
+    --signal-blue:#5B8DEF;
+    --signal-amber:#D9A441;
+
+    /* Kept for backward compatibility with any selector still
+       referencing the old variable names — now pointing at the new
+       brass accent instead of purple, so nothing silently loses its
+       accent color. */
+    --accent:var(--brass);
+    --accent-dark:var(--brass-dark);
+    --accent-gradient:var(--brass-gradient);
+
+    --font-display:'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    --font-mono:'JetBrains Mono', ui-monospace, monospace;
+
     color-scheme: dark;
 }
 
@@ -9,35 +44,106 @@ html{
     color-scheme: dark;
 }
 
+/* Headings and key labels get the display face — restrained, one
+   weight heavier than body copy, slightly tightened tracking. This
+   alone does a lot to make the panel feel designed rather than
+   templated. */
+h1, h2, h3,
+.page-heading,
+.dashboard-hero .hero-left h1,
+.logo h1,
+.dev-chat-title,
+.card h3{
+    font-family:var(--font-display) !important;
+    letter-spacing:.2px;
+}
+
+/* Every license key, stat number, timestamp and log line reads as
+   monospaced data — like a real terminal/keycard readout — rather
+   than blending into the body copy. */
+.card span,
+.activity-key,
+.license-key,
+.key-value,
+code,
+.mono{
+    font-family:var(--font-mono) !important;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.2px;
+}
+
 .save-btn,
 .action-btn:not(:disabled):not(.danger-btn){
-    background:var(--accent-gradient) !important;
-    box-shadow:0 8px 24px rgba(124,92,252,.35) !important;
-    transition:transform .2s ease, box-shadow .2s ease !important;
+    background:var(--brass-gradient) !important;
+    color:#1A1206 !important;
+    box-shadow:0 8px 20px rgba(201,151,74,.28) !important;
+    transition:transform .18s ease, box-shadow .18s ease !important;
 }
 
 .save-btn:hover,
 .action-btn:not(:disabled):not(.danger-btn):hover{
     transform:translateY(-2px) !important;
-    box-shadow:0 12px 30px rgba(124,92,252,.5) !important;
+    box-shadow:0 12px 26px rgba(201,151,74,.4) !important;
+}
+
+.save-btn:active,
+.action-btn:not(:disabled):not(.danger-btn):active{
+    transform:translateY(0) !important;
+    box-shadow:0 6px 14px rgba(201,151,74,.3) !important;
 }
 
 nav a.active{
-    background:var(--accent-gradient) !important;
-    box-shadow:0 8px 22px rgba(124,92,252,.4) !important;
+    background:linear-gradient(90deg, rgba(201,151,74,.18), rgba(201,151,74,.04)) !important;
+    border-left:2px solid var(--brass) !important;
+    box-shadow:none !important;
+    color:#F4E9D8 !important;
 }
 
 .badge.success{
-    background:rgba(124,92,252,.15) !important;
-    color:var(--accent) !important;
+    background:rgba(47,190,143,.15) !important;
+    color:var(--signal-green-bright) !important;
 }
 
 input:focus,
 select:focus,
 textarea:focus{
-    border-color:var(--accent) !important;
-    outline-color:var(--accent) !important;
-    box-shadow:0 0 0 3px rgba(124,92,252,.15) !important;
+    border-color:var(--brass) !important;
+    outline-color:var(--brass) !important;
+    box-shadow:0 0 0 3px rgba(201,151,74,.15) !important;
+}
+
+/* Visible keyboard focus everywhere, not just form fields — a
+   premium panel should be just as usable without a mouse. */
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible{
+    outline:2px solid var(--brass) !important;
+    outline-offset:2px;
+}
+
+/* Slim, on-theme scrollbar instead of the browser default — a small
+   detail that reads as "designed" everywhere it shows up. */
+::-webkit-scrollbar{
+    width:8px;
+    height:8px;
+}
+
+::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+::-webkit-scrollbar-thumb{
+    background:var(--hairline);
+    border-radius:999px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background:var(--brass-dark);
+}
+
+* {
+    scrollbar-width:thin;
+    scrollbar-color:var(--hairline) transparent;
 }
 
 html.light-theme{

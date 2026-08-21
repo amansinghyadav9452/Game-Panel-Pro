@@ -1,11 +1,9 @@
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
-const Customer = require("../models/Customer");
 
 // Same JWT check as middleware/auth.js, but does NOT block the
 // "developer" role - Messenger is the one place both admin and
-// developer are allowed in. Customers (scope:"customer") are also
-// allowed here, since they get their own thread with the developer.
+// developer are allowed in.
 async function messengerAuth(req, res, next) {
 
     const header = req.headers.authorization;
@@ -24,35 +22,6 @@ async function messengerAuth(req, res, next) {
         const token = header.substring(7);
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        if (decoded.scope === "customer") {
-
-            const customer = await Customer.findById(decoded.id);
-
-            if (!customer || decoded.sessionVersion !== customer.sessionVersion) {
-
-                return res.status(401).json({
-                    success: false,
-                    message: "Unauthorized"
-                });
-
-            }
-
-            if (customer.status === "disabled" || customer.expiryAt <= new Date()) {
-
-                return res.status(403).json({
-                    success: false,
-                    message: "Unauthorized"
-                });
-
-            }
-
-            req.customer = customer;
-            req.role = "customer";
-
-            return next();
-
-        }
 
         const admin = await Admin.findById(decoded.id);
 
@@ -84,7 +53,6 @@ async function messengerAuth(req, res, next) {
         }
 
         req.admin = admin;
-        req.role = admin.role;
 
         next();
 

@@ -23,7 +23,7 @@
 
     if (!toggleBtn || typeof io === "undefined") return;
 
-    const token = localStorage.getItem("token") || localStorage.getItem("customerToken");
+    const token = localStorage.getItem("token");
 
     if (!token) return;
 
@@ -34,13 +34,6 @@
     let typingTimeout = null;
     let menuTargetId = null;
     let socket = null;
-
-    // Developer-only: which thread is currently open in the panel.
-    // null = Admin thread, otherwise a customer's _id.
-    let currentConversationId = null;
-    let conversationsList = [];
-
-    const convSelect = document.getElementById("devChatConversationSelect");
 
     // messageId -> latest known message object, so an "unsent" update
     // can re-render a bubble without scraping stale DOM text back out.
@@ -99,9 +92,7 @@
     }
 
     function roleLabel(role) {
-        if (role === "admin") return "Admin";
-        if (role === "customer") return "Customer";
-        return "Developer";
+        return role === "admin" ? "Admin" : "Developer";
     }
 
     function metaRowHtml(msg) {
@@ -341,12 +332,7 @@
 
             if (!sure) return;
 
-            if (socket) {
-                socket.emit(
-                    "chat:clear-for-everyone",
-                    myRole === "developer" ? { customerId: currentConversationId } : undefined
-                );
-            }
+            if (socket) socket.emit("chat:clear-for-everyone");
             closeClearSheet();
 
         });
@@ -369,14 +355,13 @@
 
         overlay.classList.add("show");
 
-        if (myRole !== "developer") {
-            unreadCount = 0;
-            updateBadge();
-        }
+        unreadCount = 0;
+
+        updateBadge();
 
         input.focus();
 
-        if (socket) socket.emit("chat:mark-seen", { customerId: currentConversationId });
+        if (socket) socket.emit("chat:mark-seen");
 
     }
 
@@ -412,19 +397,7 @@
             myRole = data.role;
 
             if (peerTitle) {
-
-                if (myRole === "admin" || myRole === "customer") {
-                    peerTitle.textContent = "Developer";
-                } else {
-                    // Developer: title tracks whichever thread is open -
-                    // starts on the Admin thread.
-                    peerTitle.textContent = "Admin";
-                }
-
-            }
-
-            if (convSelect) {
-                convSelect.style.display = myRole === "developer" ? "" : "none";
+                peerTitle.textContent = myRole === "admin" ? "Developer" : "Admin";
             }
 
             connectSocket();
@@ -509,39 +482,13 @@
 
         socket.on("chat:message", (msg) => {
 
-            // Developer: multiple threads share one socket connection -
-            // only render the message if it belongs to whichever thread
-            // is currently open. Anything else just bumps the
-            // conversation list / a toast, handled by chat:conversations.
-            if (myRole === "developer") {
-
-                const msgConvId = msg.customerId ? String(msg.customerId) : null;
-
-                if (msgConvId !== currentConversationId) {
-
-                    if (msg.sender !== "developer" && typeof showToast === "function") {
-
-                        showToast(
-                            msg.senderLabel || roleLabel(msg.sender),
-                            msg.text.length > 80 ? msg.text.slice(0, 80) + "..." : msg.text,
-                            "info"
-                        );
-
-                    }
-
-                    return;
-
-                }
-
-            }
-
             renderMessage(msg);
 
             if (msg.sender !== myRole) {
 
                 if (isOpen) {
 
-                    socket.emit("chat:mark-seen", { customerId: currentConversationId });
+                    socket.emit("chat:mark-seen");
 
                 } else {
 
@@ -564,66 +511,6 @@
 
         });
 
-        // Developer only: list of "Admin" + every customer thread, with
-        // unread counts, so the operator can see who is waiting.
-        socket.on("chat:conversations", (list) => {
-
-            conversationsList = list || [];
-
-            if (!convSelect) return;
-
-            const totalUnread = conversationsList.reduce((sum, c) => sum + (c.unread || 0), 0);
-
-            unreadCount = totalUnread;
-            updateBadge();
-
-            const selected = currentConversationId;
-
-            convSelect.innerHTML = conversationsList.map((c) => {
-
-                const label = c.unread
-                    ? `${c.label} (${c.unread})`
-                    : c.label;
-
-                return `<option value="${c.id || ""}">${escapeHtml(label)}</option>`;
-
-            }).join("");
-
-            convSelect.value = selected || "";
-
-        });
-
-        // Developer only: history for whichever thread was just
-        // switched to via the conversation dropdown.
-        socket.on("chat:conversation-history", ({ customerId, history }) => {
-
-            currentConversationId = customerId || null;
-
-            if (peerTitle) {
-
-                const conv = conversationsList.find(c => (c.id || null) === currentConversationId);
-
-                peerTitle.textContent = conv ? conv.label : (currentConversationId ? "Customer" : "Admin");
-
-            }
-
-            messagesBox.innerHTML = "";
-            messageCache.clear();
-
-            if (!history.length) {
-
-                showEmptyState();
-
-            } else {
-
-                history.forEach(renderMessage);
-
-                if (isOpen) socket.emit("chat:mark-seen", { customerId: currentConversationId });
-
-            }
-
-        });
-
         socket.on("chat:seen", ({ messageIds }) => {
 
             messageIds.forEach((id) => {
@@ -638,20 +525,10 @@
 
         });
 
-        socket.on("chat:cleared", ({ scope, customerId }) => {
+        socket.on("chat:cleared", ({ scope }) => {
 
             // scope "me" only reaches the account that triggered it;
-            // scope "everyone" is broadcast to that thread's parties.
-            // Developer sees multiple threads on one socket - only wipe
-            // the view if it's the thread currently open.
-            if (myRole === "developer") {
-
-                const convId = customerId ? String(customerId) : null;
-
-                if (convId !== currentConversationId) return;
-
-            }
-
+            // scope "everyone" is broadcast to both roles.
             clearLocalChat();
 
             if (typeof showToast === "function" && scope === "everyone") {
@@ -662,17 +539,9 @@
 
         });
 
-        socket.on("chat:typing", ({ from, customerId }) => {
+        socket.on("chat:typing", ({ from }) => {
 
             if (from === myRole) return;
-
-            if (myRole === "developer") {
-
-                const fromConvId = customerId ? String(customerId) : null;
-
-                if (fromConvId !== currentConversationId) return;
-
-            }
 
             typingRow.style.display = "block";
 
@@ -692,13 +561,7 @@
 
         if (!text || !socket) return;
 
-        const payload = { text };
-
-        if (myRole === "developer") {
-            payload.customerId = currentConversationId;
-        }
-
-        socket.emit("chat:message", payload);
+        socket.emit("chat:message", { text });
 
         input.value = "";
 
@@ -714,27 +577,10 @@
 
         } else if (socket) {
 
-            socket.emit(
-                "chat:typing",
-                myRole === "developer" ? { customerId: currentConversationId } : undefined
-            );
+            socket.emit("chat:typing");
 
         }
 
     });
-
-    if (convSelect) {
-
-        convSelect.addEventListener("change", () => {
-
-            if (!socket || myRole !== "developer") return;
-
-            const customerId = convSelect.value || null;
-
-            socket.emit("chat:switch-conversation", { customerId });
-
-        });
-
-    }
 
 })();

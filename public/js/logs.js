@@ -1,4 +1,4 @@
-if (!localStorage.getItem("token") && !localStorage.getItem("customerToken")) {
+if (!localStorage.getItem("token")) {
 
     window.location.replace("/login");
 
@@ -11,8 +11,6 @@ if (typeof initSidebar === "function") {
 }
 
 initAutoLogout();
-
-const __logsRole = (typeof getPanelRole === "function") ? getPanelRole() : (localStorage.getItem("token") ? "admin" : "customer");
 let currentPage = 1;
 let allLogs = [];
 let bannedDevices = [];
@@ -54,16 +52,10 @@ async function loadLogs(page = currentPage, isAutoRefresh = false) {
 
     try {
 
-        const isCustomer = __logsRole === "customer";
-
         const token =
-            localStorage.getItem(isCustomer ? "customerToken" : "token");
+            localStorage.getItem("token");
 
-        const logsUrl = isCustomer
-            ? `/customer/logs/activity?page=${page}&limit=${limit}`
-            : `/logs/recent?page=${page}&limit=${limit}`;
-
-        const response = await fetch(logsUrl, {
+        const response = await fetch(`/logs/recent?page=${page}&limit=${limit}`, {
 
             headers: {
 
@@ -74,29 +66,17 @@ async function loadLogs(page = currentPage, isAutoRefresh = false) {
         });
 
         const data = await response.json();
+        const bannedResponse = await fetch("/api/banned-devices", {
 
-        // Banned-devices is an admin-only, panel-wide list - customers
-        // don't get a banned indicator on their own logs view.
-        if (isCustomer) {
+    headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
 
-            bannedDevices = [];
+});
 
-        } else {
+const bannedData = await bannedResponse.json();
 
-            const bannedResponse = await fetch("/api/banned-devices", {
-
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-
-            });
-
-            const bannedData = await bannedResponse.json();
-
-            bannedDevices = bannedData.map(device => device.serial);
-
-        }
-
+bannedDevices = bannedData.map(device => device.serial);
         allLogs = data.logs;
 
         const successLogs = data.logs.filter(
@@ -497,14 +477,6 @@ function openBanModal(log){
 async function banDevice(serial, reason = ""){
 
     try{
-
-        if (__logsRole === "customer") {
-
-            showToast("Restricted", "Sorry, it's allowed only to the admin.", "error");
-
-            return;
-
-        }
 
         const log = allLogs.find(
             x => x.serial === serial

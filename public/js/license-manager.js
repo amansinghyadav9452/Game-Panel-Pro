@@ -422,12 +422,7 @@ async function prefillCreateModalDefaults() {
 
     try {
 
-        const configEndpoint =
-            (typeof getPanelRole === "function" && getPanelRole() === "customer")
-                ? "/customer/license/config"
-                : "/settings/license/config";
-
-        const response = await apiFetch(configEndpoint);
+        const response = await apiFetch("/settings/license/config");
 
         const data = await response.json();
 
@@ -489,12 +484,8 @@ if (generateKeyBtn) {
 
             const type = getLicenseTypeForPage();
 
-            const genEndpoint =
-                (typeof getPanelRole === "function" && getPanelRole() === "customer")
-                    ? `/customer/license/generate-key?type=${type}`
-                    : `/settings/license/generate-key?type=${type}`;
-
-            const response = await apiFetch(genEndpoint);
+            const response =
+                await apiFetch(`/settings/license/generate-key?type=${type}`);
 
             const data = await response.json();
 
