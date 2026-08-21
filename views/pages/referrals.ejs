@@ -5,7 +5,7 @@
 <%- include("../partials/head") %>
 <link rel="stylesheet" href="/css/customer.css">
 </head>
-<body>
+<body class="referrals-page">
 <div id="overlay"></div>
 <%- include("../partials/toast") %>
 <%- include("../partials/confirm-modal") %>
@@ -14,8 +14,8 @@
     <%- include("../partials/sidebar") %>
     <main class="content">
         <%- include("../partials/topbar") %>
-        <section class="overview-section">
-            <div class="cust-toolbar">
+        <section class="overview-section referral-console">
+            <div class="cust-toolbar referral-toolbar">
                 <h2><i class="fa-solid fa-ticket"></i> Referral Codes</h2>
                 <input type="number" id="refExpiryDays" placeholder="Valid for (days)" min="1" max="3650" value="30" aria-label="Referral validity in days">
                 <button id="createReferralBtn" class="cust-primary-btn" type="button">
@@ -23,7 +23,7 @@
                 </button>
             </div>
             <div id="referralsList" class="cust-list" aria-live="polite"></div>
-            <h2 style="margin:28px 0 14px;color:#fff;font-size:18px;">
+            <h2 class="referral-section-title">
                 <i class="fa-solid fa-users"></i> Customers
             </h2>
             <div id="customersList" class="cust-list" aria-live="polite"></div>

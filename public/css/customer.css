@@ -1,10 +1,14 @@
-
 /* ============================================================
-   REFERRAL / CUSTOMER MANAGEMENT
-   Access Console: flat, technical, key-management UI.
+   CUSTOMER / REFERRAL MANAGEMENT
+   Access Console visual system: flat surfaces, brass controls,
+   terminal typography. No glass, no blur, no purple gradients.
 ============================================================ */
 
-.cust-shell{ max-width:1000px; margin:0 auto; padding:20px 16px 60px; }
+.cust-shell{
+    max-width:1000px;
+    margin:0 auto;
+    padding:20px 16px 60px;
+}
 
 .cust-toolbar{
     display:flex;
@@ -34,10 +38,10 @@
 
 .cust-primary-btn{
     min-height:42px;
-    border:1px solid rgba(201,151,74,.45);
+    border:1px solid #B3843D;
     border-radius:9px;
-    background:var(--brass-gradient,linear-gradient(135deg,#E0B471,#C9974A 55%,#9C7431));
-    color:#1A1206;
+    background:#C9974A !important;
+    color:#171109 !important;
     padding:9px 15px;
     font-family:var(--font-display,sans-serif);
     font-size:12px;
@@ -47,10 +51,24 @@
     align-items:center;
     justify-content:center;
     gap:7px;
-    transition:transform .16s ease;
+    box-shadow:none !important;
+    transition:background .16s ease,border-color .16s ease,transform .12s ease;
 }
 
-.cust-primary-btn:active{ transform:translateY(1px); }
+.cust-primary-btn:hover{
+    background:#D5A75A !important;
+    border-color:#D5A75A;
+}
+
+.cust-primary-btn:active{
+    transform:translateY(1px);
+}
+
+.cust-primary-btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    transform:none;
+}
 
 .cust-list{
     display:flex;
@@ -58,25 +76,110 @@
     gap:10px;
 }
 
-/* Swipe surface. The red action lives behind the content and is only
-   revealed after a left swipe. Used referrals therefore stay clean. */
+/* ============================================================
+   REFERRAL PAGE
+============================================================ */
+
+.referrals-page .content{
+    background:#0A0C10;
+}
+
+.referral-console{
+    width:min(100%,1080px);
+    margin:0 auto;
+    padding:26px 20px 64px;
+}
+
+.referral-toolbar{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 150px auto;
+    align-items:end;
+    gap:12px;
+    padding:18px;
+    margin-bottom:20px;
+    background:#14171D;
+    border:1px solid #262B33;
+    border-radius:14px;
+}
+
+.referral-toolbar h2{
+    margin:0;
+    font-size:18px;
+    line-height:1.25;
+    letter-spacing:.1px;
+}
+
+.referral-toolbar h2 i{
+    color:#C9974A;
+    margin-right:8px;
+    font-size:16px;
+}
+
+.referral-toolbar input{
+    width:100%;
+    height:44px;
+    box-sizing:border-box;
+    background:#0D1015;
+    border:1px solid #303640;
+    color:#F8FAFC;
+    border-radius:8px;
+    font-family:var(--font-mono,monospace);
+    font-size:13px;
+    font-variant-numeric:tabular-nums;
+}
+
+.referral-toolbar input::placeholder{ color:#667080; }
+
+.referral-toolbar input:hover{ border-color:#414956; }
+
+.referral-toolbar input:focus{
+    border-color:#C9974A !important;
+    box-shadow:0 0 0 2px rgba(201,151,74,.12) !important;
+}
+
+.referral-toolbar .cust-primary-btn{
+    min-width:154px;
+    height:44px;
+}
+
+.referral-section-title{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin:30px 0 12px !important;
+    padding-bottom:10px;
+    border-bottom:1px solid #262B33;
+    color:#F8FAFC !important;
+    font-family:var(--font-display,sans-serif) !important;
+    font-size:16px !important;
+    font-weight:700;
+}
+
+.referral-section-title i{ color:#C9974A; font-size:15px; }
+
+/* Swipe surface. Delete is intentionally hidden behind the card. */
 .referral-swipe-item{
     position:relative;
     overflow:hidden;
-    border:1px solid var(--hairline,#262B33);
+    border:1px solid #262B33;
     border-radius:12px;
     background:#0F1218;
     touch-action:pan-y;
 }
 
+.referral-swipe-item:hover{
+    border-color:#353C47;
+}
+
 .referral-delete-reveal{
     position:absolute;
     inset:0 0 0 auto;
-    width:86px;
+    width:92px;
     display:flex;
     align-items:center;
     justify-content:center;
-    background:#7F292E;
+    gap:6px;
+    background:#7B2D31 !important;
     color:#FFF;
     border:0;
     font-family:var(--font-display,sans-serif);
@@ -96,14 +199,14 @@
     justify-content:space-between;
     gap:16px;
     padding:14px 16px;
-    background:#14171D;
+    background:#14171D !important;
     transform:translateX(0);
     transition:transform .18s ease;
     will-change:transform;
 }
 
 .referral-swipe-item.swiped .referral-swipe-content{
-    transform:translateX(-86px);
+    transform:translateX(-92px);
 }
 
 .referral-code{
@@ -111,7 +214,8 @@
     font-family:var(--font-mono,monospace);
     font-size:13px;
     font-weight:700;
-    letter-spacing:.3px;
+    letter-spacing:.25px;
+    font-variant-numeric:tabular-nums;
 }
 
 .referral-meta{
@@ -119,10 +223,11 @@
     align-items:center;
     flex-wrap:wrap;
     gap:7px 10px;
-    margin-top:5px;
+    margin-top:6px;
     color:#7F8998;
     font-family:var(--font-mono,monospace);
     font-size:10px;
+    font-variant-numeric:tabular-nums;
 }
 
 .referral-status{
@@ -143,13 +248,13 @@
 }
 
 .referral-status.active{ color:#8FE7C7; }
-.referral-status.active::before{ background:var(--signal-green,#2FBE8F); }
+.referral-status.active::before{ background:#3ED598; }
 .referral-status.used{ color:#E0B471; }
-.referral-status.used::before{ background:var(--brass,#C9974A); }
+.referral-status.used::before{ background:#C9974A; }
 .referral-status.revoked,
 .referral-status.expired{ color:#E97169; }
 .referral-status.revoked::before,
-.referral-status.expired::before{ background:var(--signal-red,#D6534A); }
+.referral-status.expired::before{ background:#E5484D; }
 
 .referral-actions{
     display:flex;
@@ -161,25 +266,41 @@
 .referral-actions button,
 .customer-actions button{
     min-height:34px;
-    padding:7px 10px;
-    border:1px solid var(--hairline,#262B33);
+    padding:7px 11px;
+    border:1px solid #303640;
     border-radius:7px;
-    background:#1A1E26;
-    color:#CBD5E1;
+    background:#1A1E26 !important;
+    color:#CBD5E1 !important;
     font-family:var(--font-mono,monospace);
     font-size:10px;
+    font-weight:600;
     cursor:pointer;
+    box-shadow:none !important;
+    transition:background .14s ease,border-color .14s ease,color .14s ease;
 }
 
 .referral-actions button:hover,
-.customer-actions button:hover{ border-color:#3A424E; background:#20252D; }
+.customer-actions button:hover{
+    border-color:#4A535F;
+    background:#20252D !important;
+}
 
 .referral-actions .danger,
-.customer-actions .danger{ color:#F08A87; }
+.customer-actions .danger{
+    color:#F08A87 !important;
+}
+
+.referral-actions .danger:hover,
+.customer-actions .danger:hover{
+    border-color:#7B3438;
+    background:#24171A !important;
+}
 
 .cust-empty{
-    border:1px dashed var(--hairline,#262B33);
-    padding:30px 16px;
+    border:1px dashed #303640;
+    background:#0D1015;
+    border-radius:10px;
+    padding:28px 16px;
     text-align:center;
     color:#697383;
     font-family:var(--font-mono,monospace);
@@ -193,7 +314,7 @@
     gap:14px;
     padding:14px 16px;
     background:#14171D;
-    border:1px solid var(--hairline,#262B33);
+    border:1px solid #262B33;
     border-radius:12px;
 }
 
@@ -211,16 +332,99 @@
     font-size:10px;
 }
 
-.customer-actions{ display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; }
+.customer-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    justify-content:flex-end;
+}
 
-@media(max-width:700px){
-    .cust-toolbar{ align-items:stretch; }
-    .cust-toolbar h2{ width:100%; }
-    .cust-toolbar input,
-    .cust-primary-btn{ width:100%; }
-    .referral-swipe-content{ min-height:92px; }
-    .referral-actions .desktop-only{ display:none; }
-    .customer-management-item{ align-items:flex-start; flex-direction:column; }
-    .customer-actions{ width:100%; justify-content:stretch; }
-    .customer-actions button{ flex:1; }
+/* Loading blocks stay flat and quiet, matching the console rather than
+   turning every request into a nightclub. */
+.referrals-page .gp-loading-card{
+    min-height:78px;
+    background:#14171D !important;
+    border:1px solid #262B33 !important;
+    border-radius:12px !important;
+    box-shadow:none !important;
+    position:relative;
+    overflow:hidden;
+}
+
+.referrals-page .gp-loading-card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    width:35%;
+    background:linear-gradient(90deg,transparent,rgba(201,151,74,.09),transparent);
+    animation:referralScan 1.2s linear infinite;
+}
+
+@keyframes referralScan{
+    from{ transform:translateX(-120%); }
+    to{ transform:translateX(320%); }
+}
+
+@media(max-width:760px){
+    .referral-console{
+        padding:18px 14px 56px;
+    }
+
+    .referral-toolbar{
+        grid-template-columns:1fr;
+        align-items:stretch;
+        padding:15px;
+        gap:10px;
+    }
+
+    .referral-toolbar h2{
+        padding-bottom:4px;
+    }
+
+    .referral-toolbar input,
+    .referral-toolbar .cust-primary-btn{
+        width:100%;
+        min-width:0;
+    }
+
+    .referral-swipe-content{
+        min-height:88px;
+        padding:14px;
+    }
+
+    .referral-actions .desktop-only{
+        display:none;
+    }
+
+    .referral-actions button[data-action="copy"]{
+        min-width:58px;
+    }
+
+    .customer-management-item{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .customer-actions{
+        width:100%;
+        justify-content:stretch;
+    }
+
+    .customer-actions button{
+        flex:1;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .referrals-page .gp-loading-card::after{
+        animation:none;
+        display:none;
+    }
+
+    .referral-swipe-content,
+    .cust-primary-btn,
+    .referral-actions button,
+    .customer-actions button{
+        transition:none;
+    }
 }
