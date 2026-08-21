@@ -7,7 +7,7 @@ function generateCustomerToken(customer) {
         {
             id: customer._id,
             username: customer.username,
-            sessionVersion: customer.sessionVersion,
+            sessionVersion: Number.isInteger(customer.sessionVersion) ? customer.sessionVersion : 0,
             scope: "customer"
         },
 

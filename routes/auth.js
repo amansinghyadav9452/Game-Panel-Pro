@@ -189,6 +189,14 @@ if (!admin) {
     customer.failedAttempts = 0;
     customer.lockUntil = null;
     customer.lastLoginAt = new Date();
+
+    // Normalize accounts created before sessionVersion was introduced.
+    // A missing version must behave as the initial version, not as an
+    // already-expired session.
+    if (!Number.isInteger(customer.sessionVersion)) {
+        customer.sessionVersion = 0;
+    }
+
     await customer.save();
 
     const customerToken = generateCustomerToken(customer);

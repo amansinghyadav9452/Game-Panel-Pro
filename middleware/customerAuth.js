@@ -40,7 +40,19 @@ async function customerAuth(req, res, next) {
 
         }
 
-        if (decoded.sessionVersion !== customer.sessionVersion) {
+        // Older customer documents may predate the sessionVersion field.
+        // Treat a missing value as version 0 and persist it once, instead of
+        // rejecting a freshly-issued token as an expired session.
+        const customerSessionVersion = Number.isInteger(customer.sessionVersion)
+            ? customer.sessionVersion
+            : 0;
+
+        if (customer.sessionVersion !== customerSessionVersion) {
+            customer.sessionVersion = customerSessionVersion;
+            await customer.save();
+        }
+
+        if (decoded.sessionVersion !== customerSessionVersion) {
 
             return res.status(401).json({
                 success: false,
