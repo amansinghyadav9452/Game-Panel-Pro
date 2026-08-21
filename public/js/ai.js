@@ -13,9 +13,22 @@
 
     if (!toggleBtn || !drawer) return;
 
+    // Customers get their own, much more restricted copilot backend
+    // (/api/customer-ai/*, scoped to only their own keys/logs) - swap
+    // the URL prefix and use their token instead of the admin one.
+    function isCustomerRole() {
+        return !localStorage.getItem("token") && !!localStorage.getItem("customerToken");
+    }
+
+    function aiUrl(url) {
+        return isCustomerRole() ? url.replace("/api/ai/", "/api/customer-ai/") : url;
+    }
+
     async function aiApiFetch(url, options = {}) {
 
-        const token = localStorage.getItem("token");
+        const token = isCustomerRole()
+            ? localStorage.getItem("customerToken")
+            : localStorage.getItem("token");
 
         const headers = {
 
@@ -25,7 +38,7 @@
 
         };
 
-        return fetch(url, { ...options, headers });
+        return fetch(aiUrl(url), { ...options, headers });
 
     }
 
@@ -366,9 +379,11 @@
 
         try {
 
-            const token = localStorage.getItem("token");
+            const token = isCustomerRole()
+                ? localStorage.getItem("customerToken")
+                : localStorage.getItem("token");
 
-            const response = await fetch("/api/ai/chat", {
+            const response = await fetch(aiUrl("/api/ai/chat"), {
 
                 method: "POST",
 

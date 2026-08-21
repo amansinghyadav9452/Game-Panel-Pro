@@ -21,39 +21,47 @@
 
         <% } %>
 
-        <input
-            type="file"
-            id="profileInput"
-            accept="image/*"
-            hidden>
+        <% if (typeof role === "undefined" || role !== "customer") { %>
+
+            <input
+                type="file"
+                id="profileInput"
+                accept="image/*"
+                hidden>
+
+        <% } %>
 
     </div>
 
-    <div
-        class="profile-menu"
-        id="profileMenu">
+    <% if (typeof role === "undefined" || role !== "customer") { %>
 
-        <button
-            type="button"
-            id="viewProfileBtn">
+        <div
+            class="profile-menu"
+            id="profileMenu">
 
-            <i class="fa-solid fa-expand"></i>
+            <button
+                type="button"
+                id="viewProfileBtn">
 
-            View Profile Picture
+                <i class="fa-solid fa-expand"></i>
 
-        </button>
+                View Profile Picture
 
-        <button
-            type="button"
-            id="updateProfileBtn">
+            </button>
 
-            <i class="fa-solid fa-upload"></i>
+            <button
+                type="button"
+                id="updateProfileBtn">
 
-            Update Profile Picture
+                <i class="fa-solid fa-upload"></i>
 
-        </button>
+                Update Profile Picture
 
-    </div>
+            </button>
+
+        </div>
+
+    <% } %>
 
 </div>
 
@@ -65,21 +73,25 @@
 
     </h3>
 
-    <div
-        class="display-name-menu"
-        id="displayNameMenu">
+    <% if (typeof role === "undefined" || role !== "customer") { %>
 
-        <button
-            type="button"
-            id="editNameBtn">
+        <div
+            class="display-name-menu"
+            id="displayNameMenu">
 
-            <i class="fa-solid fa-pen"></i>
+            <button
+                type="button"
+                id="editNameBtn">
 
-            Edit Name
+                <i class="fa-solid fa-pen"></i>
 
-        </button>
+                Edit Name
 
-    </div>
+            </button>
+
+        </div>
+
+    <% } %>
 
 </div>
 
@@ -136,6 +148,7 @@ class="<%= activePage === 'premium-keys' ? 'active' : '' %>">
 </a>
 
 <a href="/banned-devices"
+   data-admin-only="true"
    class="<%= activePage === 'banned-devices' ? 'active' : '' %>">
 
     <i class="fa-solid fa-ban"></i>
@@ -144,7 +157,18 @@ class="<%= activePage === 'premium-keys' ? 'active' : '' %>">
 
 </a>
 
+<a href="/referrals"
+   data-admin-only="true"
+   class="<%= activePage === 'referrals' ? 'active' : '' %>">
+
+    <i class="fa-solid fa-ticket"></i>
+
+    <span>Referrals</span>
+
+</a>
+
 <a href="/settings"
+data-admin-only="true"
 class="<%= activePage === 'settings' ? 'active' : '' %>">
 
     <i class="fa-solid fa-gear"></i>

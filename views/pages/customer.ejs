@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<title>Game Panel | Customer</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link rel="stylesheet" href="/css/toast.css">
+<link rel="stylesheet" href="/css/customer.css">
+
+</head>
+
+<body>
+
+<%- include("../partials/toast") %>
+<script defer src="/js/toast.js"></script>
+
+<div class="cust-shell">
+
+    <header class="cust-header">
+
+        <div>
+            <h1><i class="fa-solid fa-user-shield"></i> Customer Panel</h1>
+            <p id="custWelcome">Loading...</p>
+        </div>
+
+        <div class="cust-header-right">
+            <span id="custExpiryBadge" class="cust-expiry-badge"></span>
+            <button id="custLogoutBtn" class="cust-logout-btn" type="button">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </div>
+
+    </header>
+
+    <nav class="cust-tabs-nav">
+        <button class="cust-nav-btn active" data-view="keys">Keys</button>
+        <button class="cust-nav-btn" data-view="crudlogs">Key Logs</button>
+        <button class="cust-nav-btn" data-view="activitylogs">Activity Logs</button>
+    </nav>
+
+    <section id="viewKeys" class="cust-view">
+
+        <div class="cust-toolbar">
+
+            <select id="keyTypeFilter">
+                <option value="">All Types</option>
+                <option value="public">Public</option>
+                <option value="premium">Premium</option>
+            </select>
+
+            <button id="openCreateKeyBtn" class="cust-primary-btn" type="button">
+                <i class="fa-solid fa-plus"></i> Create Key
+            </button>
+
+        </div>
+
+        <div id="createKeyForm" class="cust-card" style="display:none;">
+
+            <div class="cust-form-row">
+
+                <select id="newKeyType">
+                    <option value="public">Public</option>
+                    <option value="premium">Premium</option>
+                </select>
+
+                <input type="number" id="newKeyExpiryDays" placeholder="Expiry (days)" min="1" value="30">
+                <input type="number" id="newKeyMaxUses" placeholder="Max devices" min="1" value="1">
+
+                <button id="submitCreateKeyBtn" class="cust-primary-btn" type="button">Create</button>
+
+            </div>
+
+        </div>
+
+        <div id="keysList" class="cust-list"></div>
+
+    </section>
+
+    <section id="viewCrudlogs" class="cust-view" style="display:none;">
+        <div id="crudLogsList" class="cust-list"></div>
+    </section>
+
+    <section id="viewActivitylogs" class="cust-view" style="display:none;">
+        <div id="activityLogsList" class="cust-list"></div>
+    </section>
+
+</div>
+
+<script src="/js/customer.js"></script>
+
+</body>
+
+</html>

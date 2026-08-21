@@ -4,6 +4,73 @@ function formatDate(date) {
 
 }
 
+// ---------------------------------------------------------------
+// Role helpers - this panel has no server-side session, access is
+// entirely driven by which token is in localStorage. "admin" token
+// wins if somehow both are present (shouldn't normally happen, each
+// login flow only ever writes its own key).
+// ---------------------------------------------------------------
+
+function getPanelRole() {
+
+    if (localStorage.getItem("token")) return "admin";
+    if (localStorage.getItem("customerToken")) return "customer";
+    return null;
+
+}
+
+// Settings / Banned Devices / Referrals are admin-only. A customer
+// clicking one of those nav links gets this message instead of the
+// page loading.
+function initRestrictedNav() {
+
+    if (getPanelRole() !== "customer") return;
+
+    document.querySelectorAll('a[data-admin-only="true"]').forEach((link) => {
+
+        link.classList.add("nav-restricted");
+
+        link.addEventListener("click", (e) => {
+
+            e.preventDefault();
+
+            if (typeof showToast === "function") {
+
+                showToast("Restricted", "Sorry, it's allowed only to the admin.", "error");
+
+            } else {
+
+                alert("Sorry, it's allowed only to the admin.");
+
+            }
+
+        });
+
+    });
+
+}
+
+// Hides sidebar controls a customer should never see (profile picture
+// upload/view, display-name editing) even though the same sidebar
+// markup is shared with the admin panel.
+function applyCustomerSidebarRestrictions() {
+
+    if (getPanelRole() !== "customer") return;
+
+    const profileInput = document.getElementById("profileInput");
+    const profileMenu = document.getElementById("profileMenu");
+    const displayNameMenu = document.getElementById("displayNameMenu");
+
+    if (profileInput) profileInput.remove();
+    if (profileMenu) profileMenu.remove();
+    if (displayNameMenu) displayNameMenu.remove();
+
+    const avatar = document.getElementById("profileAvatar");
+
+    if (avatar) avatar.style.cursor = "default";
+
+}
+
 function copyText(text, btnEl) {
 
     navigator.clipboard.writeText(text);
@@ -90,7 +157,11 @@ function initAutoLogout(timeout = 15 * 60 * 1000) {
 
     function logout() {
 
-        localStorage.removeItem("token");
+        if (getPanelRole() === "customer") {
+            localStorage.removeItem("customerToken");
+        } else {
+            localStorage.removeItem("token");
+        }
 
         localStorage.removeItem("logoutAt");
 
@@ -194,6 +265,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initAutoLogout();
 
+    initRestrictedNav();
+
+    applyCustomerSidebarRestrictions();
+
     loadProfilePhoto();
 
     initDisplayNameMenu();
@@ -211,6 +286,40 @@ async function loadProfilePhoto() {
     const avatar = document.getElementById("profileAvatar");
 
     if (!avatar) return;
+
+    const role = getPanelRole();
+
+    if (role === "customer") {
+
+        const token = localStorage.getItem("customerToken");
+
+        if (!token) return;
+
+        try {
+
+            const res = await fetch("/customer/me", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const data = await res.json();
+
+            if (!data.success) return;
+
+            const displayName = document.getElementById("adminDisplayName");
+
+            if (displayName) {
+                displayName.textContent = data.customer.username;
+            }
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
+
+        return;
+
+    }
 
     const token = localStorage.getItem("token");
 
@@ -623,7 +732,12 @@ if (sidebarLogoutBtn) {
 
         e.preventDefault();
 
-        localStorage.removeItem("token");
+        if (getPanelRole() === "customer") {
+            localStorage.removeItem("customerToken");
+        } else {
+            localStorage.removeItem("token");
+        }
+
         localStorage.removeItem("logoutAt");
 
         window.location.replace("/login");

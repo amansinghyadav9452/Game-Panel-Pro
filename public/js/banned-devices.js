@@ -1,8 +1,20 @@
-if (!localStorage.getItem("token")) {
+if (!localStorage.getItem("token") && !localStorage.getItem("customerToken")) {
     window.location.replace("/login");
 }
 
-loadBannedDevices();
+if ((typeof getPanelRole === "function" ? getPanelRole() : null) === "customer") {
+
+    if (typeof showToast === "function") {
+        showToast("Restricted", "Sorry, it's allowed only to the admin.", "error");
+    }
+
+    setTimeout(() => window.location.replace("/panel"), 900);
+
+} else {
+
+    loadBannedDevices();
+
+}
 
 async function loadBannedDevices() {
 

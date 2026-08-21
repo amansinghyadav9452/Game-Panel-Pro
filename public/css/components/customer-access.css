@@ -1,0 +1,43 @@
+.cust-modal{
+    max-width: 380px;
+}
+
+.cust-tabs{
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    background: rgba(255,255,255,.05);
+    border-radius: 12px;
+    padding: 4px;
+}
+
+.cust-tab{
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #94A3B8;
+    padding: 9px 0;
+    border-radius: 9px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+.cust-tab.active{
+    background: linear-gradient(135deg,#8B5CF6,#3B82F6);
+    color: #fff;
+}
+
+.cust-hint{
+    font-size: 12.5px;
+    color: #94A3B8;
+    margin: -6px 0 14px;
+}
+
+.cust-error{
+    font-size: 12.5px;
+    color: #F87171;
+    min-height: 16px;
+    margin: 4px 0 0;
+}
