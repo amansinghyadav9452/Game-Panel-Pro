@@ -14,6 +14,18 @@ const licenseSchema = new mongoose.Schema({
         required: true
     },
 
+    // Application identity. A license is valid only for this Game ID.
+    // Existing admin keys retain the legacy default "PUBG" until their
+    // application is explicitly migrated.
+    gameId: {
+        type: String,
+        required: true,
+        default: "PUBG",
+        trim: true,
+        uppercase: true,
+        index: true
+    },
+
     status: {
         type: String,
         enum: ["active", "expired", "banned"],
@@ -76,6 +88,7 @@ const licenseSchema = new mongoose.Schema({
 // Speeds up: type-filtered lists (listLicenses), status/expiry sync queries,
 // the expired-license cleanup job, and "recent first" sorting.
 licenseSchema.index({ type: 1, status: 1 });
+licenseSchema.index({ gameId: 1, type: 1, key: 1 });
 licenseSchema.index({ status: 1, expiry: 1 });
 licenseSchema.index({ createdAt: -1 });
 

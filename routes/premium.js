@@ -46,7 +46,8 @@ router.post("/premium/create", auth, apiAccess("premium"), async (req, res) => {
         const {
             key,
             expiryDays,
-            maxUses
+            maxUses,
+            gameId
         } = req.body;
 
         let finalExpiryDays = Number(expiryDays);
@@ -71,7 +72,8 @@ router.post("/premium/create", auth, apiAccess("premium"), async (req, res) => {
             "premium",
             finalExpiryDays,
             finalMaxUses,
-            req.admin.username
+            req.admin.username,
+            gameId || "PUBG"
         );
 
         await logActivity({
@@ -98,7 +100,19 @@ router.post("/premium/create", auth, apiAccess("premium"), async (req, res) => {
 
         console.error(err);
 
-        if (err.message === "License Key Already Exists") {
+        if (err.message === "Invalid Game ID") {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message: "Invalid or disabled Game ID"
+
+        });
+
+    }
+
+    if (err.message === "License Key Already Exists") {
 
             return res.status(400).json({
                 success: false,

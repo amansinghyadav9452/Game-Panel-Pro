@@ -37,7 +37,9 @@ router.post(
 
     expiryDays,
 
-    maxUses
+    maxUses,
+
+    gameId
 
 } = req.body;
 
@@ -68,7 +70,9 @@ const license = await createLicense(
 
     finalMaxUses,
 
-    req.admin.username
+    req.admin.username,
+
+    gameId || "PUBG"
 
 );
 
@@ -99,6 +103,18 @@ await logActivity({
     } catch (err) {
 
     console.error(err);
+
+    if (err.message === "Invalid Game ID") {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message: "Invalid or disabled Game ID"
+
+        });
+
+    }
 
     if (err.message === "License Key Already Exists") {
 

@@ -19,13 +19,14 @@ function getPanelRole() {
 
 }
 
-// Settings and Referrals remain admin-only. Banned Devices is shared,
-// but customers only see/manage devices they personally banned.
+// Settings / Banned Devices / Referrals are admin-only. A customer
+// clicking one of those nav links gets this message instead of the
+// page loading.
 function initRestrictedNav() {
 
     if (getPanelRole() !== "customer") return;
 
-    document.querySelectorAll('a[data-admin-only="true"]:not([data-customer-allowed="true"])').forEach((link) => {
+    document.querySelectorAll('a[data-admin-only="true"]').forEach((link) => {
 
         link.classList.add("nav-restricted");
 

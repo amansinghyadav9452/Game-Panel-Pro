@@ -194,4 +194,28 @@ if (activity.action === "CREATE") {
 }
 
 loadRecentActivities();
+async function loadCustomerGameId() {
+
+    if (__dashRole !== "customer") return;
+
+    try {
+        const response = await apiFetch("/customer/me");
+        const data = await response.json();
+
+        if (!data.success || !data.customer?.gameId) return;
+
+        const chip = document.getElementById("customerGameIdChip");
+        const value = document.getElementById("customerGameId");
+
+        if (chip && value) {
+            value.textContent = data.customer.gameId;
+            chip.style.display = "inline-flex";
+        }
+    } catch (err) {
+        console.error("Customer Game ID load error:", err);
+    }
+}
+
+loadCustomerGameId();
+
 

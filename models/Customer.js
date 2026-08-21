@@ -20,6 +20,15 @@ const customerSchema = new mongoose.Schema({
         required: true
     },
 
+    // Immutable application identity assigned automatically at signup.
+    gameId: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        uppercase: true
+    },
+
     // Copied from the ReferralCode at signup time - this IS the
     // customer's access-until date. Once it passes, login and key
     // verification both stop working for this account.

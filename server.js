@@ -33,6 +33,8 @@ const messengerRoutes = require("./routes/messenger");
 const referralRoutes = require("./routes/referral");
 const customerRoutes = require("./routes/customer");
 const registerDevChat = require("./sockets/devChat");
+const ensureGameApplicationSetup = require("./services/gameApplicationSetup");
+const gameApplicationRoutes = require("./routes/gameApplications");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -63,6 +65,7 @@ app.use(express.static("public", {
 connectDB().then(async () => {
     await createAdmin();
     await createSettings();
+    await ensureGameApplicationSetup();
 
     // Background maintenance: used to run inline on every dashboard/
     // public/premium list request (that's what made pages slow). Now it
@@ -197,6 +200,7 @@ app.use("/api/ai", aiRateLimiter, aiRoutes);
 app.use("/api/customer-ai", aiRateLimiter, customerAiRoutes);
 app.use(rateLimiter, messengerRoutes);
 app.use(rateLimiter, referralRoutes);
+app.use("/api/game-apps", rateLimiter, gameApplicationRoutes);
 app.use(rateLimiter, customerRoutes);
 
 app.use(errorHandler);

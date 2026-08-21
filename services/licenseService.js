@@ -1,5 +1,6 @@
 const License = require("../models/License");
 const generateKey = require("./keyGenerator");
+const GameApplication = require("../models/GameApplication");
 
 async function syncLicenseStatus(license) {
 
@@ -64,7 +65,19 @@ async function bulkSyncLicenseStatuses(scope = {}) {
 
 }
 
-async function createLicense(key, type, expiryDays, maxUses, admin) {
+async function createLicense(key, type, expiryDays, maxUses, admin, gameId = "PUBG") {
+
+    const normalizedGameId = String(gameId || "PUBG").trim().toUpperCase();
+
+    const application = await GameApplication.findOne({
+        gameId: normalizedGameId,
+        ownerType: "admin",
+        status: "active"
+    });
+
+    if (!application) {
+        throw new Error("Invalid Game ID");
+    }
 
     const exists = await License.findOne({ key });
 
@@ -90,7 +103,9 @@ if (exists) {
 
         maxUses,
 
-        createdBy: admin
+        createdBy: admin,
+
+        gameId: normalizedGameId
 
     });
 

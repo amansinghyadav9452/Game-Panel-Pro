@@ -2,11 +2,13 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 
 const Customer = require("../models/Customer");
-const BannedDevice = require("../models/BannedDevice");
 const Admin = require("../models/Admin");
 const Settings = require("../models/Settings");
 const ReferralCode = require("../models/ReferralCode");
 const KeyIndex = require("../models/KeyIndex");
+const GameApplication = require("../models/GameApplication");
+const { generateUniqueGameId } = require("../services/gameId");
+const BannedDevice = require("../models/BannedDevice");
 const customerAuth = require("../middleware/customerAuth");
 const generateCustomerToken = require("../services/customerToken");
 const generateKey = require("../services/keyGenerator");
@@ -168,7 +170,8 @@ router.post("/customer/signup", async (req, res) => {
             username: cleanUsername,
             password: hashed,
             referralCode: code,
-            expiryAt: referral.expiryAt
+            expiryAt: referral.expiryAt,
+            gameId: await generateUniqueGameId()
         });
 
         // The conditional status check is the important part: two requests
@@ -317,7 +320,8 @@ router.get("/customer/me", customerAuth, async (req, res) => {
                 username: req.customer.username,
                 expiryAt: req.customer.expiryAt,
                 status: req.customer.status,
-                createdAt: req.customer.createdAt
+                createdAt: req.customer.createdAt,
+                gameId: req.customer.gameId
             },
 
             panelProfile: {
@@ -330,6 +334,45 @@ router.get("/customer/me", customerAuth, async (req, res) => {
     } catch (err) {
 
         console.error("Customer profile load error:", err);
+
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+
+    }
+
+});
+
+router.get("/customer/banned-devices", customerAuth, async (req, res) => {
+
+    try {
+
+        // A customer may only see banned devices associated with license
+        // keys that belong to that customer. Never trust a key/user id
+        // supplied by the browser for authorization.
+        const keyIndexes = await KeyIndex
+            .find({ customerId: req.customer._id })
+            .select("key -_id")
+            .lean();
+
+        const ownedKeys = keyIndexes.map(item => item.key).filter(Boolean);
+
+        if (!ownedKeys.length) {
+            return res.json({ success: true, devices: [] });
+        }
+
+        const devices = await BannedDevice
+            .find({ userKey: { $in: ownedKeys } })
+            .select("deviceBrand deviceModel androidVersion appVersion playerName userKey serial reason bannedAt")
+            .sort({ bannedAt: -1 })
+            .lean();
+
+        res.json({ success: true, devices });
+
+    } catch (err) {
+
+        console.error("Customer banned-device load error:", err);
 
         res.status(500).json({
             success: false,
@@ -613,144 +656,6 @@ router.delete("/customer/keys/:key", customerAuth, async (req, res) => {
 
         console.error(err);
 
-        res.status(500).json({ success: false, message: "Server Error" });
-
-    }
-
-});
-
-// ===================== CUSTOMER BANNED DEVICES =====================
-
-// Customers may only see devices they personally banned. Admin-created
-// bans are deliberately excluded from this endpoint.
-router.get("/customer/banned-devices", customerAuth, async (req, res) => {
-
-    try {
-
-        const devices = await BannedDevice
-            .find({ ownerCustomer: req.customer._id })
-            .sort({ bannedAt: -1 })
-            .lean();
-
-        res.json({ success: true, devices });
-
-    }
-
-    catch (err) {
-
-        console.error(err);
-        res.status(500).json({ success: false, message: "Server Error" });
-
-    }
-
-});
-
-router.post("/customer/banned-devices/ban", customerAuth, async (req, res) => {
-
-    try {
-
-        const {
-            serial,
-            userKey,
-            deviceBrand,
-            deviceModel,
-            androidVersion,
-            appVersion,
-            playerName,
-            reason
-        } = req.body;
-
-        const cleanSerial = String(serial || "").trim();
-        const cleanKey = String(userKey || "").trim();
-
-        if (!cleanSerial || !cleanKey) {
-            return res.status(400).json({
-                success: false,
-                message: "Serial and license key are required."
-            });
-        }
-
-        // A customer can only ban a device that is associated with one of
-        // their own keys. The key is taken from the customer's isolated key
-        // collection, so another customer's/admin key cannot be targeted.
-        const KeyModel = getCustomerKeyModel(req.customer._id);
-        const ownKey = await KeyModel.findOne({ key: cleanKey }).lean();
-
-        if (!ownKey) {
-            return res.status(403).json({
-                success: false,
-                message: "You can only ban devices related to your own keys."
-            });
-        }
-
-        const existing = await BannedDevice.findOne({ serial: cleanSerial }).lean();
-
-        if (existing) {
-            return res.status(409).json({
-                success: false,
-                message: "Device already banned."
-            });
-        }
-
-        const banned = await BannedDevice.create({
-            ownerCustomer: req.customer._id,
-            serial: cleanSerial,
-            userKey: cleanKey,
-            deviceBrand: String(deviceBrand || ""),
-            deviceModel: String(deviceModel || ""),
-            androidVersion: String(androidVersion || ""),
-            appVersion: String(appVersion || ""),
-            playerName: String(playerName || ""),
-            bannedBy: req.customer.username,
-            reason: String(reason || "No reason provided").slice(0, 200)
-        });
-
-        const CrudLog = getCustomerCrudLogModel(req.customer._id);
-        await CrudLog.create({
-            action: "device_banned",
-            key: cleanKey,
-            type: ownKey.type,
-            details: `Device ${cleanSerial} banned${reason ? `: ${String(reason).slice(0, 200)}` : ""}`
-        });
-
-        res.json({ success: true, banned });
-
-    }
-
-    catch (err) {
-
-        console.error(err);
-        res.status(500).json({ success: false, message: "Server Error" });
-
-    }
-
-});
-
-router.delete("/customer/banned-devices/:serial", customerAuth, async (req, res) => {
-
-    try {
-
-        const serial = String(req.params.serial || "").trim();
-
-        const result = await BannedDevice.deleteOne({
-            serial,
-            ownerCustomer: req.customer._id
-        });
-
-        if (!result.deletedCount) {
-            return res.status(404).json({
-                success: false,
-                message: "Banned device not found in your own bans."
-            });
-        }
-
-        res.json({ success: true });
-
-    }
-
-    catch (err) {
-
-        console.error(err);
         res.status(500).json({ success: false, message: "Server Error" });
 
     }

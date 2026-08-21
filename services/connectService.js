@@ -29,13 +29,22 @@ function getEncryptionCode() {
 
 }
 
-// Admin's own keys still live in the single License collection, checked
-// first exactly like before (zero behaviour change for existing keys).
-// Only if not found there do we consult the KeyIndex to see if it's a
-// customer-owned key living in that customer's isolated collection.
-async function resolveLicenseDoc(key, type) {
+// A key is valid only inside the application (Game ID) that owns it.
+// Admin keys carry gameId directly; customer keys inherit the immutable
+// gameId assigned to their customer account.
+async function resolveLicenseDoc(key, type, gameId) {
 
-    const adminLicense = await License.findOne({ key, type });
+    const normalizedGameId = String(gameId || "").trim().toUpperCase();
+
+    if (!normalizedGameId) {
+        return { doc: null, ownerCustomer: null };
+    }
+
+    const adminLicense = await License.findOne({
+        key,
+        type,
+        gameId: normalizedGameId
+    });
 
     if (adminLicense) {
 
@@ -53,7 +62,7 @@ async function resolveLicenseDoc(key, type) {
 
     const ownerCustomer = await Customer.findById(indexEntry.customerId);
 
-    if (!ownerCustomer) {
+    if (!ownerCustomer || ownerCustomer.gameId !== normalizedGameId) {
 
         return { doc: null, ownerCustomer: null };
 
@@ -88,6 +97,16 @@ async function logAttempt(ownerCustomer, data) {
 async function verifyLicense(body, req, expectedType = "public") {
 
     const { game, user_key, serial } = body;
+    const gameId = String(game || "").trim().toUpperCase();
+
+    if (!gameId || !user_key) {
+
+        return {
+            status: false,
+            reason: "Invalid Application"
+        };
+
+    }
 
     if (!process.env.TOKEN_SECRET) {
 
@@ -95,7 +114,7 @@ async function verifyLicense(body, req, expectedType = "public") {
 
 }
 
-    const { doc: license, ownerCustomer } = await resolveLicenseDoc(user_key, expectedType);
+    const { doc: license, ownerCustomer } = await resolveLicenseDoc(user_key, expectedType, gameId);
 if (!license) {
 
     await logAttempt(ownerCustomer, {
@@ -326,7 +345,7 @@ if (!recentSuccessLog) {
 const rng = Math.floor(Date.now() / 1000);
 
 const authString =
-`${game}-${user_key}-${serial}-${process.env.TOKEN_SECRET}`;
+`${gameId}-${user_key}-${serial}-${process.env.TOKEN_SECRET}`;
 
 const token = md5(authString);
 
@@ -447,7 +466,7 @@ async function verifyEncryptedConnect(body, req) {
 
         }
 
-        const license = (await resolveLicenseDoc(userKey, "public")).doc;
+        const license = (await resolveLicenseDoc(userKey, "public", body.game)).doc;
 
         const data = {
 
