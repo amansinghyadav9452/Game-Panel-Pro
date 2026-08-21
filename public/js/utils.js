@@ -308,7 +308,37 @@ async function loadProfilePhoto() {
             const displayName = document.getElementById("adminDisplayName");
 
             if (displayName) {
-                displayName.textContent = data.customer.username;
+                displayName.textContent =
+                    data.panelProfile?.displayName || "Administrator";
+            }
+
+            // Reuse the exact panel profile configured by the admin.
+            // No customer-specific avatar is created here, so the
+            // customer sidebar stays visually identical to the admin
+            // sidebar.
+            const img = avatar.querySelector(".profile-photo");
+            const letter = avatar.querySelector(".profile-letter");
+
+            if (data.panelProfile?.profileImage) {
+
+                if (letter) letter.remove();
+
+                let profileImg = img;
+
+                if (!profileImg) {
+                    profileImg = document.createElement("img");
+                    profileImg.className = "profile-photo";
+                    profileImg.alt = "Profile";
+                    avatar.insertBefore(profileImg, avatar.firstChild);
+                }
+
+                profileImg.src =
+                    `${data.panelProfile.profileImage}?t=${Date.now()}`;
+
+            } else if (img) {
+
+                img.remove();
+
             }
 
         } catch (err) {

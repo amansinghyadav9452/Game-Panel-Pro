@@ -298,18 +298,44 @@ router.post("/customer/login", async (req, res) => {
 
 router.get("/customer/me", customerAuth, async (req, res) => {
 
-    res.json({
+    try {
 
-        success: true,
+        // The sidebar is shared with the admin panel. Customers should
+        // see the same public panel identity (display name + profile
+        // picture) that the admin has configured, without exposing any
+        // admin account credentials or private settings.
+        const settings = await Settings.findOne().select("panelProfile").lean();
 
-        customer: {
-            username: req.customer.username,
-            expiryAt: req.customer.expiryAt,
-            status: req.customer.status,
-            createdAt: req.customer.createdAt
-        }
+        const panelProfile = settings?.panelProfile || {};
 
-    });
+        res.json({
+
+            success: true,
+
+            customer: {
+                username: req.customer.username,
+                expiryAt: req.customer.expiryAt,
+                status: req.customer.status,
+                createdAt: req.customer.createdAt
+            },
+
+            panelProfile: {
+                displayName: panelProfile.displayName || "Administrator",
+                profileImage: panelProfile.profileImage || ""
+            }
+
+        });
+
+    } catch (err) {
+
+        console.error("Customer profile load error:", err);
+
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+
+    }
 
 });
 
