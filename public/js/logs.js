@@ -502,14 +502,6 @@ async function banDevice(serial, reason = ""){
 
     try{
 
-        if (__logsRole === "customer") {
-
-            showToast("Restricted", "Sorry, it's allowed only to the admin.", "error");
-
-            return;
-
-        }
-
         const log = allLogs.find(
             x => x.serial === serial
         );
@@ -525,37 +517,33 @@ async function banDevice(serial, reason = ""){
 
         }
 
+        const isCustomer = __logsRole === "customer";
+        const token = localStorage.getItem(isCustomer ? "customerToken" : "token");
+        const endpoint = isCustomer
+            ? "/customer/banned-devices/ban"
+            : "/api/banned-devices/ban";
+
         const response = await fetch(
-            "/api/banned-devices/ban",
+            endpoint,
             {
 
                 method:"POST",
-            headers:{
+                headers:{
 
-                "Content-Type":"application/json",
+                    "Content-Type":"application/json",
+                    Authorization:`Bearer ${token}`
 
-                Authorization:`Bearer ${localStorage.getItem("token")}`
-
-            },
+                },
 
                 body:JSON.stringify({
 
                     serial:log.serial,
-
                     userKey:log.licenseKey,
-
                     deviceBrand:log.deviceBrand,
-
                     deviceModel:log.deviceModel,
-
                     androidVersion:log.androidVersion,
-
                     appVersion:log.appVersion,
-
                     playerName:log.playerName,
-
-                    bannedBy:"Admin",
-
                     reason:reason || "No reason provided"
 
                 })

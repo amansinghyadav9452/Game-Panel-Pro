@@ -2,19 +2,7 @@ if (!localStorage.getItem("token") && !localStorage.getItem("customerToken")) {
     window.location.replace("/login");
 }
 
-if ((typeof getPanelRole === "function" ? getPanelRole() : null) === "customer") {
-
-    if (typeof showToast === "function") {
-        showToast("Restricted", "Sorry, it's allowed only to the admin.", "error");
-    }
-
-    setTimeout(() => window.location.replace("/panel"), 900);
-
-} else {
-
-    loadBannedDevices();
-
-}
+loadBannedDevices();
 
 async function loadBannedDevices() {
 
@@ -26,15 +14,20 @@ async function loadBannedDevices() {
 
     try {
 
-        const response = await fetch("/api/banned-devices", {
+        const isCustomer = (typeof getPanelRole === "function" ? getPanelRole() : null) === "customer";
+        const token = localStorage.getItem(isCustomer ? "customerToken" : "token");
+        const endpoint = isCustomer ? "/customer/banned-devices" : "/api/banned-devices";
+
+        const response = await fetch(endpoint, {
 
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
+                Authorization: `Bearer ${token}`
             }
 
         });
 
-        const devices = await response.json();
+        const payload = await response.json();
+        const devices = Array.isArray(payload) ? payload : (payload.devices || []);
 
         const container = document.getElementById("bannedDevicesContainer");
 
@@ -139,12 +132,18 @@ async function unbanDevice(serial, cardEl) {
         "Are you sure you want to unban this device?",
         async () => {
 
-            const response = await fetch(`/api/banned-devices/${serial}`, {
+            const isCustomer = (typeof getPanelRole === "function" ? getPanelRole() : null) === "customer";
+            const token = localStorage.getItem(isCustomer ? "customerToken" : "token");
+            const endpoint = isCustomer
+                ? `/customer/banned-devices/${encodeURIComponent(serial)}`
+                : `/api/banned-devices/${encodeURIComponent(serial)}`;
+
+            const response = await fetch(endpoint, {
 
                 method: "DELETE",
 
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                    Authorization: `Bearer ${token}`
                 }
 
             });

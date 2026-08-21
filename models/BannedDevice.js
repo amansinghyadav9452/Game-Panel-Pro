@@ -2,6 +2,15 @@ const mongoose = require("mongoose");
 
 const bannedDeviceSchema = new mongoose.Schema({
 
+    // Null for admin-created bans. Set for customer-created bans so the
+    // customer can see/unban only devices they personally banned.
+    ownerCustomer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Customer",
+        default: null,
+        index: true
+    },
+
     serial: {
         type: String,
         required: true,
