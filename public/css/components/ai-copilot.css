@@ -263,18 +263,16 @@
     width: 54px;
     height: 54px;
     border-radius: 50%;
-    border: 1px solid rgba(59, 193, 246, .35);
+    border: 1px solid rgba(91, 141, 239, .4);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(37, 99, 235, .18);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(165deg, var(--surface-2), var(--surface));
     color: #fff;
     font-size: 20px;
     cursor: pointer;
     z-index: 500;
-    box-shadow: 0 8px 24px rgba(37, 99, 235, .25);
+    box-shadow: 0 8px 24px rgba(91, 141, 239, .25);
     transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease, background .2s ease;
 }
 
@@ -284,8 +282,8 @@
 
 .ai-copilot-fab:hover {
     transform: translateY(-3px) scale(1.05);
-    background: rgba(37, 99, 235, .3);
-    box-shadow: 0 12px 28px rgba(37, 99, 235, .4);
+    background: linear-gradient(165deg, var(--surface-2), var(--hairline));
+    box-shadow: 0 12px 28px rgba(91, 141, 239, .4);
 }
 
 .ai-copilot-fab:active {

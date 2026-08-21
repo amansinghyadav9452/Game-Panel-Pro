@@ -16,7 +16,7 @@
 
     border-radius:50%;
 
-    border:1px solid rgba(224,180,113,.35);
+    border:1px solid rgba(224,180,113,.4);
 
     display:flex;
 
@@ -24,11 +24,7 @@
 
     justify-content:center;
 
-    background:rgba(224,180,113,.18);
-
-    backdrop-filter:blur(10px);
-
-    -webkit-backdrop-filter:blur(10px);
+    background:linear-gradient(165deg, var(--surface-2), var(--surface));
 
     color:#fff;
 
@@ -48,7 +44,7 @@
 
     transform:translateY(-3px) scale(1.05);
 
-    background:rgba(224,180,113,.3);
+    background:linear-gradient(165deg, var(--surface-2), var(--hairline));
 
     box-shadow:0 12px 28px rgba(224,180,113,.4);
 
