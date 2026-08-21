@@ -1,162 +1,56 @@
-*{ box-sizing:border-box; }
 
-body{
-    margin:0;
-    font-family:"Plus Jakarta Sans",sans-serif;
-    background:
-        radial-gradient(circle at top right, rgba(59,130,246,.1), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(139,92,246,.08), transparent 35%),
-        linear-gradient(135deg,#08111f,#0f172a);
-    color:#E2E8F0;
-    min-height:100vh;
-}
+/* ============================================================
+   REFERRAL / CUSTOMER MANAGEMENT
+   Access Console: flat, technical, key-management UI.
+============================================================ */
 
-.cust-shell{
-    max-width:900px;
-    margin:0 auto;
-    padding:20px 16px 60px;
-}
-
-.cust-header{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:12px;
-    margin-bottom:20px;
-}
-
-.cust-header h1{
-    font-size:20px;
-    margin:0 0 4px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:#fff;
-}
-
-.cust-header p{
-    margin:0;
-    color:#94A3B8;
-    font-size:13px;
-}
-
-.cust-header-right{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.cust-expiry-badge{
-    font-size:12px;
-    font-weight:700;
-    padding:6px 12px;
-    border-radius:20px;
-    background:rgba(34,197,94,.15);
-    color:#4ADE80;
-    border:1px solid rgba(34,197,94,.3);
-}
-
-.cust-expiry-badge.warn{
-    background:rgba(245,158,11,.15);
-    color:#F59E0B;
-    border-color:rgba(245,158,11,.3);
-}
-
-.cust-logout-btn{
-    border:1px solid rgba(255,255,255,.1);
-    background:rgba(255,255,255,.05);
-    color:#E2E8F0;
-    padding:9px 16px;
-    border-radius:10px;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-
-.cust-logout-btn:hover{ background:rgba(239,68,68,.15); color:#F87171; }
-
-.cust-tabs-nav{
-    display:flex;
-    gap:8px;
-    margin-bottom:18px;
-    overflow-x:auto;
-}
-
-.cust-nav-btn{
-    border:none;
-    background:rgba(255,255,255,.05);
-    color:#94A3B8;
-    padding:10px 18px;
-    border-radius:10px;
-    font-weight:700;
-    font-size:13px;
-    cursor:pointer;
-    white-space:nowrap;
-}
-
-.cust-nav-btn.active{
-    background:linear-gradient(135deg,#8B5CF6,#3B82F6);
-    color:#fff;
-}
+.cust-shell{ max-width:1000px; margin:0 auto; padding:20px 16px 60px; }
 
 .cust-toolbar{
     display:flex;
-    gap:10px;
-    margin-bottom:14px;
+    align-items:center;
+    gap:12px;
     flex-wrap:wrap;
+    margin-bottom:18px;
 }
 
+.cust-toolbar h2,
+.overview-section > h2{
+    font-family:var(--font-display,sans-serif) !important;
+    color:#F8FAFC !important;
+}
+
+.cust-toolbar input,
 .cust-toolbar select{
-    background:#1F2937;
-    color:#fff;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:10px;
+    min-height:42px;
+    background:#0D1015;
+    color:#F8FAFC;
+    border:1px solid var(--hairline,#262B33);
+    border-radius:9px;
     padding:9px 12px;
-    font-size:13px;
+    font-family:var(--font-mono,monospace);
+    font-size:12px;
 }
 
 .cust-primary-btn{
-    border:none;
-    background:linear-gradient(135deg,#8B5CF6,#3B82F6);
-    color:#fff;
-    padding:9px 16px;
-    border-radius:10px;
-    font-weight:700;
-    font-size:13px;
+    min-height:42px;
+    border:1px solid rgba(201,151,74,.45);
+    border-radius:9px;
+    background:var(--brass-gradient,linear-gradient(135deg,#E0B471,#C9974A 55%,#9C7431));
+    color:#1A1206;
+    padding:9px 15px;
+    font-family:var(--font-display,sans-serif);
+    font-size:12px;
+    font-weight:800;
     cursor:pointer;
-    display:flex;
+    display:inline-flex;
     align-items:center;
-    gap:6px;
+    justify-content:center;
+    gap:7px;
+    transition:transform .16s ease;
 }
 
-.cust-card{
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    padding:16px;
-    margin-bottom:16px;
-}
-
-.cust-form-row{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.cust-form-row input, .cust-form-row select{
-    flex:1;
-    min-width:120px;
-    background:#1F2937;
-    color:#fff;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:10px;
-    padding:9px 12px;
-    font-size:13px;
-}
+.cust-primary-btn:active{ transform:translateY(1px); }
 
 .cust-list{
     display:flex;
@@ -164,75 +58,169 @@ body{
     gap:10px;
 }
 
-.cust-item{
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    padding:14px 16px;
+/* Swipe surface. The red action lives behind the content and is only
+   revealed after a left swipe. Used referrals therefore stay clean. */
+.referral-swipe-item{
+    position:relative;
+    overflow:hidden;
+    border:1px solid var(--hairline,#262B33);
+    border-radius:12px;
+    background:#0F1218;
+    touch-action:pan-y;
+}
+
+.referral-delete-reveal{
+    position:absolute;
+    inset:0 0 0 auto;
+    width:86px;
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.cust-item-key{
-    font-family:monospace;
-    font-size:14px;
-    font-weight:700;
-    color:#fff;
-}
-
-.cust-item-meta{
-    font-size:11.5px;
-    color:#94A3B8;
-    margin-top:4px;
-}
-
-.cust-badge{
-    font-size:10.5px;
-    font-weight:700;
-    padding:3px 9px;
-    border-radius:20px;
-    text-transform:uppercase;
-}
-
-.cust-badge.active{ background:rgba(34,197,94,.15); color:#4ADE80; }
-.cust-badge.expired{ background:rgba(148,163,184,.15); color:#94A3B8; }
-.cust-badge.banned{ background:rgba(239,68,68,.15); color:#F87171; }
-
-.cust-item-actions{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-}
-
-.cust-item-actions button{
-    border:1px solid rgba(255,255,255,.1);
-    background:rgba(255,255,255,.05);
-    color:#E2E8F0;
-    padding:6px 10px;
-    border-radius:8px;
-    font-size:11.5px;
+    justify-content:center;
+    background:#7F292E;
+    color:#FFF;
+    border:0;
+    font-family:var(--font-display,sans-serif);
+    font-size:11px;
+    font-weight:800;
     cursor:pointer;
 }
 
-.cust-item-actions button:hover{ background:rgba(255,255,255,.12); }
-.cust-item-actions button.danger:hover{ background:rgba(239,68,68,.15); color:#F87171; }
+.referral-delete-reveal i{ font-size:14px; }
+
+.referral-swipe-content{
+    position:relative;
+    z-index:1;
+    min-height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 16px;
+    background:#14171D;
+    transform:translateX(0);
+    transition:transform .18s ease;
+    will-change:transform;
+}
+
+.referral-swipe-item.swiped .referral-swipe-content{
+    transform:translateX(-86px);
+}
+
+.referral-code{
+    color:#F8FAFC;
+    font-family:var(--font-mono,monospace);
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+.referral-meta{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:7px 10px;
+    margin-top:5px;
+    color:#7F8998;
+    font-family:var(--font-mono,monospace);
+    font-size:10px;
+}
+
+.referral-status{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    color:#AEB7C4;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.referral-status::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#667080;
+}
+
+.referral-status.active{ color:#8FE7C7; }
+.referral-status.active::before{ background:var(--signal-green,#2FBE8F); }
+.referral-status.used{ color:#E0B471; }
+.referral-status.used::before{ background:var(--brass,#C9974A); }
+.referral-status.revoked,
+.referral-status.expired{ color:#E97169; }
+.referral-status.revoked::before,
+.referral-status.expired::before{ background:var(--signal-red,#D6534A); }
+
+.referral-actions{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    flex-shrink:0;
+}
+
+.referral-actions button,
+.customer-actions button{
+    min-height:34px;
+    padding:7px 10px;
+    border:1px solid var(--hairline,#262B33);
+    border-radius:7px;
+    background:#1A1E26;
+    color:#CBD5E1;
+    font-family:var(--font-mono,monospace);
+    font-size:10px;
+    cursor:pointer;
+}
+
+.referral-actions button:hover,
+.customer-actions button:hover{ border-color:#3A424E; background:#20252D; }
+
+.referral-actions .danger,
+.customer-actions .danger{ color:#F08A87; }
 
 .cust-empty{
+    border:1px dashed var(--hairline,#262B33);
+    padding:30px 16px;
     text-align:center;
-    color:#64748B;
-    padding:40px 0;
-    font-size:13px;
-}
-
-.cust-log-line{
-    font-size:12.5px;
-    color:#CBD5E1;
-}
-
-.cust-log-time{
+    color:#697383;
+    font-family:var(--font-mono,monospace);
     font-size:11px;
-    color:#64748B;
+}
+
+.customer-management-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:14px 16px;
+    background:#14171D;
+    border:1px solid var(--hairline,#262B33);
+    border-radius:12px;
+}
+
+.customer-name{
+    color:#F8FAFC;
+    font-family:var(--font-mono,monospace);
+    font-size:13px;
+    font-weight:700;
+}
+
+.customer-meta{
+    margin-top:5px;
+    color:#7F8998;
+    font-family:var(--font-mono,monospace);
+    font-size:10px;
+}
+
+.customer-actions{ display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; }
+
+@media(max-width:700px){
+    .cust-toolbar{ align-items:stretch; }
+    .cust-toolbar h2{ width:100%; }
+    .cust-toolbar input,
+    .cust-primary-btn{ width:100%; }
+    .referral-swipe-content{ min-height:92px; }
+    .referral-actions .desktop-only{ display:none; }
+    .customer-management-item{ align-items:flex-start; flex-direction:column; }
+    .customer-actions{ width:100%; justify-content:stretch; }
+    .customer-actions button{ flex:1; }
 }

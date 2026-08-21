@@ -27,8 +27,11 @@ const logsRoutes = require("./routes/logs");
 const createSettings = require("./services/createSettings");
 const bannedDeviceRoutes = require("./routes/bannedDevices");
 const aiRoutes = require("./routes/ai");
+const customerAiRoutes = require("./routes/customerAi");
 const aiRateLimiter = require("./middleware/aiRateLimiter");
 const messengerRoutes = require("./routes/messenger");
+const referralRoutes = require("./routes/referral");
+const customerRoutes = require("./routes/customer");
 const registerDevChat = require("./sockets/devChat");
 
 const app = express();
@@ -191,7 +194,10 @@ app.use("/settings", rateLimiter, settingsRoutes);
 app.use("/logs", rateLimiter, logsRoutes);
 app.use("/api/banned-devices", rateLimiter, bannedDeviceRoutes);
 app.use("/api/ai", aiRateLimiter, aiRoutes);
+app.use("/api/customer-ai", aiRateLimiter, customerAiRoutes);
 app.use(rateLimiter, messengerRoutes);
+app.use(rateLimiter, referralRoutes);
+app.use(rateLimiter, customerRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {

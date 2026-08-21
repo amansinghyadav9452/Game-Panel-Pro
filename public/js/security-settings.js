@@ -20,7 +20,6 @@ function renderBiometricStatus(enabled) {
 
         biometricBadge.textContent = enabled ? "Enabled" : "Disabled";
 
-        biometricBadge.classList.remove("gp-loading");
         biometricBadge.classList.toggle("warning", !enabled);
         biometricBadge.classList.toggle("success", enabled);
 
@@ -67,11 +66,6 @@ async function loadBiometricStatus() {
     catch (error) {
 
         console.error(error);
-
-        if (biometricBadge) {
-            biometricBadge.classList.remove("gp-loading");
-            biometricBadge.textContent = "Unavailable";
-        }
 
     }
 

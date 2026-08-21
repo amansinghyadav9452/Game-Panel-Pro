@@ -6,7 +6,7 @@ function setBadge(id, text, level) {
 
     badge.textContent = text;
 
-    badge.classList.remove("active", "warning", "danger", "gp-loading");
+    badge.classList.remove("active", "warning", "danger");
 
     badge.classList.add(level);
 
@@ -52,13 +52,7 @@ async function loadSecurityStatus() {
 
         const data = await res.json();
 
-        if (!data.success) {
-            document.querySelectorAll(".badge.gp-loading").forEach((badge) => {
-                badge.classList.remove("gp-loading");
-                badge.textContent = "Unavailable";
-            });
-            return;
-        }
+        if (!data.success) return;
 
         setBadge(
             "jwtBadge",
@@ -147,11 +141,6 @@ async function loadSecurityStatus() {
     catch (error) {
 
         console.error(error);
-
-        document.querySelectorAll(".badge.gp-loading").forEach((badge) => {
-            badge.classList.remove("gp-loading");
-            badge.textContent = "Unavailable";
-        });
 
     }
 

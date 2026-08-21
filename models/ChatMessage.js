@@ -4,13 +4,23 @@ const chatMessageSchema = new mongoose.Schema({
 
     sender: {
         type: String,
-        enum: ["admin", "developer"],
+        enum: ["admin", "developer", "customer"],
         required: true
     },
 
     senderLabel: {
         type: String,
         default: ""
+    },
+
+    // null/undefined = the admin<->developer thread (original behaviour).
+    // Set = this message belongs to a specific customer's own thread
+    // with the developer. Keeps every customer's conversation - and the
+    // admin's - fully separate from one another.
+    customerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Customer",
+        default: null
     },
 
     text: {
@@ -25,6 +35,11 @@ const chatMessageSchema = new mongoose.Schema({
     },
 
     readByDeveloper: {
+        type: Boolean,
+        default: false
+    },
+
+    readByCustomer: {
         type: Boolean,
         default: false
     },

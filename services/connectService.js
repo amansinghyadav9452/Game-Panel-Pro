@@ -1,9 +1,12 @@
 const License = require("../models/License");
 const UserLog = require("../models/UserLog");
 const BannedDevice = require("../models/BannedDevice");
+const KeyIndex = require("../models/KeyIndex");
+const Customer = require("../models/Customer");
 const md5 = require("md5");
 const { resolveMarketingName } = require("./deviceLookup");
 const { encryptAES, decryptAES, generateSignature } = require("./cryptoBridge");
+const { getCustomerKeyModel, getCustomerActivityLogModel } = require("./customerModels");
 require("dotenv").config();
 
 // Never hardcode this key in source — this repo is public, so a literal
@@ -26,6 +29,62 @@ function getEncryptionCode() {
 
 }
 
+// Admin's own keys still live in the single License collection, checked
+// first exactly like before (zero behaviour change for existing keys).
+// Only if not found there do we consult the KeyIndex to see if it's a
+// customer-owned key living in that customer's isolated collection.
+async function resolveLicenseDoc(key, type) {
+
+    const adminLicense = await License.findOne({ key, type });
+
+    if (adminLicense) {
+
+        return { doc: adminLicense, ownerCustomer: null };
+
+    }
+
+    const indexEntry = await KeyIndex.findOne({ key, type });
+
+    if (!indexEntry) {
+
+        return { doc: null, ownerCustomer: null };
+
+    }
+
+    const ownerCustomer = await Customer.findById(indexEntry.customerId);
+
+    if (!ownerCustomer) {
+
+        return { doc: null, ownerCustomer: null };
+
+    }
+
+    const CustomerKeyModel = getCustomerKeyModel(ownerCustomer._id);
+
+    const doc = await CustomerKeyModel.findOne({ key, type });
+
+    return { doc, ownerCustomer };
+
+}
+
+// Verification-attempt logs for a customer-owned key go into that
+// customer's own isolated log collection instead of the shared
+// UserLog, so no customer's activity ever lands in another
+// collection.
+async function logAttempt(ownerCustomer, data) {
+
+    if (ownerCustomer) {
+
+        const ActivityLog = getCustomerActivityLogModel(ownerCustomer._id);
+
+        return ActivityLog.create(data);
+
+    }
+
+    return UserLog.create(data);
+
+}
+
 async function verifyLicense(body, req, expectedType = "public") {
 
     const { game, user_key, serial } = body;
@@ -36,13 +95,10 @@ async function verifyLicense(body, req, expectedType = "public") {
 
 }
 
-    const license = await License.findOne({
-        key: user_key,
-        type: expectedType
-    });
+    const { doc: license, ownerCustomer } = await resolveLicenseDoc(user_key, expectedType);
 if (!license) {
 
-    await UserLog.create({
+    await logAttempt(ownerCustomer, {
     licenseKey: user_key,
     licenseType: expectedType,
     serial,
@@ -68,9 +124,32 @@ if (!license) {
 
 }
 
+// Key belongs to a customer whose referral access has expired or been
+// disabled - verification (and therefore the game itself) must stop
+// working, without touching the key/data itself.
+if (ownerCustomer && (ownerCustomer.status === "disabled" || ownerCustomer.expiryAt <= new Date())) {
+
+    await logAttempt(ownerCustomer, {
+        licenseKey: user_key,
+        licenseType: expectedType,
+        serial,
+        deviceModel: body.device_model || "",
+        deviceBrand: body.device_brand || "",
+        androidVersion: body.android_version || "",
+        status: "failed",
+        reason: "Owner Access Expired"
+    });
+
+    return {
+        status: false,
+        reason: "Service Unavailable"
+    };
+
+}
+
 if (license.expiry < new Date()) {
 
-    await UserLog.create({
+    await logAttempt(ownerCustomer, {
     licenseKey: user_key,
     licenseType: expectedType,
     serial,
@@ -89,7 +168,7 @@ if (license.expiry < new Date()) {
 
 if (license.status === "banned") {
 
-    await UserLog.create({
+    await logAttempt(ownerCustomer, {
     licenseKey: user_key,
     licenseType: expectedType,
     serial,
@@ -108,7 +187,7 @@ if (license.status === "banned") {
 
 if (!serial) {
 
-    await UserLog.create({
+    await logAttempt(ownerCustomer, {
     licenseKey: user_key,
     licenseType: expectedType,
     serial: "",
@@ -135,7 +214,7 @@ const bannedDevice = await BannedDevice.findOne({
 
 if (bannedDevice) {
 
-    await UserLog.create({
+    await logAttempt(ownerCustomer, {
 
         licenseKey: user_key,
         licenseType: expectedType,
@@ -160,7 +239,7 @@ if (bannedDevice) {
 
 if (!game || !user_key) {
 
-    await UserLog.create({
+    await logAttempt(ownerCustomer, {
     licenseKey: user_key || "",
     licenseType: expectedType,
     serial: serial || "",
@@ -187,7 +266,7 @@ if (!alreadyRegistered) {
 
     if (license.devices.length >= license.maxUses) {
 
-        await UserLog.create({
+        await logAttempt(ownerCustomer, {
     licenseKey: user_key,
     licenseType: expectedType,
     serial,
@@ -218,7 +297,11 @@ await license.save();
 
 const duplicateWindow = new Date(Date.now() - 15 * 1000);
 
-const recentSuccessLog = await UserLog.findOne({
+const RecentLogModel = ownerCustomer
+    ? getCustomerActivityLogModel(ownerCustomer._id)
+    : UserLog;
+
+const recentSuccessLog = await RecentLogModel.findOne({
     licenseKey: user_key,
     serial,
     status: "success",
@@ -227,7 +310,7 @@ const recentSuccessLog = await UserLog.findOne({
 
 if (!recentSuccessLog) {
 
-    await UserLog.create({
+    await logAttempt(ownerCustomer, {
         licenseKey: user_key,
         licenseType: expectedType,
         serial,
@@ -364,10 +447,7 @@ async function verifyEncryptedConnect(body, req) {
 
         }
 
-        const license = await License.findOne({
-            key: userKey,
-            type: "public"
-        });
+        const license = (await resolveLicenseDoc(userKey, "public")).doc;
 
         const data = {
 

@@ -157,15 +157,9 @@ router.delete("/referral/:id", auth, async (req, res) => {
 
         }
 
-        if (referral.status === "used") {
-
-            return res.status(400).json({
-                success: false,
-                message: "Cannot delete a used referral code."
-            });
-
-        }
-
+        // Used codes may be deleted as historical referral records. This
+        // does NOT delete or disable the customer referenced by usedBy.
+        // The customer account owns its own access lifecycle.
         await referral.deleteOne();
 
         res.json({ success: true });

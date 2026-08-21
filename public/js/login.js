@@ -128,7 +128,16 @@ if (data.success && data.twoFactorRequired) {
 
 } else if (data.success) {
 
-    localStorage.setItem("token", data.token);
+    // Never leave a stale token from the previous identity in storage.
+    // A customer token is intentionally kept separate from the admin token.
+    localStorage.removeItem("token");
+    localStorage.removeItem("customerToken");
+
+    if (data.role === "customer") {
+        localStorage.setItem("customerToken", data.token);
+    } else {
+        localStorage.setItem("token", data.token);
+    }
 
     localStorage.setItem(
         "logoutAt",

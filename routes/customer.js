@@ -2,6 +2,8 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 
 const Customer = require("../models/Customer");
+const Admin = require("../models/Admin");
+const Settings = require("../models/Settings");
 const ReferralCode = require("../models/ReferralCode");
 const KeyIndex = require("../models/KeyIndex");
 const customerAuth = require("../middleware/customerAuth");
@@ -14,6 +16,7 @@ const {
 } = require("../services/customerModels");
 
 const router = express.Router();
+const fetch = global.fetch;
 
 // ===================== PAGE =====================
 
@@ -79,88 +82,130 @@ router.post("/customer/signup", async (req, res) => {
 
     try {
 
-        const { referralCode, username, password } = req.body;
+        const { referralCode, username, password, turnstileToken } = req.body;
+
+        const settings = await Settings.findOne();
+
+        if (settings?.security?.turnstileEnabled) {
+
+            if (!turnstileToken) {
+                return res.status(400).json({ success: false, message: "Captcha verification required." });
+            }
+
+            const response = await fetch(
+                "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({
+                        secret: process.env.TURNSTILE_SECRET_KEY,
+                        response: turnstileToken
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            if (!result.success) {
+                return res.status(400).json({ success: false, message: "Captcha verification failed." });
+            }
+
+        }
 
         if (!referralCode || !username || !password) {
-
             return res.status(400).json({
                 success: false,
                 message: "Referral code, username and password are all required."
             });
-
         }
 
-        if (String(username).trim().length < 3 || String(password).length < 6) {
-
-            return res.status(400).json({
-                success: false,
-                message: "Username must be 3+ chars and password 6+ chars."
-            });
-
-        }
-
+        const cleanUsername = String(username).trim().toLowerCase();
         const code = String(referralCode).trim().toUpperCase();
 
-        const referral = await ReferralCode.findOne({ code });
-
-        if (!referral || referral.status !== "active") {
-
+        if (cleanUsername.length < 3 || cleanUsername.length > 40 ||
+            typeof password !== "string" || password.length < 6 || password.length > 128) {
             return res.status(400).json({
                 success: false,
-                message: "This referral code is not valid."
+                message: "Username must be 3-40 chars and password 6-128 chars."
             });
-
         }
 
-        if (referral.expiryAt <= new Date()) {
-
-            return res.status(400).json({
+        // Do not let a customer shadow an admin account name. This also keeps
+        // the single /login endpoint deterministic and avoids identity ambiguity.
+        const adminExists = await Admin.exists({ username: cleanUsername });
+        if (adminExists) {
+            return res.status(409).json({
                 success: false,
-                message: "This referral code has expired."
+                message: "That username is reserved."
             });
-
         }
 
-        const existing = await Customer.findOne({
-            username: String(username).trim().toLowerCase()
+        const referral = await ReferralCode.findOne({
+            code,
+            status: "active",
+            expiryAt: { $gt: new Date() }
         });
 
-        if (existing) {
+        if (!referral) {
+            return res.status(400).json({
+                success: false,
+                message: "This referral code is not valid or has expired."
+            });
+        }
 
+        const existing = await Customer.findOne({ username: cleanUsername });
+        if (existing) {
             return res.status(409).json({
                 success: false,
                 message: "That username is already taken."
             });
-
         }
 
         const hashed = await bcrypt.hash(password, 10);
 
         const customer = await Customer.create({
-            username: String(username).trim().toLowerCase(),
+            username: cleanUsername,
             password: hashed,
             referralCode: code,
             expiryAt: referral.expiryAt
         });
 
-        referral.status = "used";
-        referral.usedBy = customer._id;
-        referral.usedAt = new Date();
+        // The conditional status check is the important part: two requests
+        // cannot successfully redeem the same referral code. If another
+        // request won the race, remove the just-created orphan account.
+        const claimed = await ReferralCode.findOneAndUpdate(
+            { _id: referral._id, status: "active", expiryAt: { $gt: new Date() } },
+            {
+                $set: {
+                    status: "used",
+                    usedBy: customer._id,
+                    usedAt: new Date()
+                }
+            },
+            { new: true }
+        );
 
-        await referral.save();
+        if (!claimed) {
+            await Customer.deleteOne({ _id: customer._id });
+            return res.status(409).json({
+                success: false,
+                message: "This referral code was just used. Please use another code."
+            });
+        }
 
-        const token = generateCustomerToken(customer);
-
-        res.json({ success: true, token });
+        // Signup ends here. The customer deliberately logs in through the
+        // normal main login form, just like an admin. No second login modal.
+        return res.json({
+            success: true,
+            username: customer.username,
+            message: "Account created. Please sign in with your new credentials."
+        });
 
     }
 
     catch (err) {
-
         console.error(err);
-
         res.status(500).json({ success: false, message: "Server Error" });
-
     }
 
 });

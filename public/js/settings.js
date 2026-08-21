@@ -1,12 +1,27 @@
-if (!localStorage.getItem("token")) {
+if (!localStorage.getItem("token") && !localStorage.getItem("customerToken")) {
 
     window.location.replace("/login");
 
 }
+
+if ((typeof getPanelRole === "function" ? getPanelRole() : null) === "customer") {
+
+    if (typeof showToast === "function") {
+        showToast("Restricted", "Sorry, it's allowed only to the admin.", "error");
+    }
+
+    setTimeout(() => window.location.replace("/panel"), 900);
+
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
     initSidebar();
     initAutoLogout();
+
+    if ((typeof getPanelRole === "function" ? getPanelRole() : null) === "customer") {
+        return;
+    }
 
     const searchInput =
         document.querySelector(".settings-search input");

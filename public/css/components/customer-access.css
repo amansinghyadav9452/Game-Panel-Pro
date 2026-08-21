@@ -1,43 +1,186 @@
-.cust-modal{
-    max-width: 380px;
+
+/* ============================================================
+   CUSTOMER SIGNUP / REFERRAL ACCESS
+   Flat Access Console treatment. No glass, no backdrop-filter.
+============================================================ */
+
+.customer-signup-overlay{
+    background:rgba(5,6,9,.82);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
 }
 
-.cust-tabs{
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-    background: rgba(255,255,255,.05);
-    border-radius: 12px;
-    padding: 4px;
+.customer-signup-modal{
+    width:440px;
+    max-width:calc(100vw - 28px);
+    background:var(--surface,#14171D);
+    border:1px solid var(--hairline,#262B33);
+    border-radius:16px;
+    padding:24px;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
 }
 
-.cust-tab{
-    flex: 1;
-    border: none;
-    background: transparent;
-    color: #94A3B8;
-    padding: 9px 0;
-    border-radius: 9px;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    transition: background .2s ease, color .2s ease;
+.customer-signup-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:22px;
 }
 
-.cust-tab.active{
-    background: linear-gradient(135deg,#8B5CF6,#3B82F6);
-    color: #fff;
+.customer-signup-icon{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(201,151,74,.35);
+    background:rgba(201,151,74,.10);
+    color:var(--brass,#C9974A);
+    border-radius:10px;
+    font-size:18px;
 }
 
-.cust-hint{
-    font-size: 12.5px;
-    color: #94A3B8;
-    margin: -6px 0 14px;
+.customer-signup-kicker{
+    display:block;
+    color:var(--brass,#C9974A);
+    font-family:var(--font-mono,monospace);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:1.4px;
+    margin-bottom:4px;
 }
 
-.cust-error{
-    font-size: 12.5px;
-    color: #F87171;
-    min-height: 16px;
-    margin: 4px 0 0;
+.customer-signup-modal h3{
+    margin:0 0 4px;
+    color:#F8FAFC;
+    font-family:var(--font-display,sans-serif);
+    font-size:22px;
+}
+
+.customer-signup-modal .customer-signup-header p{
+    margin:0;
+    color:#8E98A8;
+    font-size:12px;
+    line-height:1.45;
+}
+
+.customer-signup-label{
+    display:block;
+    margin:0 0 7px;
+    color:#B8C0CC;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.2px;
+}
+
+.customer-signup-input{
+    margin-bottom:0;
+}
+
+.customer-signup-input input{
+    background:#0D1015 !important;
+    border:1px solid var(--hairline,#262B33) !important;
+    color:#F8FAFC !important;
+    font-family:var(--font-mono,monospace);
+    font-size:13px;
+}
+
+.customer-signup-input input:focus{
+    border-color:var(--brass,#C9974A) !important;
+    box-shadow:0 0 0 3px rgba(201,151,74,.12) !important;
+}
+
+.customer-signup-modal .cust-error{
+    min-height:18px;
+    margin:8px 0 4px;
+    color:var(--signal-red-bright,#E97169);
+    font-size:12px;
+    line-height:1.4;
+}
+
+.customer-signup-actions{
+    display:grid;
+    grid-template-columns:1fr 1.25fr;
+    gap:10px;
+    margin-top:16px;
+}
+
+.customer-signup-btn{
+    min-height:44px;
+    border:1px solid var(--hairline,#262B33);
+    border-radius:9px;
+    font-family:var(--font-display,sans-serif);
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .16s ease, background .16s ease, border-color .16s ease;
+}
+
+.customer-signup-btn:active{
+    transform:translateY(1px);
+}
+
+.customer-signup-btn.secondary{
+    background:#1A1E26;
+    color:#CBD5E1;
+}
+
+.customer-signup-btn.secondary:hover{
+    background:#20252D;
+    border-color:#343B46;
+}
+
+.customer-signup-btn.primary{
+    background:var(--brass-gradient,linear-gradient(135deg,#E0B471,#C9974A 55%,#9C7431));
+    color:#1A1206;
+    border-color:rgba(201,151,74,.5);
+}
+
+.customer-signup-btn.primary:hover{
+    transform:translateY(-1px);
+}
+
+.customer-signup-btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.customer-code-confirmed{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin:0 0 18px;
+    padding:10px 12px;
+    border:1px solid rgba(47,190,143,.25);
+    background:rgba(47,190,143,.07);
+    border-radius:9px;
+    color:#8FE7C7;
+    font-size:11px;
+    font-family:var(--font-mono,monospace);
+}
+
+.customer-code-confirmed i{
+    color:var(--signal-green,#2FBE8F);
+}
+
+@media(max-width:480px){
+    .customer-signup-modal{
+        width:calc(100vw - 24px);
+        max-width:none;
+        padding:20px;
+        border-radius:14px;
+    }
+
+    .customer-signup-header{
+        align-items:flex-start;
+    }
+
+    .customer-signup-actions{
+        grid-template-columns:1fr;
+    }
+
+    .customer-signup-btn{
+        width:100%;
+    }
 }

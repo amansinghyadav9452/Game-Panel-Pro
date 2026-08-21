@@ -38,14 +38,11 @@ async function loadDbStatus() {
                 ? `Connected (${data.collections} collections)`
                 : "Disconnected";
 
-            statusInput.classList.remove("gp-loading-input");
-
         }
 
         else {
 
             statusInput.value = "Disconnected";
-            statusInput.classList.remove("gp-loading-input");
 
         }
 
@@ -56,7 +53,6 @@ async function loadDbStatus() {
         console.error(error);
 
         statusInput.value = "Disconnected";
-        statusInput.classList.remove("gp-loading-input");
 
     }
 

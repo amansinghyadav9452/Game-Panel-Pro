@@ -5,217 +5,149 @@
 
     if (!openBtn || !overlay) return;
 
-    const tabLogin = document.getElementById("custTabLogin");
-    const tabSignup = document.getElementById("custTabSignup");
-
-    const loginPane = document.getElementById("custLoginPane");
     const step1 = document.getElementById("custSignupStep1");
     const step2 = document.getElementById("custSignupStep2");
-
+    const codeInput = document.getElementById("custReferralCode");
+    const codeError = document.getElementById("custCodeError");
+    const signupError = document.getElementById("custSignupError");
     let verifiedCode = null;
 
-    function showOnly(pane) {
-
-        [loginPane, step1, step2].forEach((el) => {
-            el.style.display = el === pane ? "block" : "none";
-        });
-
+    function showStep(step) {
+        step1.hidden = step !== step1;
+        step2.hidden = step !== step2;
     }
 
     function resetModal() {
-
-        showOnly(loginPane);
-
-        tabLogin.classList.add("active");
-        tabSignup.classList.remove("active");
-
-        document.getElementById("custLoginUsername").value = "";
-        document.getElementById("custLoginPassword").value = "";
-        document.getElementById("custLoginError").textContent = "";
-
-        document.getElementById("custReferralCode").value = "";
-        document.getElementById("custCodeError").textContent = "";
-
+        showStep(step1);
+        verifiedCode = null;
+        codeInput.value = "";
+        codeError.textContent = "";
+        signupError.textContent = "";
         document.getElementById("custNewUsername").value = "";
         document.getElementById("custNewPassword").value = "";
-        document.getElementById("custSignupError").textContent = "";
+        document.getElementById("custCodeValidUntil").textContent = "Referral verified";
+    }
 
-        verifiedCode = null;
-
+    function closeModal() {
+        overlay.classList.remove("show");
+        resetModal();
     }
 
     openBtn.addEventListener("click", (e) => {
         e.preventDefault();
         resetModal();
         overlay.classList.add("show");
+        setTimeout(() => codeInput.focus(), 80);
     });
 
-    function closeModal() {
-        overlay.classList.remove("show");
-    }
-
-    document.getElementById("customerAccessCancel").addEventListener("click", closeModal);
-    document.getElementById("customerAccessCancel2").addEventListener("click", closeModal);
+    document.getElementById("customerAccessCancel")?.addEventListener("click", closeModal);
 
     overlay.addEventListener("click", (e) => {
         if (e.target === overlay) closeModal();
     });
 
-    tabLogin.addEventListener("click", () => {
-        tabLogin.classList.add("active");
-        tabSignup.classList.remove("active");
-        showOnly(loginPane);
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && overlay.classList.contains("show")) closeModal();
     });
 
-    tabSignup.addEventListener("click", () => {
-        tabSignup.classList.add("active");
-        tabLogin.classList.remove("active");
-        showOnly(step1);
-    });
+    document.getElementById("custVerifyCodeBtn")?.addEventListener("click", async () => {
+        const code = codeInput.value.trim().toUpperCase();
+        codeError.textContent = "";
 
-    // ===== Login =====
-
-    document.getElementById("custLoginBtn").addEventListener("click", async () => {
-
-        const username = document.getElementById("custLoginUsername").value.trim();
-        const password = document.getElementById("custLoginPassword").value;
-        const errorEl = document.getElementById("custLoginError");
-
-        errorEl.textContent = "";
-
-        if (!username || !password) {
-            errorEl.textContent = "Enter username and password.";
+        if (!/^REF-[A-Z0-9]{10}$/.test(code)) {
+            codeError.textContent = "Enter a valid referral code.";
             return;
         }
 
-        try {
+        const btn = document.getElementById("custVerifyCodeBtn");
+        btn.disabled = true;
+        btn.textContent = "Checking...";
 
-            const res = await fetch("/customer/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
+        try {
+            const res = await fetch(`/customer/referral/${encodeURIComponent(code)}/check`, {
+                headers: { "Accept": "application/json" }
             });
-
             const data = await res.json();
 
             if (!data.success) {
-                errorEl.textContent = data.message || "Login failed.";
-                return;
-            }
-
-            localStorage.setItem("customerToken", data.token);
-
-            window.location.href = "/panel";
-
-        }
-
-        catch (err) {
-
-            errorEl.textContent = "Network error. Try again.";
-
-        }
-
-    });
-
-    // ===== Signup step 1: verify code =====
-
-    document.getElementById("custVerifyCodeBtn").addEventListener("click", async () => {
-
-        const code = document.getElementById("custReferralCode").value.trim().toUpperCase();
-        const errorEl = document.getElementById("custCodeError");
-
-        errorEl.textContent = "";
-
-        if (!code) {
-            errorEl.textContent = "Enter a referral code.";
-            return;
-        }
-
-        try {
-
-            const res = await fetch(`/customer/referral/${encodeURIComponent(code)}/check`);
-
-            const data = await res.json();
-
-            if (!data.success) {
-                errorEl.textContent = data.message || "Invalid code.";
+                codeError.textContent = data.message || "Invalid referral code.";
                 return;
             }
 
             verifiedCode = code;
-
-            const until = new Date(data.expiryAt).toLocaleDateString();
-
             document.getElementById("custCodeValidUntil").textContent =
-                `Access valid until ${until}`;
+                `Verified • access valid until ${new Date(data.expiryAt).toLocaleDateString()}`;
+            showStep(step2);
+            setTimeout(() => document.getElementById("custNewUsername").focus(), 50);
 
-            showOnly(step2);
-
+        } catch (err) {
+            console.error(err);
+            codeError.textContent = "Server connection failed.";
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Verify Code";
         }
-
-        catch (err) {
-
-            errorEl.textContent = "Network error. Try again.";
-
-        }
-
     });
 
-    document.getElementById("custSignupBack").addEventListener("click", () => {
-        showOnly(step1);
+    document.getElementById("custSignupBack")?.addEventListener("click", () => {
+        signupError.textContent = "";
+        showStep(step1);
+        codeInput.focus();
     });
 
-    // ===== Signup step 2: create account =====
-
-    document.getElementById("custSignupBtn").addEventListener("click", async () => {
-
+    document.getElementById("custSignupBtn")?.addEventListener("click", async () => {
         const username = document.getElementById("custNewUsername").value.trim();
         const password = document.getElementById("custNewPassword").value;
-        const errorEl = document.getElementById("custSignupError");
-
-        errorEl.textContent = "";
+        signupError.textContent = "";
 
         if (!verifiedCode) {
-            showOnly(step1);
+            showStep(step1);
             return;
         }
 
-        if (username.length < 3 || password.length < 6) {
-            errorEl.textContent = "Username 3+ chars, password 6+ chars.";
+        if (username.length < 3 || username.length > 40 || password.length < 6 || password.length > 128) {
+            signupError.textContent = "Username must be 3-40 chars; password 6-128 chars.";
             return;
         }
+
+        const btn = document.getElementById("custSignupBtn");
+        btn.disabled = true;
+        btn.textContent = "Creating...";
 
         try {
-
             const res = await fetch("/customer/signup", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify({
                     referralCode: verifiedCode,
                     username,
-                    password
+                    password,
+                    turnstileToken: document.querySelector("[name='cf-turnstile-response']")?.value || undefined
                 })
             });
 
             const data = await res.json();
 
             if (!data.success) {
-                errorEl.textContent = data.message || "Signup failed.";
+                signupError.textContent = data.message || "Signup failed.";
                 return;
             }
 
-            localStorage.setItem("customerToken", data.token);
+            // Signup does NOT create a customer session. The normal login form
+            // is the only login entry point now.
+            closeModal();
+            document.getElementById("username").value = data.username || username;
+            document.getElementById("password").value = "";
+            showMessage(data.message || "Account created. Please sign in.", true);
+            document.getElementById("password").focus();
 
-            window.location.href = "/panel";
-
+        } catch (err) {
+            console.error(err);
+            signupError.textContent = "Server connection failed.";
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Create Account";
         }
-
-        catch (err) {
-
-            errorEl.textContent = "Network error. Try again.";
-
-        }
-
     });
 
 })();

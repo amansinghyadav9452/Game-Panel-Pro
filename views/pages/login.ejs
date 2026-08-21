@@ -14,11 +14,13 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-    <link rel="stylesheet" href="/css/login.css?v=2">
+    <link rel="stylesheet" href="/css/login.css">
 
     <link rel="stylesheet" href="/css/components/password-modal.css">
 
     <link rel="stylesheet" href="/css/components/otp-verify-modal.css">
+
+    <link rel="stylesheet" href="/css/components/customer-access.css">
 
     <link rel="stylesheet" href="/css/interactions.css">
 
@@ -120,7 +122,7 @@
 
                 <div class="input-group">
 
-                    <label> Admin Username</label>
+                    <label> Username</label>
 
                     <div class="input-box">
 
@@ -168,10 +170,22 @@
                     <a
                         href="#"
                         id="openResetPasswordBtn"
-                        style="color:#60a5fa;font-size:14px;">
+                        class="login-option-link login-option-reset">
 
                         <i class="fa-solid fa-key"></i>
                         Reset Password
+
+                    </a>
+
+                    <span class="login-option-sep" aria-hidden="true">&bull;</span>
+
+                    <a
+                        href="#"
+                        id="openCustomerAccessBtn"
+                        class="login-option-link login-option-customer">
+
+                        <i class="fa-solid fa-ticket"></i>
+                        Customer Access
 
                     </a>
 
@@ -353,9 +367,77 @@ Protected by Cloudflare Turnstile • JWT • MongoDB
 
     <%- include("../partials/otp-verify-modal") %>
 
+    <div class="password-overlay customer-signup-overlay" id="customerAccessOverlay">
+
+        <div class="password-modal customer-signup-modal">
+
+            <div class="customer-signup-header">
+                <div class="customer-signup-icon">
+                    <i class="fa-solid fa-ticket"></i>
+                </div>
+                <div>
+                    <span class="customer-signup-kicker">CUSTOMER ACCESS</span>
+                    <h3>Create Account</h3>
+                    <p>Use your referral code to create a customer account.</p>
+                </div>
+            </div>
+
+            <div id="custSignupStep1">
+
+                <label class="customer-signup-label" for="custReferralCode">Referral code</label>
+                <div class="password-input customer-signup-input">
+                    <input
+                        type="text"
+                        id="custReferralCode"
+                        placeholder="REF-XXXXXXXXXX"
+                        autocomplete="off"
+                        maxlength="14"
+                        style="text-transform:uppercase;">
+                </div>
+
+                <p class="cust-error" id="custCodeError" role="alert"></p>
+
+                <div class="customer-signup-actions">
+                    <button type="button" id="customerAccessCancel" class="customer-signup-btn secondary">Cancel</button>
+                    <button type="button" id="custVerifyCodeBtn" class="customer-signup-btn primary">Verify Code</button>
+                </div>
+
+            </div>
+
+            <div id="custSignupStep2" hidden>
+
+                <div class="customer-code-confirmed">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="custCodeValidUntil">Referral verified</span>
+                </div>
+
+                <label class="customer-signup-label" for="custNewUsername">Username</label>
+                <div class="password-input customer-signup-input">
+                    <input type="text" id="custNewUsername" placeholder="Choose username" autocomplete="username" maxlength="40">
+                </div>
+
+                <label class="customer-signup-label" for="custNewPassword">Password</label>
+                <div class="password-input customer-signup-input">
+                    <input type="password" id="custNewPassword" placeholder="Choose password (6+ chars)" autocomplete="new-password" maxlength="128">
+                </div>
+
+                <p class="cust-error" id="custSignupError" role="alert"></p>
+
+                <div class="customer-signup-actions">
+                    <button type="button" id="custSignupBack" class="customer-signup-btn secondary">Back</button>
+                    <button type="button" id="custSignupBtn" class="customer-signup-btn primary">Create Account</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 <script src="/vendor/simplewebauthn.js"></script>
 <script src="/js/login.js"></script>
 <script src="/js/otp-verify-modal.js"></script>
+<script src="/js/customer-access.js"></script>
 <% if (settings?.security?.turnstileEnabled) { %>
 
 <script

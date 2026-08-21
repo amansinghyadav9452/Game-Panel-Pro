@@ -3,8 +3,10 @@ const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
 
 const Admin = require("../models/Admin");
+const Customer = require("../models/Customer");
 const Settings = require("../models/Settings");
 const generateToken = require("../services/tokenGenerator");
+const generateCustomerToken = require("../services/customerToken");
 const { generateOtp, hashOtp, compareOtp, OTP_TTL_MS } = require("../services/otp");
 const { sendOtpEmail } = require("../services/mailer");
 
@@ -66,6 +68,11 @@ router.post("/login", loginLimiter, async (req, res) => {
     try {
 
         const { username, password, turnstileToken, deviceId } = req.body;
+
+        if (typeof username !== "string" || username.trim().length < 1 || username.trim().length > 80) {
+            return res.status(400).json({ success: false, message: "Invalid username or password." });
+        }
+
         const settings = await Settings.findOne();
 
 if (settings?.security?.turnstileEnabled) {
@@ -110,8 +117,91 @@ if (settings?.security?.turnstileEnabled) {
 
 }
 
+// Reject oversized passwords before any bcrypt operation. This applies to
+// both admin and customer credentials and prevents password-DoS attempts.
+if (typeof password !== "string" || password.length > 128) {
+
+    return res.status(400).json({
+        success: false,
+        message: "Invalid username or password."
+    });
+
+}
+
 const admin = await Admin.findOne({ username });
-if (admin && admin.lockUntil && admin.lockUntil > Date.now()) {
+
+// Customers use this exact same login endpoint. Their token is deliberately
+// a different scope and is never accepted by the admin auth middleware.
+if (!admin) {
+
+    const customer = await Customer.findOne({
+        username: String(username || "").trim().toLowerCase()
+    });
+
+    if (!customer) {
+        return res.json({
+            success: false,
+            message: "Invalid Username or Password"
+        });
+    }
+
+    if (customer.lockUntil && customer.lockUntil > new Date()) {
+        const remaining = Math.ceil((customer.lockUntil - Date.now()) / 1000);
+        return res.status(423).json({
+            success: false,
+            message: `Account locked. Try again in ${Math.ceil(remaining / 60)} minute(s).`,
+            remaining
+        });
+    }
+
+    const customerMatch = await bcrypt.compare(password, customer.password);
+
+    if (!customerMatch) {
+        customer.failedAttempts = (customer.failedAttempts || 0) + 1;
+
+        if (customer.failedAttempts >= 6) {
+            customer.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+            customer.failedAttempts = 0;
+        }
+
+        await customer.save();
+
+        return res.status(401).json({
+            success: false,
+            message: "Invalid Username or Password"
+        });
+    }
+
+    if (customer.status === "disabled") {
+        return res.status(403).json({
+            success: false,
+            message: "Your account has been disabled by admin."
+        });
+    }
+
+    if (customer.expiryAt <= new Date()) {
+        return res.status(403).json({
+            success: false,
+            message: "Your referral access has expired. Contact admin for a new code."
+        });
+    }
+
+    customer.failedAttempts = 0;
+    customer.lockUntil = null;
+    customer.lastLoginAt = new Date();
+    await customer.save();
+
+    const customerToken = generateCustomerToken(customer);
+
+    return res.json({
+        success: true,
+        token: customerToken,
+        role: "customer"
+    });
+
+}
+
+if (admin.lockUntil && admin.lockUntil > Date.now()) {
 
     const remainingMinutes = Math.ceil(
         (admin.lockUntil - Date.now()) / 60000
@@ -138,19 +228,6 @@ if (!admin) {
     return res.json({
         success: false,
         message: "Invalid Username or Password"
-    });
-
-}
-
-// Reject oversized passwords before they ever reach bcrypt. Without this,
-// an attacker can send a very large password string on every request and
-// force the server to spend CPU/memory hashing it (password DoS), since
-// bcrypt.compare() has no built-in length cap.
-if (typeof password !== "string" || password.length > 128) {
-
-    return res.status(400).json({
-        success: false,
-        message: "Invalid username or password."
     });
 
 }
