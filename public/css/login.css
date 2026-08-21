@@ -1713,3 +1713,52 @@ body.form-busy .logo h1{
         display:none;
     }
 }
+
+
+/* ==========================
+   TELEGRAM SUPPORT FAB
+========================== */
+.login-telegram-fab{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    width:56px;
+    height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10000;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:50%;
+    background:#229ED9;
+    color:#fff;
+    text-decoration:none;
+    font-size:28px;
+    box-shadow:0 10px 28px rgba(0,0,0,.35);
+    transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.login-telegram-fab:hover{
+    transform:translateY(-2px) scale(1.03);
+    filter:brightness(1.06);
+    box-shadow:0 14px 34px rgba(0,0,0,.42);
+}
+
+.login-telegram-fab:active{
+    transform:scale(.96);
+}
+
+.login-telegram-fab:focus-visible{
+    outline:3px solid rgba(34,158,217,.35);
+    outline-offset:3px;
+}
+
+@media (max-width:480px){
+    .login-telegram-fab{
+        right:16px;
+        bottom:16px;
+        width:52px;
+        height:52px;
+        font-size:25px;
+    }
+}
