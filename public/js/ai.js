@@ -224,6 +224,7 @@
         drawer.classList.add("show");
 
         toggleBtn.classList.add("active");
+        document.body.classList.add("ai-copilot-open");
 
         if (!historyLoaded) {
 
@@ -242,6 +243,7 @@
         drawer.classList.remove("show");
 
         toggleBtn.classList.remove("active");
+        document.body.classList.remove("ai-copilot-open");
 
     }
 

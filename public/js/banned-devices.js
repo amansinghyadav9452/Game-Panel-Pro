@@ -2,19 +2,9 @@ if (!localStorage.getItem("token") && !localStorage.getItem("customerToken")) {
     window.location.replace("/login");
 }
 
-if ((typeof getPanelRole === "function" ? getPanelRole() : null) === "customer") {
-
-    if (typeof showToast === "function") {
-        showToast("Restricted", "Sorry, it's allowed only to the admin.", "error");
-    }
-
-    setTimeout(() => window.location.replace("/panel"), 900);
-
-} else {
-
-    loadBannedDevices();
-
-}
+// Admins see the global banned-device list; customers see only devices
+// associated with keys they own. The server enforces that scope.
+loadBannedDevices();
 
 async function loadBannedDevices() {
 
