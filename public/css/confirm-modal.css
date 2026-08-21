@@ -4,9 +4,7 @@
 
     inset:0;
 
-    background:rgba(0,0,0,.55);
-
-    backdrop-filter:blur(8px);
+    background:rgba(5,6,9,.72);
 
     display:flex;
 
@@ -36,11 +34,11 @@
 
     width:min(430px,92vw);
 
-    background:#111827;
+    background:linear-gradient(165deg, var(--surface-2), var(--surface));
 
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid var(--hairline);
 
-    border-radius:22px;
+    border-radius:16px;
 
     padding:28px;
 
@@ -50,7 +48,9 @@
 
     transition:.3s;
 
-    box-shadow:0 25px 60px rgba(0,0,0,.45);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 25px 60px rgba(0,0,0,.5);
 
 }
 
@@ -62,13 +62,13 @@
 
 .confirm-icon{
 
-    width:72px;
+    width:64px;
 
-    height:72px;
+    height:64px;
 
     margin:auto;
 
-    border-radius:50%;
+    border-radius:14px;
 
     display:flex;
 
@@ -76,11 +76,13 @@
 
     justify-content:center;
 
-    font-size:30px;
+    font-size:26px;
 
-    color:#F59E0B;
+    color:var(--brass-bright);
 
-    background:rgba(245,158,11,.15);
+    background:rgba(201,151,74,.12);
+
+    border:1px solid rgba(201,151,74,.25);
 
     margin-bottom:18px;
 
@@ -88,9 +90,13 @@
 
 .confirm-modal h2{
 
-    color:#F8FAFC;
+    font-family:var(--font-display);
 
-    font-size:24px;
+    color:#F4E9D8;
+
+    font-size:22px;
+
+    letter-spacing:.2px;
 
     margin-bottom:10px;
 
@@ -98,7 +104,7 @@
 
 .confirm-modal p{
 
-    color:#94A3B8;
+    color:#9AA3AF;
 
     line-height:1.6;
 
@@ -110,7 +116,7 @@
 
     display:flex;
 
-    gap:14px;
+    gap:12px;
 
 }
 
@@ -118,37 +124,39 @@
 
     flex:1;
 
-    height:50px;
+    height:48px;
 
-    border:none;
+    border:1px solid var(--hairline);
 
-    border-radius:14px;
+    border-radius:10px;
 
     cursor:pointer;
 
     font-weight:600;
 
-    transition:.25s;
+    transition:.2s ease;
 
 }
 
 .confirm-btn.secondary{
 
-    background:#1E293B;
+    background:var(--surface-2);
 
-    color:#F8FAFC;
+    color:#E7E9ED;
 
 }
 
 .confirm-btn.secondary:hover{
 
-    background:#334155;
+    background:var(--hairline);
 
 }
 
 .confirm-btn.danger{
 
-    background:#EF4444;
+    background:var(--signal-red);
+
+    border-color:var(--signal-red);
 
     color:#fff;
 
@@ -156,7 +164,7 @@
 
 .confirm-btn.danger:hover{
 
-    background:#DC2626;
+    background:var(--signal-red-bright);
 
 }
 
@@ -174,9 +182,11 @@
 
 .confirm-btn.primary{
 
-    background:var(--accent-gradient, linear-gradient(135deg,#E0B471,#9C7431));
+    background:var(--brass-gradient);
 
-    color:#fff;
+    border-color:transparent;
+
+    color:#1A1206;
 
     display:flex;
 

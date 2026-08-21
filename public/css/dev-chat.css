@@ -104,7 +104,7 @@
 
     justify-content:center;
 
-    border:2px solid #0F172A;
+    border:2px solid var(--surface);
 
 }
 
@@ -118,11 +118,7 @@
 
     inset:0;
 
-    background:rgba(5,8,16,.55);
-
-    backdrop-filter:blur(6px);
-
-    -webkit-backdrop-filter:blur(6px);
+    background:rgba(5,6,9,.82);
 
     display:none;
 
@@ -157,7 +153,7 @@
 
     max-width:100%;
 
-    background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(8,17,31,.98));
+    background:linear-gradient(180deg, var(--surface-2), var(--void));
 
     display:flex;
 
@@ -177,9 +173,9 @@
 
     padding:16px 20px;
 
-    border-bottom:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid var(--hairline);
 
-    background:linear-gradient(135deg,rgba(224,180,113,.15),rgba(59,130,246,.1));
+    background:linear-gradient(135deg,rgba(201,151,74,.14),rgba(91,141,239,.08));
 
     flex-shrink:0;
 
@@ -273,7 +269,7 @@
 
     background:#64748B;
 
-    border:2px solid #0F172A;
+    border:2px solid var(--surface);
 
     transition:background .2s ease;
 
@@ -299,9 +295,11 @@
 
 .dev-chat-title{
 
+    font-family:var(--font-display);
+
     font-weight:700;
 
-    color:#fff;
+    color:#F4E9D8;
 
     font-size:15px;
 
@@ -533,9 +531,9 @@
 
     flex-direction:column;
 
-    background:#1F2937;
+    background:linear-gradient(165deg, var(--surface-2), var(--surface));
 
-    border:1px solid rgba(255,255,255,.1);
+    border:1px solid var(--hairline);
 
     border-radius:12px;
 
@@ -599,7 +597,7 @@
 
     padding:14px 16px;
 
-    border-top:1px solid rgba(255,255,255,.08);
+    border-top:1px solid var(--hairline);
 
     flex-shrink:0;
 
@@ -611,11 +609,11 @@
 
     height:46px;
 
-    border-radius:14px;
+    border-radius:10px;
 
-    border:1px solid rgba(255,255,255,.1);
+    border:1px solid var(--hairline);
 
-    background:#1F2937;
+    background:var(--void);
 
     color:#fff;
 
@@ -629,7 +627,7 @@
 
 .dev-chat-input-row input:focus{
 
-    border-color:#E0B471;
+    border-color:var(--brass);
 
 }
 
@@ -701,9 +699,9 @@
 
     min-width:170px;
 
-    background:#1F2937;
+    background:linear-gradient(165deg, var(--surface-2), var(--surface));
 
-    border:1px solid rgba(255,255,255,.1);
+    border:1px solid var(--hairline);
 
     border-radius:12px;
 
