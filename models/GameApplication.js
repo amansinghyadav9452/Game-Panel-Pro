@@ -34,7 +34,6 @@ const gameApplicationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 gameApplicationSchema.index({ customerId: 1 }, { unique: true, sparse: true });
-gameApplicationSchema.index({ gameId: 1 }, { unique: true });
 
 gameApplicationSchema.pre("validate", function(next) {
     if (this.ownerType === "customer" && !this.customerId) {
