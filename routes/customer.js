@@ -187,6 +187,9 @@ router.post("/customer/signup", async (req, res) => {
                 }
             },
             { returnDocument: "after" }
+        );
+
+        if (!claimed) {
             await Customer.deleteOne({ _id: customer._id });
             return res.status(409).json({
                 success: false,

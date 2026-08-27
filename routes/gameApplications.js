@@ -53,6 +53,9 @@ router.put("/:gameId/status", auth, async (req, res) => {
             { gameId: String(req.params.gameId).trim().toUpperCase(), ownerType: "admin" },
             { $set: { status } },
             { returnDocument: "after" }
+        );
+
+        if (!application) {
             return res.status(404).json({ success: false, message: "Application not found." });
         }
 
