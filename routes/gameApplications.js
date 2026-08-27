@@ -52,10 +52,7 @@ router.put("/:gameId/status", auth, async (req, res) => {
         const application = await GameApplication.findOneAndUpdate(
             { gameId: String(req.params.gameId).trim().toUpperCase(), ownerType: "admin" },
             { $set: { status } },
-            { new: true }
-        );
-
-        if (!application) {
+            { returnDocument: "after" }
             return res.status(404).json({ success: false, message: "Application not found." });
         }
 

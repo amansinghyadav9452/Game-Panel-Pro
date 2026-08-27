@@ -48,7 +48,7 @@ router.post("/api/push/subscribe", messengerAuth, async (req, res) => {
                 customerId: req.role === "customer" ? req.customer._id : null
             },
 
-            { upsert: true, new: true, setDefaultsOnInsert: true }
+            { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
 
         );
 
