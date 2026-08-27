@@ -428,12 +428,88 @@
             }
 
             connectSocket();
+            setupPushNotifications(token);
 
         })
         .catch(() => {
             // Session invalid - widget chup rehta hai; page ka apna
             // auth-check (jahan hai) login pe bhej dega.
         });
+
+    // Browser push permission maangta hai aur subscription backend me
+    // save karta hai - taaki app band ho ya doosra tab/login na ho,
+    // tab bhi naya message aane par device pe notification aa jaaye.
+    function setupPushNotifications(authToken) {
+
+        if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+        if (Notification.permission === "denied") return;
+
+        navigator.serviceWorker.ready
+            .then((registration) => {
+                return registration.pushManager.getSubscription()
+                    .then((existing) => {
+
+                        if (existing) return existing;
+
+                        return Promise.resolve(
+                            Notification.permission === "granted"
+                                ? Notification.permission
+                                : Notification.requestPermission()
+                        ).then((permission) => {
+
+                            if (permission !== "granted") return null;
+
+                            return fetch("/api/push/vapid-public-key")
+                                .then((res) => res.json())
+                                .then(({ publicKey }) => {
+
+                                    if (!publicKey) return null;
+
+                                    return registration.pushManager.subscribe({
+                                        userVisibleOnly: true,
+                                        applicationServerKey: urlBase64ToUint8Array(publicKey)
+                                    });
+
+                                });
+
+                        });
+
+                    });
+            })
+            .then((subscription) => {
+
+                if (!subscription) return;
+
+                return fetch("/api/push/subscribe", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ subscription })
+                });
+
+            })
+            .catch((err) => {
+                console.error("Push subscription failed:", err);
+            });
+
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+
+        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const rawData = atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; i++) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+
+        return outputArray;
+
+    }
 
     function connectSocket() {
 

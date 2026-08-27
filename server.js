@@ -35,11 +35,47 @@ const customerRoutes = require("./routes/customer");
 const registerDevChat = require("./sockets/devChat");
 const ensureGameApplicationSetup = require("./services/gameApplicationSetup");
 const gameApplicationRoutes = require("./routes/gameApplications");
+const pushRoutes = require("./routes/push");
+
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.set("trust proxy", 1);
 app.set("view engine","ejs");
 app.set("views","./views/pages");
+
+// Service worker version = server process ke boot ka timestamp. Har
+// deploy/restart pe yeh khud badal jaata hai, isliye purana service-
+// worker cache automatically invalid ho jaata hai aur naya push turant
+// sabke panel pe reflect hota hai - kisi ko manually browsing data
+// clear karne ki zaroorat nahi. (Agar future me multiple server
+// instances/cluster mode use karoge, isko ek fixed build id/commit
+// hash se replace kar dena taaki sabhi instances same version bheje.)
+const SW_VERSION = Date.now().toString();
+
+app.get("/sw.js", (req, res) => {
+
+    fs.readFile(path.join(__dirname, "public", "sw.js"), "utf8", (err, content) => {
+
+        if (err) {
+            return res.status(500).end();
+        }
+
+        const versioned = content.replace(/__SW_VERSION__/g, SW_VERSION);
+
+        res.setHeader("Content-Type", "application/javascript");
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+        res.setHeader("Service-Worker-Allowed", "/");
+
+        res.send(versioned);
+
+    });
+
+});
+
 app.use(express.static("public", {
 
     etag: true,
@@ -202,6 +238,7 @@ app.use(rateLimiter, messengerRoutes);
 app.use(rateLimiter, referralRoutes);
 app.use("/api/game-apps", rateLimiter, gameApplicationRoutes);
 app.use(rateLimiter, customerRoutes);
+app.use(rateLimiter, pushRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {

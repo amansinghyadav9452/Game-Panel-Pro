@@ -2,8 +2,14 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 const Customer = require("../models/Customer");
 const ChatMessage = require("../models/ChatMessage");
+const { pushToAdmin, pushToDeveloper, pushToCustomer } = require("../services/pushService");
 
 const HISTORY_LIMIT = 100;
+
+function pushPreview(text) {
+    const clean = (text || "").toString();
+    return clean.length > 120 ? clean.slice(0, 117) + "..." : clean;
+}
 
 function customerRoom(customerId) {
     return `customer:${customerId}`;
@@ -352,6 +358,16 @@ function registerDevChat(io) {
 
                     refreshDeveloperConversations();
 
+                    // Developer app band ho ya login na ho, tab bhi
+                    // OS-level notification aa jaaye.
+                    if (!isOnline("developer")) {
+                        pushToDeveloper({
+                            title: socket.senderLabel || "Customer",
+                            body: pushPreview(text),
+                            url: "/messenger"
+                        }).catch((err) => console.error("push error:", err.message));
+                    }
+
                     return;
 
                 }
@@ -376,8 +392,27 @@ function registerDevChat(io) {
                     if (targetCustomerId) {
                         nsp.to(customerRoom(targetCustomerId)).to("developer").emit("chat:message", message);
                         refreshDeveloperConversations();
+
+                        // Customer app ke liye - unka koi online-tracking
+                        // set nahi hai yahan, isliye hamesha push try karo
+                        // (subscription na ho to service khud skip kar
+                        // degi, koi error nahi aayega).
+                        pushToCustomer(targetCustomerId, {
+                            title: "Developer",
+                            body: pushPreview(text),
+                            url: "/messenger"
+                        }).catch((err) => console.error("push error:", err.message));
+
                     } else {
                         nsp.to("admin").to("developer").emit("chat:message", message);
+
+                        if (!isOnline("admin")) {
+                            pushToAdmin({
+                                title: "Developer",
+                                body: pushPreview(text),
+                                url: "/messenger"
+                            }).catch((err) => console.error("push error:", err.message));
+                        }
                     }
 
                     return;
@@ -396,6 +431,14 @@ function registerDevChat(io) {
                 });
 
                 nsp.to("admin").to("developer").emit("chat:message", message);
+
+                if (!isOnline("developer")) {
+                    pushToDeveloper({
+                        title: socket.senderLabel || "Admin",
+                        body: pushPreview(text),
+                        url: "/messenger"
+                    }).catch((err) => console.error("push error:", err.message));
+                }
 
             }
 
