@@ -56,126 +56,75 @@ router.get("/game-id", auth, async (req, res) => {
 });
 
 router.put("/game-id", auth, async (req, res) => {
-
     try {
-
         const gameId = String(req.body?.gameId || "")
             .trim()
             .toUpperCase();
 
-        // ---------------------------------------------------------
-        // 1. Validate Game ID
-        // ---------------------------------------------------------
-
+        // Validate Game ID
         if (!/^[A-Z0-9_-]{12,64}$/.test(gameId)) {
-
             return res.status(400).json({
                 success: false,
                 message:
                     "Game ID must be 12–64 characters and contain only A-Z, 0-9, _ or -."
             });
-
         }
 
-
-        // ---------------------------------------------------------
-        // 2. Get current admin's OLD Game ID
-        // ---------------------------------------------------------
-
         const currentAdminId = req.admin._id;
-
         const oldGameId = String(req.admin.gameId || "")
             .trim()
             .toUpperCase();
 
-
-        // ---------------------------------------------------------
-        // 3. Check whether another ADMIN already owns this Game ID
-        // ---------------------------------------------------------
-
+        // Check if another admin already owns this Game ID
         const otherAdmin = await Admin.findOne({
             _id: { $ne: currentAdminId },
             gameId
         }).select("_id username");
 
-
         if (otherAdmin) {
-
             return res.status(409).json({
                 success: false,
                 message:
                     "This Game ID is already assigned to another admin."
             });
-
         }
 
-
-        // ---------------------------------------------------------
-        // 4. Check whether a CUSTOMER already owns this Game ID
-        // ---------------------------------------------------------
-
+        // Check if a customer already owns this Game ID
         const customer = await Customer.findOne({
             gameId
         }).select("_id username gameId");
 
-
         if (customer) {
-
             return res.status(409).json({
                 success: false,
                 message:
                     "This Game ID is already assigned to a customer."
             });
-
         }
 
-
-        // ---------------------------------------------------------
-        // 5. Check existing GameApplication
-        // ---------------------------------------------------------
-
+        // Check existing GameApplication
         const existingApplication = await GameApplication.findOne({
             gameId
         });
 
-
-        /*
-         * If an application exists and belongs to a customer,
-         * NEVER allow admin to claim it.
-         */
-
+        // Never allow admin to claim a customer-owned application
         if (
             existingApplication &&
             existingApplication.ownerType === "customer"
         ) {
-
             return res.status(409).json({
                 success: false,
                 message:
                     "This Game ID is already assigned to another application."
             });
-
         }
 
-
-        // ---------------------------------------------------------
-        // 6. Save Admin Game ID
-        // ---------------------------------------------------------
-
+        // Save Admin Game ID
         req.admin.gameId = gameId;
-
         await req.admin.save();
 
-
-        // ---------------------------------------------------------
-        // 7. Disable OLD admin GameApplication
-        // ---------------------------------------------------------
-
-        if (
-            oldGameId &&
-            oldGameId !== gameId
-        ) {
-
+        // Disable old Admin GameApplication
+        if (oldGameId && oldGameId !== gameId) {
             await GameApplication.updateMany(
                 {
                     gameId: oldGameId,
@@ -187,42 +136,21 @@ router.put("/game-id", auth, async (req, res) => {
                     }
                 }
             );
-
         }
 
+        // Existing admin application → activate it
+        if (
+            existingApplication &&
+            existingApplication.ownerType === "admin"
+        ) {
+            existingApplication.status = "active";
+            existingApplication.customerId = null;
 
-        // ---------------------------------------------------------
-        // 8. Create / activate NEW Admin GameApplication
-        // ---------------------------------------------------------
+            await existingApplication.save();
+        }
 
-        if (existingApplication) {
-
-            /*
-             * Existing application is already admin-owned.
-             * Just activate it.
-             */
-
-            await GameApplication.updateOne(
-                {
-                    _id: existingApplication._id,
-                    ownerType: "admin"
-                },
-                {
-                    $set: {
-                        ownerType: "admin",
-                        status: "active",
-                        customerId: null
-                    }
-                }
-            );
-
-        } else {
-
-            /*
-             * No application exists.
-             * Create a fresh admin-owned application.
-             */
-
+        // No existing application → create admin application
+        else {
             await GameApplication.create({
                 gameId,
                 name: `Admin ${req.admin.username}`,
@@ -230,40 +158,22 @@ router.put("/game-id", auth, async (req, res) => {
                 customerId: null,
                 status: "active"
             });
-
         }
 
-
-        // ---------------------------------------------------------
-        // 9. Success
-        // ---------------------------------------------------------
-
         return res.json({
-
             success: true,
-
             gameId,
-
-            message:
-                "Game ID saved successfully."
-
+            message: "Game ID saved successfully."
         });
 
-
     } catch (error) {
-
         console.error(
             "Admin Game ID save error:",
             error
         );
 
-
-        // ---------------------------------------------------------
-        // Duplicate MongoDB key
-        // ---------------------------------------------------------
-
+        // MongoDB duplicate-key error
         if (error?.code === 11000) {
-
             console.error(
                 "Game ID duplicate details:",
                 error.keyPattern,
@@ -271,32 +181,18 @@ router.put("/game-id", auth, async (req, res) => {
             );
 
             return res.status(409).json({
-
                 success: false,
-
                 message:
                     "This Game ID conflicts with an existing database record."
-
             });
-
         }
 
-
-        // ---------------------------------------------------------
-        // Generic server error
-        // ---------------------------------------------------------
-
         return res.status(500).json({
-
             success: false,
-
             message:
-                "Internal server error."
-
+                error?.message || "Internal server error."
         });
-
     }
-
 });
 
 router.get("/status", auth, async (req, res) => {
