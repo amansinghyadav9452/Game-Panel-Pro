@@ -246,6 +246,37 @@
     color: #ff6b6b;
 }
 
+/* =========================================================
+   FIX: KEEP FORM CONTROLS ABOVE DECORATIVE CARD LAYERS
+   ========================================================= */
+
+.admin-game-id-card {
+    position: relative;
+    z-index: 5;
+    isolation: isolate;
+}
+
+.admin-game-id-card .admin-game-id-field,
+.admin-game-id-card .admin-game-id-status {
+    position: relative;
+    z-index: 10;
+}
+
+.admin-game-id-card .admin-game-id-input,
+.admin-game-id-card .admin-game-id-save {
+    position: relative;
+    z-index: 11;
+
+    pointer-events: auto;
+    touch-action: manipulation;
+}
+
+/* Prevent decorative effects from ever blocking taps */
+.admin-game-id-card::before,
+.admin-game-id-card::after {
+    pointer-events: none !important;
+}
+
 
 /* ---------------------------------------------------------
    MOBILE

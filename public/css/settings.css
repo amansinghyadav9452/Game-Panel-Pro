@@ -194,6 +194,8 @@ html.light-theme .settings-search input,
 
     transition:.25s;
 
+    pointer-events: none;
+
 }
 
 .setting-item:hover::before{
@@ -435,6 +437,8 @@ html.light-theme .settings-search input,
     transform:rotate(20deg);
 
     transition:.7s;
+
+    pointer-events: none;
 
 }
 
