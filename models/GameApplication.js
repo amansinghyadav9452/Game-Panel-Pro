@@ -23,8 +23,7 @@ const gameApplicationSchema = new mongoose.Schema({
     },
     customerId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Customer",
-        default: null
+        ref: "Customer"
     },
     status: {
         type: String,
@@ -41,7 +40,7 @@ gameApplicationSchema.pre("validate", function() {
     }
 
     if (this.ownerType === "admin") {
-        this.customerId = null;
+        this.customerId = undefined;
     }
 });
 

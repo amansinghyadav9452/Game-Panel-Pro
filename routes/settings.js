@@ -144,7 +144,7 @@ router.put("/game-id", auth, async (req, res) => {
             existingApplication.ownerType === "admin"
         ) {
             existingApplication.status = "active";
-            existingApplication.customerId = null;
+            existingApplication.customerId = undefined;
 
             await existingApplication.save();
         }
@@ -155,7 +155,6 @@ router.put("/game-id", auth, async (req, res) => {
                 gameId,
                 name: `Admin ${req.admin.username}`,
                 ownerType: "admin",
-                customerId: null,
                 status: "active"
             });
         }
