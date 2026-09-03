@@ -8,6 +8,7 @@
     <%- include("../partials/head") %>
 
     <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/admin-game-id.css">
 
 </head>
 
@@ -47,6 +48,31 @@
                 <h3>No Settings Found</h3>
 
                 <p>Try another keyword.</p>
+
+            </div>
+
+            <div class="admin-game-id-card setting-item" style="display:block; cursor:default;">
+
+                <div class="setting-icon cyan" style="float:left; margin-right:14px;">
+                    <i class="fa-solid fa-fingerprint"></i>
+                </div>
+
+                <div class="setting-info">
+                    <h3>Admin Game ID</h3>
+                    <p>Set the Game ID used by your game build and admin licenses.</p>
+                </div>
+
+                <div class="admin-game-id-field" style="clear:both; margin-top:14px;">
+                    <input
+                        id="adminGameId"
+                        class="admin-game-id-input"
+                        type="text"
+                        maxlength="64"
+                        autocomplete="off"
+                        placeholder="Enter Game ID">
+                    <button id="saveAdminGameId" class="admin-game-id-save" type="button">Save</button>
+                </div>
+                <div id="adminGameIdStatus" class="admin-game-id-status" aria-live="polite"></div>
 
             </div>
 
@@ -473,6 +499,7 @@
 <script src="/js/api.js"></script>
 <script src="/js/settings.js"></script>
 <script src="/js/settings-status.js"></script>
+<script src="/js/admin-game-id.js"></script>
 
 </body>
 

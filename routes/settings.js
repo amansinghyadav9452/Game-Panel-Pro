@@ -17,6 +17,8 @@ const deleteExpiredLicenses = require("../services/licenseCleanup");
 const { generateOtp, hashOtp, compareOtp, OTP_TTL_MS } = require("../services/otp");
 const { sendOtpEmail } = require("../services/mailer");
 const generateKey = require("../services/keyGenerator");
+const GameApplication = require("../models/GameApplication");
+const Customer = require("../models/Customer");
 
 router.get("/", (req, res) => {
 
@@ -29,6 +31,101 @@ router.get("/", (req, res) => {
         pageTitle: "Settings"
 
     });
+
+});
+
+router.get("/game-id", auth, async (req, res) => {
+
+    try {
+
+        return res.json({
+            success: true,
+            gameId: req.admin.gameId || ""
+        });
+
+    } catch (error) {
+
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+
+    }
+
+});
+
+router.put("/game-id", auth, async (req, res) => {
+
+    try {
+
+        const gameId = String(req.body?.gameId || "").trim().toUpperCase();
+
+        if (!/^[A-Z0-9_-]{12,64}$/.test(gameId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Game ID must be 12–64 characters and contain only A-Z, 0-9, _ or -."
+            });
+        }
+
+        const [otherAdmin, customer] = await Promise.all([
+            Admin.findOne({ _id: { $ne: req.admin._id }, gameId }).select("_id"),
+            Customer.findOne({ gameId }).select("_id")
+        ]);
+
+        if (otherAdmin || customer) {
+            return res.status(409).json({
+                success: false,
+                message: "This Game ID is already assigned."
+            });
+        }
+
+        const oldGameId = String(req.admin.gameId || "").trim().toUpperCase();
+
+        // Disable the old admin application first. This immediately makes
+        // old builds/keys invalid after a Game ID change.
+        if (oldGameId && oldGameId !== gameId) {
+            await GameApplication.updateMany(
+                { gameId: oldGameId, ownerType: "admin" },
+                { $set: { status: "disabled" } }
+            );
+        }
+
+        req.admin.gameId = gameId;
+        await req.admin.save();
+
+        await GameApplication.findOneAndUpdate(
+            { gameId },
+            {
+                $set: { ownerType: "admin", status: "active" },
+                $setOnInsert: { gameId }
+            },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+
+        return res.json({
+            success: true,
+            gameId,
+            message: "Game ID saved successfully."
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        if (error?.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: "This Game ID is already assigned."
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+
+    }
 
 });
 

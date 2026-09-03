@@ -72,7 +72,7 @@ const license = await createLicense(
 
     req.admin.username,
 
-    gameId || "PUBG"
+    req.admin.gameId || gameId || "PUBG"
 
 );
 

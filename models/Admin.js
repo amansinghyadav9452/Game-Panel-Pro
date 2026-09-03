@@ -14,6 +14,17 @@ const adminSchema = new mongoose.Schema({
     default: "Administrator"
     },
 
+    // Game ID assigned to this admin's game/build. Verification and
+    // admin-created licenses are isolated to this Game ID.
+    gameId: {
+        type: String,
+        unique: true,
+        sparse: true,
+        trim: true,
+        uppercase: true,
+        default: ""
+    },
+
     twoFactorEnabled:{
 
     type:Boolean,

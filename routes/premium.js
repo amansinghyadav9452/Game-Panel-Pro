@@ -73,7 +73,7 @@ router.post("/premium/create", auth, apiAccess("premium"), async (req, res) => {
             finalExpiryDays,
             finalMaxUses,
             req.admin.username,
-            gameId || "PUBG"
+            req.admin.gameId || gameId || "PUBG"
         );
 
         await logActivity({

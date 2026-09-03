@@ -1,6 +1,7 @@
 const License = require("../models/License");
 const generateKey = require("./keyGenerator");
 const GameApplication = require("../models/GameApplication");
+const Admin = require("../models/Admin");
 
 async function syncLicenseStatus(license) {
 
@@ -67,7 +68,10 @@ async function bulkSyncLicenseStatuses(scope = {}) {
 
 async function createLicense(key, type, expiryDays, maxUses, admin, gameId = "PUBG") {
 
-    const normalizedGameId = String(gameId || "PUBG").trim().toUpperCase();
+    const adminDoc = await Admin.findOne({ username: admin }).select("gameId").lean();
+    const configuredGameId = String(adminDoc?.gameId || "").trim().toUpperCase();
+    const normalizedGameId = configuredGameId || String(gameId || "PUBG").trim().toUpperCase();
+
 
     const application = await GameApplication.findOne({
         gameId: normalizedGameId,

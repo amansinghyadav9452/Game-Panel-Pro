@@ -1,0 +1,17 @@
+.admin-game-id-card {
+    position: relative;
+    grid-column: 1 / -1;
+}
+.admin-game-id-card .setting-info { margin-bottom: 2px; }
+.admin-game-id-field { display:flex; align-items:center; gap:10px; width:100%; }
+.admin-game-id-input { flex:1; min-width:0; height:44px; padding:0 14px; border:1px solid var(--border-color,#2a2f3a); border-radius:10px; background:var(--input-bg,rgba(255,255,255,.04)); color:var(--text-color,inherit); font:inherit; outline:none; text-transform:uppercase; letter-spacing:.04em; transition:border-color .2s ease,box-shadow .2s ease; }
+.admin-game-id-input:focus { border-color:var(--primary-color,#6c63ff); box-shadow:0 0 0 3px color-mix(in srgb,var(--primary-color,#6c63ff) 16%,transparent); }
+.admin-game-id-input::placeholder { text-transform:none; letter-spacing:normal; }
+.admin-game-id-save { flex:0 0 auto; min-width:84px; height:44px; padding:0 16px; border:0; border-radius:10px; background:var(--primary-color,#6c63ff); color:#fff; font-weight:600; cursor:pointer; transition:transform .15s ease,opacity .2s ease; }
+.admin-game-id-save:hover { opacity:.92; }
+.admin-game-id-save:active { transform:translateY(1px); }
+.admin-game-id-save:disabled { opacity:.6; cursor:not-allowed; }
+.admin-game-id-status { min-height:20px; margin-top:9px; font-size:13px; }
+.admin-game-id-status.success { color:#35c98a; }
+.admin-game-id-status.error { color:#ff6b6b; }
+@media (max-width:560px) { .admin-game-id-field { flex-direction:column; align-items:stretch; } .admin-game-id-save { width:100%; } }
