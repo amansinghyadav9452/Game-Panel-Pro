@@ -1,17 +1,314 @@
+/* =========================================================
+   ADMIN GAME ID
+   ========================================================= */
+
 .admin-game-id-card {
     position: relative;
-    grid-column: 1 / -1;
+    overflow: hidden;
 }
-.admin-game-id-card .setting-info { margin-bottom: 2px; }
-.admin-game-id-field { display:flex; align-items:center; gap:10px; width:100%; }
-.admin-game-id-input { flex:1; min-width:0; height:44px; padding:0 14px; border:1px solid var(--border-color,#2a2f3a); border-radius:10px; background:var(--input-bg,rgba(255,255,255,.04)); color:var(--text-color,inherit); font:inherit; outline:none; text-transform:uppercase; letter-spacing:.04em; transition:border-color .2s ease,box-shadow .2s ease; }
-.admin-game-id-input:focus { border-color:var(--primary-color,#6c63ff); box-shadow:0 0 0 3px color-mix(in srgb,var(--primary-color,#6c63ff) 16%,transparent); }
-.admin-game-id-input::placeholder { text-transform:none; letter-spacing:normal; }
-.admin-game-id-save { flex:0 0 auto; min-width:84px; height:44px; padding:0 16px; border:0; border-radius:10px; background:var(--primary-color,#6c63ff); color:#fff; font-weight:600; cursor:pointer; transition:transform .15s ease,opacity .2s ease; }
-.admin-game-id-save:hover { opacity:.92; }
-.admin-game-id-save:active { transform:translateY(1px); }
-.admin-game-id-save:disabled { opacity:.6; cursor:not-allowed; }
-.admin-game-id-status { min-height:20px; margin-top:9px; font-size:13px; }
-.admin-game-id-status.success { color:#35c98a; }
-.admin-game-id-status.error { color:#ff6b6b; }
-@media (max-width:560px) { .admin-game-id-field { flex-direction:column; align-items:stretch; } .admin-game-id-save { width:100%; } }
+
+.admin-game-id-card .setting-description {
+    margin-bottom: 18px;
+}
+
+
+/* ---------------------------------------------------------
+   INPUT + SAVE ROW
+   --------------------------------------------------------- */
+
+.admin-game-id-field {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+    margin-top: 16px;
+}
+
+
+/* ---------------------------------------------------------
+   INPUT
+   --------------------------------------------------------- */
+
+.admin-game-id-input {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    height: 48px;
+
+    padding: 0 15px;
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.055),
+            rgba(255, 255, 255, 0.025)
+        );
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+
+    outline: none;
+
+    text-transform: uppercase;
+    letter-spacing: 0.055em;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+.admin-game-id-input::placeholder {
+    color: rgba(255, 255, 255, 0.38);
+
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+
+.admin-game-id-input:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+
+.admin-game-id-input:focus {
+    border-color: #7567ff;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(117, 103, 255, 0.10),
+            rgba(255, 255, 255, 0.035)
+        );
+
+    box-shadow:
+        0 0 0 3px rgba(117, 103, 255, 0.13),
+        0 8px 25px rgba(0, 0, 0, 0.16);
+}
+
+
+/* Error state */
+
+.admin-game-id-input.input-error {
+    border-color: #ff6262;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 98, 98, 0.10);
+}
+
+
+/* Success state */
+
+.admin-game-id-input.input-success {
+    border-color: #35d49a;
+
+    box-shadow:
+        0 0 0 3px rgba(53, 212, 154, 0.10);
+}
+
+
+/* ---------------------------------------------------------
+   SAVE BUTTON
+   --------------------------------------------------------- */
+
+.admin-game-id-save {
+    flex: 0 0 104px;
+
+    height: 48px;
+
+    padding: 0 16px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7667ff,
+            #6555ed
+        );
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 7px 20px rgba(101, 85, 237, 0.20);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        filter 0.2s ease;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    white-space: nowrap;
+}
+
+
+.admin-game-id-save:hover {
+    filter: brightness(1.06);
+
+    box-shadow:
+        0 9px 25px rgba(101, 85, 237, 0.30);
+
+    transform: translateY(-1px);
+}
+
+
+.admin-game-id-save:active {
+    transform: translateY(1px);
+
+    box-shadow:
+        0 4px 12px rgba(101, 85, 237, 0.20);
+}
+
+
+.admin-game-id-save:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow:
+        0 5px 14px rgba(101, 85, 237, 0.12);
+}
+
+
+/* ---------------------------------------------------------
+   LOADING SPINNER
+   --------------------------------------------------------- */
+
+.game-id-spinner {
+    width: 15px;
+    height: 15px;
+
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+
+    border-radius: 50%;
+
+    animation: gameIdSpin 0.7s linear infinite;
+}
+
+
+@keyframes gameIdSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* ---------------------------------------------------------
+   STATUS MESSAGE
+   --------------------------------------------------------- */
+
+.admin-game-id-status {
+    min-height: 20px;
+
+    margin-top: 9px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    line-height: 20px;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.admin-game-id-status.success {
+    color: #35d49a;
+}
+
+
+.admin-game-id-status.error {
+    color: #ff6b6b;
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+/*
+ * DON'T stack the input and button.
+ * Keep them side-by-side like a proper control instead
+ * of making the Save button occupy half the planet.
+ */
+
+@media (max-width: 560px) {
+
+    .admin-game-id-field {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+
+        gap: 8px;
+    }
+
+    .admin-game-id-input {
+        height: 46px;
+
+        padding-left: 13px;
+        padding-right: 13px;
+
+        font-size: 14px;
+
+        border-radius: 11px;
+    }
+
+    .admin-game-id-save {
+        flex: 0 0 92px;
+
+        height: 46px;
+
+        padding: 0 10px;
+
+        font-size: 14px;
+
+        border-radius: 11px;
+    }
+}
+
+
+/* Very small screens */
+
+@media (max-width: 360px) {
+
+    .admin-game-id-field {
+        gap: 7px;
+    }
+
+    .admin-game-id-input {
+        font-size: 13px;
+
+        letter-spacing: 0.035em;
+    }
+
+    .admin-game-id-save {
+        flex-basis: 82px;
+
+        font-size: 13px;
+    }
+}
