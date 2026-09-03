@@ -35,14 +35,14 @@ const gameApplicationSchema = new mongoose.Schema({
 
 gameApplicationSchema.index({ customerId: 1 }, { unique: true, sparse: true });
 
-gameApplicationSchema.pre("validate", function(next) {
+gameApplicationSchema.pre("validate", function() {
     if (this.ownerType === "customer" && !this.customerId) {
-        return next(new Error("Customer application requires customerId."));
+        throw new Error("Customer application requires customerId.");
     }
+
     if (this.ownerType === "admin") {
         this.customerId = null;
     }
-    next();
 });
 
 module.exports = mongoose.model("GameApplication", gameApplicationSchema);
