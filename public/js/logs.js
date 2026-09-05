@@ -106,22 +106,27 @@ function deviceVisualMarkup(log, theme, deviceName) {
     const cacheKey = candidates.join("|");
     const cached = DEVICE_IMAGE_CACHE.get(cacheKey);
     const src = cached || candidates[0];
-    return `<div class="device-visual" data-image-key="${escapeHtml(cacheKey)}">
-        <div class="device-visual-glow"></div>
-        <img class="device-visual-image" src="${escapeHtml(src)}" data-candidates="${escapeHtml(JSON.stringify(candidates))}" alt="${escapeHtml(deviceName)} product visual" loading="lazy" decoding="async">
-        <div class="device-visual-fallback"><i class="fa-solid fa-mobile-screen-button"></i></div>
-        <span class="device-visual-label">${escapeHtml(deviceName)}</span>
+    const model = log?.deviceModel || "Unknown model";
+    return `<div class="device-stage" data-image-key="${escapeHtml(cacheKey)}" aria-label="${escapeHtml(deviceName)} ${escapeHtml(model)}">
+        <div class="device-stage-glow"></div>
+        <div class="device-stage-wash"></div>
+        <img class="device-stage-image" src="${escapeHtml(src)}" data-candidates="${escapeHtml(JSON.stringify(candidates))}" alt="${escapeHtml(deviceName)} ${escapeHtml(model)} device visual" loading="lazy" decoding="async">
+        <div class="device-stage-fallback"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <div class="device-stage-copy">
+            <span class="device-stage-brand">${escapeHtml(deviceName)}</span>
+            <strong>${escapeHtml(model)}</strong>
+        </div>
     </div>`;
 }
 
 function initDeviceVisuals() {
-    document.querySelectorAll(".device-visual-image").forEach(img => {
+    document.querySelectorAll(".device-stage-image").forEach(img => {
         if (img.dataset.bound === "1") return;
         img.dataset.bound = "1";
         let candidates = [];
         try { candidates = JSON.parse(img.dataset.candidates || "[]"); } catch (_) {}
         let index = 0;
-        const key = img.closest(".device-visual")?.dataset.imageKey || "";
+        const key = img.closest(".device-stage")?.dataset.imageKey || "";
         const markLoaded = () => {
             img.classList.add("is-loaded");
             if (key) DEVICE_IMAGE_CACHE.set(key, img.currentSrc || img.src);
@@ -134,7 +139,7 @@ function initDeviceVisuals() {
                 return;
             }
             img.removeAttribute("src");
-            img.closest(".device-visual")?.classList.add("image-failed");
+            img.closest(".device-stage")?.classList.add("image-failed");
         });
         if (img.complete && img.naturalWidth) markLoaded();
     });
@@ -305,12 +310,9 @@ function renderLogs(data) {
                 <div class="log-body">
                     ${deviceVisualMarkup(log, theme, deviceName)}
                     <div class="meta-panel">
-                        <div class="meta-item"><i class="fa-solid fa-mobile-screen-button"></i><div><span>Device</span><strong>${escapeHtml(deviceName)}</strong></div></div>
                         <div class="meta-item"><i class="fa-regular fa-user"></i><div><span>Player</span><strong>${escapeHtml(log.playerName || "—")}</strong></div></div>
                         <div class="meta-item"><i class="fa-brands fa-android"></i><div><span>Android</span><strong>${escapeHtml(log.androidVersion || "—")}</strong></div></div>
-                        <div class="meta-item"><i class="fa-solid fa-mobile-screen"></i><div><span>Model</span><strong>${escapeHtml(model)}</strong></div></div>
                         <div class="meta-item"><i class="fa-solid fa-cube"></i><div><span>App Version</span><strong>${escapeHtml(log.appVersion || "—")}</strong></div></div>
-                        <div class="meta-item"><i class="fa-solid fa-hashtag"></i><div><span>Log ID</span><strong>${escapeHtml(shortId)}</strong></div><button class="copy-id mini" type="button" data-copy="${escapeHtml(serial)}" aria-label="Copy log ID"><i class="fa-regular fa-copy"></i></button></div>
                     </div>
                 </div>
 
