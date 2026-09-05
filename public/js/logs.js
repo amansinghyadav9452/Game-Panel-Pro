@@ -19,6 +19,204 @@ let bannedDevices = [];
 let lastRenderSignature = null;
 const limit = 100;
 
+/*
+ * Device-aware visual system.
+ * Uses the backend's deviceBrand first, then marketing/model strings as a
+ * fallback. The renderer only changes presentation; log data and actions
+ * remain untouched.
+ */
+const DEVICE_THEMES = {
+    motorola: {
+        className: "motorola",
+        accent: "#D7B56D",
+        accent2: "#7F8A45",
+        glow: "rgba(215,181,109,.30)",
+        bg: "rgba(78,72,39,.34)",
+        pattern: "rings"
+    },
+    samsung: {
+        className: "samsung",
+        accent: "#6D8CFF",
+        accent2: "#4BD4FF",
+        glow: "rgba(76,121,255,.30)",
+        bg: "rgba(25,43,92,.34)",
+        pattern: "orbit"
+    },
+    nothing: {
+        className: "nothing",
+        accent: "#F1F1E8",
+        accent2: "#E5484D",
+        glow: "rgba(229,72,77,.22)",
+        bg: "rgba(232,232,220,.08)",
+        pattern: "glyphs"
+    },
+    vivo: {
+        className: "vivo",
+        accent: "#9B82FF",
+        accent2: "#4DE2FF",
+        glow: "rgba(117,104,255,.30)",
+        bg: "rgba(64,54,126,.34)",
+        pattern: "aurora"
+    },
+    oppo: {
+        className: "oppo",
+        accent: "#55D69A",
+        accent2: "#A9E86D",
+        glow: "rgba(57,202,128,.27)",
+        bg: "rgba(31,92,62,.30)",
+        pattern: "leaf"
+    },
+    oneplus: {
+        className: "oneplus",
+        accent: "#FF5B5F",
+        accent2: "#C93D4A",
+        glow: "rgba(255,73,79,.28)",
+        bg: "rgba(91,27,34,.30)",
+        pattern: "slash"
+    },
+    xiaomi: {
+        className: "xiaomi",
+        accent: "#FF9B54",
+        accent2: "#FFD36A",
+        glow: "rgba(255,137,64,.28)",
+        bg: "rgba(94,52,26,.32)",
+        pattern: "grid"
+    },
+    redmi: {
+        className: "redmi",
+        accent: "#FF8B45",
+        accent2: "#FFCF5C",
+        glow: "rgba(255,123,55,.27)",
+        bg: "rgba(91,48,23,.30)",
+        pattern: "grid"
+    },
+    realme: {
+        className: "realme",
+        accent: "#D9F43A",
+        accent2: "#8CC63E",
+        glow: "rgba(185,224,44,.26)",
+        bg: "rgba(72,84,20,.30)",
+        pattern: "diagonal"
+    },
+    pixel: {
+        className: "pixel",
+        accent: "#76D5FF",
+        accent2: "#A88BFF",
+        glow: "rgba(75,190,255,.28)",
+        bg: "rgba(34,65,92,.30)",
+        pattern: "dots"
+    },
+    iqoo: {
+        className: "iqoo",
+        accent: "#FFB45B",
+        accent2: "#FF5C52",
+        glow: "rgba(255,126,61,.28)",
+        bg: "rgba(92,46,25,.30)",
+        pattern: "slash"
+    },
+    asus: {
+        className: "asus",
+        accent: "#B8C4D9",
+        accent2: "#7F8CFF",
+        glow: "rgba(125,140,255,.24)",
+        bg: "rgba(56,63,84,.30)",
+        pattern: "tech"
+    },
+    huawei: {
+        className: "huawei",
+        accent: "#D5A1FF",
+        accent2: "#FF7B9B",
+        glow: "rgba(204,120,255,.25)",
+        bg: "rgba(76,40,84,.30)",
+        pattern: "wave"
+    },
+    honor: {
+        className: "honor",
+        accent: "#7DE4FF",
+        accent2: "#C59CFF",
+        glow: "rgba(88,206,255,.26)",
+        bg: "rgba(32,72,92,.30)",
+        pattern: "crystal"
+    },
+    sony: {
+        className: "sony",
+        accent: "#B9C5D6",
+        accent2: "#6689B8",
+        glow: "rgba(104,145,198,.25)",
+        bg: "rgba(48,59,76,.30)",
+        pattern: "lines"
+    },
+    nokia: {
+        className: "nokia",
+        accent: "#62C8FF",
+        accent2: "#5477FF",
+        glow: "rgba(70,171,255,.25)",
+        bg: "rgba(28,62,91,.30)",
+        pattern: "wave"
+    },
+    generic: {
+        className: "generic",
+        accent: "#B8A7FF",
+        accent2: "#72D6D0",
+        glow: "rgba(133,115,255,.22)",
+        bg: "rgba(55,51,88,.28)",
+        pattern: "constellation"
+    }
+};
+
+function normalizeDeviceText(value) {
+    return String(value || "").trim().toLowerCase().replace(/[._-]+/g, " ");
+}
+
+function detectDeviceTheme(log) {
+    const brand = normalizeDeviceText(log?.deviceBrand);
+    const marketing = normalizeDeviceText(log?.deviceMarketingName);
+    const model = normalizeDeviceText(log?.deviceModel);
+    const combined = `${brand} ${marketing} ${model}`;
+
+    // Prefer an explicit backend brand over model-prefix heuristics.
+    const explicitBrand = [
+        "motorola", "samsung", "nothing", "vivo", "oppo", "oneplus",
+        "xiaomi", "redmi", "realme", "pixel", "iqoo", "asus", "huawei",
+        "honor", "sony", "nokia"
+    ].find(name => brand.includes(name));
+
+    if (explicitBrand) {
+        return DEVICE_THEMES[explicitBrand];
+    }
+
+    const rules = [
+        ["motorola", /motorola|moto\b|xt\d/],
+        ["samsung", /samsung|galaxy|sm [a-z0-9]/],
+        ["nothing", /nothing|a063|a065|a059/],
+        ["vivo", /\bvivo\b|v\d{2,4}/],
+        ["oppo", /\boppo\b|cph\d/],
+        ["oneplus", /oneplus|one plus|in\d{3,5}/],
+        ["redmi", /redmi/],
+        ["xiaomi", /xiaomi|mi \d|mix|poco/],
+        ["realme", /realme|rmx\d/],
+        ["pixel", /google|pixel/],
+        ["iqoo", /iqoo/],
+        ["asus", /asus|rog phone|zenfone/],
+        ["huawei", /huawei/],
+        ["honor", /honor/],
+        ["sony", /sony|xperia/],
+        ["nokia", /nokia/]
+    ];
+
+    const match = rules.find(([, pattern]) => pattern.test(combined));
+    return DEVICE_THEMES[match ? match[0] : "generic"];
+}
+
+function themeStyle(theme) {
+    return [
+        `--device-accent:${theme.accent}`,
+        `--device-accent-2:${theme.accent2}`,
+        `--device-glow:${theme.glow}`,
+        `--device-bg:${theme.bg}`
+    ].join(";");
+}
+
 function getLastSeen(date) {
 
     const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -250,12 +448,22 @@ let html = `
 const success = log.status === "success";
 
 const isBanned = bannedDevices.includes(log.serial);
+const deviceTheme = detectDeviceTheme(log);
 
 html += `
 
-<div class="log-card ${success ? "success" : "failed"}" style="animation-delay:${index * 45}ms;">
+<div class="log-card ${success ? "success" : "failed"} device-theme-${deviceTheme.className}" style="animation-delay:${index * 45}ms;${themeStyle(deviceTheme)}" data-device-brand="${log.deviceBrand || ""}">
 
-    <div class="status-line"></div>
+    <div class="device-ambient" aria-hidden="true">
+    <span class="ambient-orb"></span>
+    <span class="ambient-ring ring-one"></span>
+    <span class="ambient-ring ring-two"></span>
+    <span class="ambient-grid"></span>
+    <span class="ambient-spark spark-one"></span>
+    <span class="ambient-spark spark-two"></span>
+</div>
+
+<div class="status-line"></div>
 
 <div class="log-top">
 
