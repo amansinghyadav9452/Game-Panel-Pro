@@ -168,7 +168,7 @@ function renderLogs(data) {
                 <div class="logs-subtitle">Track · Analyze · Stay in Control</div>
             </div>
             <div class="logs-signature" aria-hidden="true">Every<br>Login<br>Tells a Story</div>
-            <button class="logs-alert" type="button" id="logsAlert" aria-label="Refresh logs"><i class="fa-regular fa-bell"></i><span></span></button>
+            <button class="logs-alert" type="button" id="logsAlert" aria-label="Refresh logs" title="Refresh logs"><i class="fa-solid fa-rotate"></i></button>
         </div>
 
         <div class="logs-stats">
@@ -189,10 +189,14 @@ function renderLogs(data) {
                 <button class="log-filter ${activeStatusFilter === "success" ? "active" : ""}" data-filter="success"><i class="fa-solid fa-circle"></i> Success</button>
                 <button class="log-filter ${activeStatusFilter === "failed" ? "active" : ""}" data-filter="failed"><i class="fa-solid fa-circle"></i> Failed</button>
             </div>
-            <select class="sort-select" id="logsSort" aria-label="Sort logs">
-                <option value="newest" ${sortOrder === "newest" ? "selected" : ""}>Newest first</option>
-                <option value="oldest" ${sortOrder === "oldest" ? "selected" : ""}>Oldest first</option>
-            </select>
+            <label class="sort-control" aria-label="Sort logs">
+                <i class="fa-solid fa-arrow-down-wide-short" aria-hidden="true"></i>
+                <select class="sort-select" id="logsSort" aria-label="Sort logs">
+                    <option value="newest" ${sortOrder === "newest" ? "selected" : ""}>Newest</option>
+                    <option value="oldest" ${sortOrder === "oldest" ? "selected" : ""}>Oldest</option>
+                </select>
+                <i class="fa-solid fa-chevron-down sort-chevron" aria-hidden="true"></i>
+            </label>
         </div>
 
         <div class="logs-info"><span>Showing ${start}-${end} of ${data.totalLogs} logs</span><span class="live-indicator"><i></i>${rangeLabel}</span></div>
@@ -294,7 +298,15 @@ function bindLogControls(data) {
         renderLogs(data);
     });
 
-    document.getElementById("logsAlert")?.addEventListener("click", () => loadLogs(currentPage));
+    document.getElementById("logsAlert")?.addEventListener("click", async () => {
+        const button = document.getElementById("logsAlert");
+        button?.classList.add("is-refreshing");
+        try {
+            await loadLogs(currentPage);
+        } finally {
+            button?.classList.remove("is-refreshing");
+        }
+    });
     document.getElementById("logsFab")?.addEventListener("click", () => loadLogs(currentPage));
 
     document.querySelectorAll(".device-action,.more-btn").forEach(button => button.addEventListener("click", () => showDeviceMenu(button.dataset.serial)));

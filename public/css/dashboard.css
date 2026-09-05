@@ -3047,3 +3047,21 @@ table{
 
 }
 
+
+
+/* Customer Game ID copy control */
+.customer-game-id-chip {
+    gap:8px;
+}
+.copy-customer-game-id {
+    width:30px; height:30px; padding:0; border-radius:9px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.045); color:#cbd5e1;
+    display:inline-grid; place-items:center; cursor:pointer;
+    transition:.2s ease;
+}
+.copy-customer-game-id:hover {
+    color:#fff; border-color:rgba(117,103,255,.45);
+    background:rgba(117,103,255,.12); box-shadow:0 0 18px rgba(117,103,255,.16);
+}
+.copy-customer-game-id:active { transform:scale(.95); }

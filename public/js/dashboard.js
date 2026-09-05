@@ -210,6 +210,34 @@ async function loadCustomerGameId() {
         if (chip && value) {
             value.textContent = data.customer.gameId;
             chip.style.display = "inline-flex";
+
+            const copyButton = document.getElementById("copyCustomerGameId");
+            copyButton?.addEventListener("click", async () => {
+                const gameId = data.customer.gameId;
+                try {
+                    await navigator.clipboard.writeText(gameId);
+                    if (typeof showToast === "function") {
+                        showToast("Copied", "Customer Game ID copied to clipboard.", "success");
+                    }
+                } catch (err) {
+                    try {
+                        const area = document.createElement("textarea");
+                        area.value = gameId;
+                        area.setAttribute("readonly", "");
+                        area.style.position = "fixed";
+                        area.style.opacity = "0";
+                        document.body.appendChild(area);
+                        area.select();
+                        document.execCommand("copy");
+                        area.remove();
+                        if (typeof showToast === "function") {
+                            showToast("Copied", "Customer Game ID copied to clipboard.", "success");
+                        }
+                    } catch (_) {
+                        if (typeof showToast === "function") showToast("Copy failed", "Unable to copy Game ID.", "error");
+                    }
+                }
+            });
         }
     } catch (err) {
         console.error("Customer Game ID load error:", err);
