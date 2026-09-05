@@ -196,6 +196,25 @@
 
 .log-body { display:grid;grid-template-columns:105px 1fr;gap:12px;align-items:stretch; }
 .device-preview { position:relative;min-height:150px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:9px;border-radius:18px;background:linear-gradient(160deg,color-mix(in srgb,var(--device-accent) 9%,rgba(255,255,255,.025)),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.06);overflow:hidden; }
+.device-visual {
+    position:relative; min-height:190px; border-radius:18px; overflow:hidden;
+    display:flex; align-items:flex-end; justify-content:center; padding:12px 8px 9px;
+    background:linear-gradient(160deg,color-mix(in srgb,var(--device-accent) 10%,rgba(255,255,255,.025)),rgba(4,12,20,.22));
+    border:1px solid rgba(255,255,255,.065); isolation:isolate;
+}
+.device-visual-glow { position:absolute; width:130px; height:130px; right:-30px; top:-15px; border-radius:50%; background:var(--device-glow); filter:blur(28px); z-index:-1; }
+.device-visual-image {
+    position:absolute; inset:8px 4px 25px; width:calc(100% - 8px); height:calc(100% - 33px);
+    object-fit:contain; object-position:center; opacity:0; transform:translateY(8px) scale(.97) rotate(2deg);
+    filter:drop-shadow(0 15px 18px rgba(0,0,0,.48)) saturate(.98); transition:opacity .35s ease,transform .35s ease;
+    mix-blend-mode:normal;
+}
+.device-visual-image.is-loaded { opacity:.92; transform:translateY(0) scale(1) rotate(2deg); }
+.device-visual-fallback { position:absolute; inset:0; display:grid; place-items:center; color:var(--device-accent); font-size:48px; opacity:.45; pointer-events:none; transition:opacity .2s; }
+.device-visual-image.is-loaded + .device-visual-fallback { opacity:.03; }
+.device-visual-label { position:relative; z-index:2; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#9aa8b9; font-size:9px; text-align:center; text-shadow:0 2px 8px #02060a; }
+.device-visual.image-failed .device-visual-fallback { opacity:.5; }
+
 .device-preview i { font-size:48px;color:#f0f5fb;filter:drop-shadow(0 0 15px color-mix(in srgb,var(--device-accent) 18%,transparent));z-index:1; }
 .device-preview span { max-width:90px;text-align:center;color:#8f9db2;font-size:9px;line-height:1.25;z-index:1; }
 .preview-glow { position:absolute;width:100px;height:100px;border-radius:50%;background:var(--device-glow);filter:blur(25px); }
@@ -233,7 +252,7 @@
     .logs-controls{align-items:center;gap:8px}.filter-tabs{gap:7px;flex:1;min-width:0}.log-filter{height:38px;padding:0 12px;font-size:11px}.sort-control{height:38px;min-width:104px;width:104px;padding:0 10px;gap:6px}.sort-select{font-size:10px;padding-right:15px}.sort-control > i:first-child{font-size:10px}.sort-chevron{right:9px;font-size:8px}
     .logs-info{font-size:11px;margin-bottom:11px}
     .log-card{padding:18px 14px 14px;border-radius:21px}.log-card-head{gap:11px}.device-action{width:52px;height:52px;flex-basis:52px;border-radius:15px;font-size:22px}.log-title-row h3{font-size:15px}.log-uuid{font-size:9px}.log-status-row{margin:15px 0 12px}.status-pill{padding:8px 13px;font-size:12px}.log-time{font-size:12px}.log-time small{font-size:9px}
-    .log-body{grid-template-columns:1fr;}.device-preview{display:none}.meta-panel{grid-template-columns:repeat(2,minmax(0,1fr));padding:7px}.meta-item{padding:7px 5px;gap:8px}.meta-item>i{font-size:12px;width:19px;flex-basis:19px}.meta-item span{font-size:9px}.meta-item strong{font-size:11px}.log-footer{margin-top:10px}.details-btn{min-width:0;flex:1;height:38px;font-size:11px;padding:0 12px}.license-badge{padding:8px 11px;font-size:10px}
+    .log-body{grid-template-columns:1fr;}.device-visual{min-height:175px;max-height:205px;margin-bottom:2px}.meta-panel{grid-template-columns:repeat(2,minmax(0,1fr));padding:7px}.meta-item{padding:7px 5px;gap:8px}.meta-item>i{font-size:12px;width:19px;flex-basis:19px}.meta-item span{font-size:9px}.meta-item strong{font-size:11px}.log-footer{margin-top:10px}.details-btn{min-width:0;flex:1;height:38px;font-size:11px;padding:0 12px}.license-badge{padding:8px 11px;font-size:10px}
     .device-ghost{font-size:125px;right:-2px;bottom:-15px}
 
     .logs-pagination{margin-bottom:5px}

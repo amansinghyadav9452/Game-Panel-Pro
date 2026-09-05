@@ -212,7 +212,9 @@ app.use(
 
                     "data:",
 
-                    "https://res.cloudinary.com"
+                    "https://res.cloudinary.com",
+                    "https://c.ndtvimg.com",
+                    "https://tse1.mm.bing.net"
 
                 ],
             }

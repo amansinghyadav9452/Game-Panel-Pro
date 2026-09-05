@@ -76,6 +76,70 @@ function detectDeviceTheme(log) {
     return DEVICE_THEMES[match ? match[0] : "generic"];
 }
 
+
+const DEVICE_VISUALS = {
+    // Curated exact-model image when a stable direct source is known.
+    "vivo t2 5g": "https://c.ndtvimg.com/2023-11/ses7p1s_image_640x480_21_November_23.png?downsize=400%3A300&output-quality=80",
+};
+
+const DEVICE_IMAGE_CACHE = new Map();
+
+function deviceImageQuery(log) {
+    const model = String(log?.deviceModel || "").trim();
+    const marketing = String(log?.deviceMarketingName || "").trim();
+    const brand = String(log?.deviceBrand || "").trim();
+    const device = String(log?.device || "").trim();
+    const primary = [marketing, model, brand, device].filter(Boolean).join(" ").trim();
+    return primary ? `${primary} smartphone official product image front back` : "smartphone product image front back";
+}
+
+function getDeviceImageCandidates(log) {
+    const modelKey = normalizeDeviceText(log?.deviceMarketingName || log?.deviceModel || log?.device || "");
+    const exact = DEVICE_VISUALS[modelKey];
+    const query = encodeURIComponent(deviceImageQuery(log));
+    const fallbackSearch = `https://tse1.mm.bing.net/th?q=${query}&w=700&h=900&rs=1&c=1`;
+    return exact ? [exact, fallbackSearch] : [fallbackSearch];
+}
+
+function deviceVisualMarkup(log, theme, deviceName) {
+    const candidates = getDeviceImageCandidates(log);
+    const cacheKey = candidates.join("|");
+    const cached = DEVICE_IMAGE_CACHE.get(cacheKey);
+    const src = cached || candidates[0];
+    return `<div class="device-visual" data-image-key="${escapeHtml(cacheKey)}">
+        <div class="device-visual-glow"></div>
+        <img class="device-visual-image" src="${escapeHtml(src)}" data-candidates="${escapeHtml(JSON.stringify(candidates))}" alt="${escapeHtml(deviceName)} product visual" loading="lazy" decoding="async">
+        <div class="device-visual-fallback"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <span class="device-visual-label">${escapeHtml(deviceName)}</span>
+    </div>`;
+}
+
+function initDeviceVisuals() {
+    document.querySelectorAll(".device-visual-image").forEach(img => {
+        if (img.dataset.bound === "1") return;
+        img.dataset.bound = "1";
+        let candidates = [];
+        try { candidates = JSON.parse(img.dataset.candidates || "[]"); } catch (_) {}
+        let index = 0;
+        const key = img.closest(".device-visual")?.dataset.imageKey || "";
+        const markLoaded = () => {
+            img.classList.add("is-loaded");
+            if (key) DEVICE_IMAGE_CACHE.set(key, img.currentSrc || img.src);
+        };
+        img.addEventListener("load", markLoaded, {once:true});
+        img.addEventListener("error", () => {
+            index += 1;
+            if (candidates[index]) {
+                img.src = candidates[index];
+                return;
+            }
+            img.removeAttribute("src");
+            img.closest(".device-visual")?.classList.add("image-failed");
+        });
+        if (img.complete && img.naturalWidth) markLoaded();
+    });
+}
+
 function themeStyle(theme) {
     return [
         `--device-accent:${theme.accent}`,
@@ -239,7 +303,7 @@ function renderLogs(data) {
                 </div>
 
                 <div class="log-body">
-                    <div class="device-preview"><div class="preview-glow"></div><i class="fa-solid fa-mobile-screen-button"></i><span>${escapeHtml(deviceName)}</span></div>
+                    ${deviceVisualMarkup(log, theme, deviceName)}
                     <div class="meta-panel">
                         <div class="meta-item"><i class="fa-solid fa-mobile-screen-button"></i><div><span>Device</span><strong>${escapeHtml(deviceName)}</strong></div></div>
                         <div class="meta-item"><i class="fa-regular fa-user"></i><div><span>Player</span><strong>${escapeHtml(log.playerName || "—")}</strong></div></div>
@@ -272,6 +336,7 @@ function renderLogs(data) {
 
     container.innerHTML = html;
     bindLogControls(data);
+    initDeviceVisuals();
 }
 
 function bindLogControls(data) {
