@@ -161,13 +161,21 @@
 
 .log-card{
 
+    --device-accent:#B8A7FF;
+    --device-accent-2:#72D6D0;
+    --device-glow:rgba(133,115,255,.22);
+    --device-bg:rgba(55,51,88,.28);
+
     position:relative;
 
     overflow:hidden;
 
-    background:linear-gradient(165deg, var(--surface-2), var(--surface));
+    background:
+        radial-gradient(circle at 88% 14%, var(--device-glow), transparent 30%),
+        radial-gradient(circle at 8% 88%, color-mix(in srgb, var(--device-accent-2) 12%, transparent), transparent 34%),
+        linear-gradient(145deg, color-mix(in srgb, var(--device-bg) 72%, var(--surface-2)), var(--surface));
 
-    border:1px solid var(--hairline);
+    border:1px solid color-mix(in srgb, var(--device-accent) 28%, var(--hairline));
 
     border-radius:16px;
 
@@ -208,13 +216,13 @@
 
     transform:translateY(-4px);
 
-    border-color:rgba(59,130,246,.35);
+    border-color:color-mix(in srgb, var(--device-accent) 62%, var(--hairline));
 
     box-shadow:
 
         0 20px 45px rgba(0,0,0,.45),
 
-        0 0 40px rgba(59,130,246,.12);
+        0 0 42px color-mix(in srgb, var(--device-accent) 18%, transparent);
 
 }
 
@@ -236,13 +244,13 @@
 
 .log-card.success .status-line{
 
-    background:#22C55E;
+    background:linear-gradient(180deg, var(--device-accent), #22C55E);
 
 }
 
 .log-card.failed .status-line{
 
-    background:#EF4444;
+    background:linear-gradient(180deg, var(--device-accent-2), #EF4444);
 
 }
 
@@ -274,15 +282,16 @@
 
     background:
 
-        linear-gradient(
-            135deg,
-            #E0B471,
-            #9C7431
-        );
+        linear-gradient(135deg, color-mix(in srgb, var(--device-accent) 88%, #fff), var(--device-accent-2));
+
+    color:#0A0D14;
+
+    border:1px solid color-mix(in srgb, var(--device-accent) 68%, transparent);
 
     box-shadow:
 
-        0 10px 25px rgba(59,130,246,.35);
+        0 10px 25px color-mix(in srgb, var(--device-accent) 26%, transparent),
+        inset 0 1px 0 rgba(255,255,255,.32);
 
 }
 
@@ -322,7 +331,8 @@
 
 .device-action:hover{
 
-    background:rgba(59,130,246,.15);
+    background:color-mix(in srgb, var(--device-accent) 13%, transparent);
+    box-shadow:0 0 22px color-mix(in srgb, var(--device-accent) 14%, transparent);
 
 }
 
@@ -658,6 +668,97 @@
 
 }
 
+
+/* Dynamic device atmosphere ------------------------------------------------ */
+.device-ambient{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+    opacity:.9;
+}
+
+.log-card > *:not(.device-ambient){
+    position:relative;
+    z-index:1;
+}
+
+.ambient-orb{
+    position:absolute;
+    width:240px;
+    height:240px;
+    right:-90px;
+    top:-100px;
+    border-radius:50%;
+    background:radial-gradient(circle, var(--device-glow) 0%, transparent 68%);
+    filter:blur(4px);
+    animation:device-orb-drift 7s ease-in-out infinite alternate;
+}
+
+.ambient-ring{
+    position:absolute;
+    border:1px solid color-mix(in srgb, var(--device-accent) 22%, transparent);
+    border-radius:50%;
+    right:-68px;
+    top:-62px;
+    transform:rotate(-18deg);
+}
+
+.ring-one{ width:190px; height:190px; }
+.ring-two{ width:270px; height:270px; opacity:.5; }
+
+.ambient-grid{
+    position:absolute;
+    width:310px;
+    height:170px;
+    right:-130px;
+    bottom:-82px;
+    opacity:.12;
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--device-accent) 45%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--device-accent) 45%, transparent) 1px, transparent 1px);
+    background-size:22px 22px;
+    transform:perspective(300px) rotateX(58deg) rotateZ(-9deg);
+    mask-image:linear-gradient(to top, #000, transparent 82%);
+}
+
+.ambient-spark{
+    position:absolute;
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--device-accent);
+    box-shadow:0 0 12px var(--device-accent);
+    animation:device-spark 3.5s ease-in-out infinite;
+}
+
+.spark-one{ right:23%; top:25%; }
+.spark-two{ right:13%; top:48%; width:3px; height:3px; animation-delay:1.2s; }
+
+.device-theme-nothing .ambient-grid{
+    opacity:.18;
+    background-size:8px 8px;
+}
+.device-theme-nothing .ambient-ring{ border-style:dotted; }
+.device-theme-realme .ambient-grid{ transform:rotate(-24deg); }
+.device-theme-oneplus .ambient-grid,
+.device-theme-iqoo .ambient-grid{ transform:skewX(-22deg) rotate(-10deg); }
+.device-theme-vivo .ambient-orb{ width:330px; height:180px; filter:blur(28px); }
+.device-theme-oppo .ambient-ring{ border-radius:44% 56% 58% 42%; transform:rotate(24deg); }
+.device-theme-samsung .ambient-ring{ transform:rotate(28deg) skewX(-12deg); }
+.device-theme-pixel .ambient-grid{ background-size:16px 16px; }
+
+@keyframes device-orb-drift{
+    from{ transform:translate3d(0,0,0) scale(1); }
+    to{ transform:translate3d(-18px,14px,0) scale(1.08); }
+}
+
+@keyframes device-spark{
+    0%,100%{ opacity:.2; transform:translateY(0) scale(.8); }
+    50%{ opacity:.9; transform:translateY(-10px) scale(1.25); }
+}
+
 .log-card::before{
 
     content:"";
@@ -678,7 +779,7 @@
 
         radial-gradient(
 
-            rgba(59,130,246,.18),
+            var(--device-glow),
 
             transparent 70%
 
@@ -708,7 +809,7 @@
 
         radial-gradient(
 
-            rgba(34,197,94,.12),
+            color-mix(in srgb, var(--device-accent) 12%, rgba(34,197,94,.10)),
 
             transparent 70%
 
@@ -736,7 +837,7 @@
 
         radial-gradient(
 
-            rgba(239,68,68,.12),
+            color-mix(in srgb, var(--device-accent-2) 12%, rgba(239,68,68,.10)),
 
             transparent 70%
 
@@ -1051,11 +1152,12 @@ html.light-theme .stat-label{
 
 }
 
-.log-card::before,
-.log-card::after{
+.log-card::before{
+    opacity:.7;
+}
 
-    display:none;
-
+.device-ambient{
+    opacity:.65;
 }
 
 }
