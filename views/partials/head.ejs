@@ -35,13 +35,17 @@ href="/css/toast.css">
 
 <link rel="stylesheet" href="/css/logs.css">
 
+<% if (activePage !== "logs") { %>
 <link rel="stylesheet" href="/css/components/ai-copilot.css">
+<% } %>
 
 <link rel="stylesheet" href="/css/interactions.css">
 
 <link rel="stylesheet" href="/css/loading.css">
 
+<% if (activePage !== "logs") { %>
 <link rel="stylesheet" href="/css/dev-chat.css">
+<% } %>
 
 <link rel="manifest" href="/manifest.json">
 
@@ -73,4 +77,6 @@ href="/css/toast.css">
 
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js"></script>
 
+<% if (activePage !== "logs") { %>
 <script defer src="/js/ai.js"></script>
+<% } %>

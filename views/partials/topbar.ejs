@@ -1,17 +1,17 @@
 <header class="topbar">
-
     <div class="topbar-row">
-
         <div class="left-section">
-
-            <button id="menuBtn">
+            <button id="menuBtn" type="button" aria-label="Open menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
-
             <h2><%= pageTitle %></h2>
-
         </div>
-
+        <% if (activePage === "logs") { %>
+        <div class="right-section logs-topbar-actions">
+            <button id="logsAlert" class="logs-alert" type="button" aria-label="Refresh logs" title="Refresh logs">
+                <i class="fa-solid fa-rotate"></i>
+            </button>
+        </div>
+        <% } %>
     </div>
-
 </header>

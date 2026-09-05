@@ -188,7 +188,9 @@ class="<%= activePage === 'settings' ? 'active' : '' %>">
 </nav>
 </aside>
 
+<% if (activePage !== "logs") { %>
 <%- include("./ai-copilot") %>
+<% } %>
 
 <div
 class="profile-viewer"

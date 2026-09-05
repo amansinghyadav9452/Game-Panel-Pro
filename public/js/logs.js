@@ -78,42 +78,43 @@ function detectDeviceTheme(log) {
 
 
 const DEVICE_VISUALS = {
-    // Curated exact-model image when a stable direct source is known.
-    "vivo t2 5g": "https://c.ndtvimg.com/2023-11/ses7p1s_image_640x480_21_November_23.png?downsize=400%3A300&output-quality=80",
+    "infinix smart 10 plus": "https://cdn.beebom.com/mobile/infinix-smart-10-plus-front-back-1.png",
+    "infinix note 30 5g": "https://infinixmobiles.in/cdn/shop/files/Note305G-1.webp?v=1768807235&width=1000",
 };
 
 const DEVICE_IMAGE_CACHE = new Map();
 
 function deviceImageQuery(log) {
-    const model = String(log?.deviceModel || "").trim();
-    const marketing = String(log?.deviceMarketingName || "").trim();
-    const brand = String(log?.deviceBrand || "").trim();
-    const device = String(log?.device || "").trim();
-    const primary = [marketing, model, brand, device].filter(Boolean).join(" ").trim();
-    return primary ? `${primary} smartphone official product image front back` : "smartphone product image front back";
+    const parts = [log?.deviceMarketingName, log?.deviceModel, log?.deviceBrand, log?.device]
+        .map(value => String(value || "").trim()).filter(Boolean);
+    return parts.length ? `${parts.slice(0, 3).join(" ")} smartphone product image` : "smartphone product image";
 }
 
 function getDeviceImageCandidates(log) {
-    const modelKey = normalizeDeviceText(log?.deviceMarketingName || log?.deviceModel || log?.device || "");
-    const exact = DEVICE_VISUALS[modelKey];
+    const lookupKeys = [
+        log?.deviceMarketingName,
+        log?.deviceModel,
+        log?.deviceBrand && log?.deviceModel ? `${log.deviceBrand} ${log.deviceModel}` : "",
+        log?.deviceBrand && log?.deviceMarketingName ? `${log.deviceBrand} ${log.deviceMarketingName}` : "",
+        log?.device
+    ].map(normalizeDeviceText).filter(Boolean);
+    const exact = lookupKeys.map(key => DEVICE_VISUALS[key]).find(Boolean);
     const query = encodeURIComponent(deviceImageQuery(log));
-    const fallbackSearch = `https://tse1.mm.bing.net/th?q=${query}&w=700&h=900&rs=1&c=1`;
-    const wrap = src => `/logs/device-visual?src=${encodeURIComponent(src)}`;
-    return exact ? [wrap(exact), wrap(fallbackSearch)] : [wrap(fallbackSearch)];
+    const search = `https://tse1.mm.bing.net/th?q=${query}&w=900&h=900&rs=1&c=1`;
+    const wrap = (src) => `/logs/device-visual?src=${encodeURIComponent(src)}`;
+    return exact ? [wrap(exact), wrap(search)] : [wrap(search)];
 }
 
 function deviceVisualMarkup(log, theme, deviceName) {
     const candidates = getDeviceImageCandidates(log);
     const cacheKey = candidates.join("|");
-    const cached = DEVICE_IMAGE_CACHE.get(cacheKey);
-    const src = cached || candidates[0];
     const model = log?.deviceModel || "Unknown model";
-    return `<div class="device-stage" data-image-key="${escapeHtml(cacheKey)}" aria-label="${escapeHtml(deviceName)} ${escapeHtml(model)}">
+    return `<div class="device-stage" data-image-key="${escapeHtml(cacheKey)}">
         <div class="device-stage-glow"></div>
-        <div class="device-stage-wash"></div>
-        <img class="device-stage-image" src="${escapeHtml(src)}" data-candidates="${escapeHtml(JSON.stringify(candidates))}" alt="${escapeHtml(deviceName)} ${escapeHtml(model)} device visual" loading="lazy" decoding="async">
+        <div class="device-stage-floor"></div>
+        <img class="device-stage-image" src="${escapeHtml(candidates[0])}" data-candidates="${escapeHtml(JSON.stringify(candidates))}" alt="" aria-hidden="true" loading="lazy" decoding="async">
         <div class="device-stage-copy">
-            <span class="device-stage-brand">${escapeHtml(deviceName)}</span>
+            <span>${escapeHtml(deviceName)}</span>
             <strong>${escapeHtml(model)}</strong>
         </div>
     </div>`;
@@ -126,22 +127,24 @@ function initDeviceVisuals() {
         let candidates = [];
         try { candidates = JSON.parse(img.dataset.candidates || "[]"); } catch (_) {}
         let index = 0;
-        const key = img.closest(".device-stage")?.dataset.imageKey || "";
+        const stage = img.closest(".device-stage");
+        const key = stage?.dataset.imageKey || "";
         const markLoaded = () => {
+            if (!img.naturalWidth) return;
             img.classList.add("is-loaded");
-            if (key) DEVICE_IMAGE_CACHE.set(key, img.currentSrc || img.src);
+            stage?.classList.add("has-image");
+            if (key) DEVICE_IMAGE_CACHE.set(key, img.src);
         };
-        img.addEventListener("load", markLoaded, {once:true});
+        img.addEventListener("load", markLoaded);
         img.addEventListener("error", () => {
             index += 1;
-            if (candidates[index]) {
-                img.src = candidates[index];
-                return;
-            }
+            if (candidates[index]) { img.src = candidates[index]; return; }
+            stage?.classList.add("image-failed");
             img.removeAttribute("src");
-            img.closest(".device-stage")?.classList.add("image-failed");
         });
-        if (img.complete && img.naturalWidth) markLoaded();
+        const cached = DEVICE_IMAGE_CACHE.get(key);
+        if (cached) img.src = cached;
+        else if (img.complete && img.naturalWidth) markLoaded();
     });
 }
 
@@ -226,7 +229,6 @@ function renderLogs(data) {
                 <div class="logs-subtitle">Track · Analyze · Stay in Control</div>
             </div>
             <div class="logs-signature" aria-hidden="true">Every<br>Login<br>Tells a Story</div>
-            <button class="logs-alert" type="button" id="logsAlert" aria-label="Refresh logs" title="Refresh logs"><i class="fa-solid fa-rotate"></i></button>
         </div>
 
         <div class="logs-stats">
@@ -279,13 +281,12 @@ function renderLogs(data) {
                 <div class="device-ambient" aria-hidden="true">
                     <span class="ambient-orb"></span><span class="ambient-ring ring-one"></span><span class="ambient-ring ring-two"></span>
                     <span class="ambient-grid"></span><span class="ambient-spark spark-one"></span><span class="ambient-spark spark-two"></span>
-                    <div class="device-ghost"><i class="fa-solid fa-mobile-screen-button"></i></div>
                 </div>
                 <div class="status-line"></div>
                 <header class="log-card-head">
                     <button class="device-action" data-serial="${escapeHtml(serial)}" aria-label="Device actions"><i class="fa-solid fa-mobile-screen-button"></i></button>
                     <div class="log-identity">
-                        <div class="log-title-row"><h3>${escapeHtml(log.licenseKey || "Untitled license")}</h3><button class="more-btn" type="button" data-serial="${escapeHtml(serial)}" aria-label="More actions"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+                        <div class="log-title-row"><h3>${escapeHtml(log.licenseKey || "Untitled license")}</h3></div>
                         <div class="log-uuid"><span>${escapeHtml(shortId)}</span><button class="copy-id" type="button" data-copy="${escapeHtml(serial)}" aria-label="Copy ID"><i class="fa-regular fa-copy"></i></button></div>
                     </div>
                 </header>
@@ -355,7 +356,7 @@ function bindLogControls(data) {
             button?.classList.remove("is-refreshing");
         }
     });
-    document.querySelectorAll(".device-action,.more-btn").forEach(button => button.addEventListener("click", () => showDeviceMenu(button.dataset.serial)));
+    document.querySelectorAll(".device-action").forEach(button => button.addEventListener("click", () => showDeviceMenu(button.dataset.serial)));
     document.querySelectorAll(".copy-id").forEach(button => button.addEventListener("click", async () => {
         try {
             await navigator.clipboard.writeText(button.dataset.copy || "");

@@ -161,8 +161,11 @@ html.light-theme body{
 }
 
 html.light-theme .sidebar{
-    background:rgba(194, 190, 247, 0.473) !important;
-    border-right:1px solid var(--border) !important;
+    background:rgba(255,255,255,.84) !important;
+    border-right:1px solid rgba(15,23,42,.10) !important;
+    -webkit-backdrop-filter:blur(22px) saturate(135%);
+    backdrop-filter:blur(22px) saturate(135%);
+    box-shadow:10px 0 35px rgba(15,23,42,.10);
 }
 
 html.light-theme .content,
