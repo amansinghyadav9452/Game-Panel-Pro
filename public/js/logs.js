@@ -98,7 +98,8 @@ function getDeviceImageCandidates(log) {
     const exact = DEVICE_VISUALS[modelKey];
     const query = encodeURIComponent(deviceImageQuery(log));
     const fallbackSearch = `https://tse1.mm.bing.net/th?q=${query}&w=700&h=900&rs=1&c=1`;
-    return exact ? [exact, fallbackSearch] : [fallbackSearch];
+    const wrap = src => `/logs/device-visual?src=${encodeURIComponent(src)}`;
+    return exact ? [wrap(exact), wrap(fallbackSearch)] : [wrap(fallbackSearch)];
 }
 
 function deviceVisualMarkup(log, theme, deviceName) {
@@ -111,7 +112,6 @@ function deviceVisualMarkup(log, theme, deviceName) {
         <div class="device-stage-glow"></div>
         <div class="device-stage-wash"></div>
         <img class="device-stage-image" src="${escapeHtml(src)}" data-candidates="${escapeHtml(JSON.stringify(candidates))}" alt="${escapeHtml(deviceName)} ${escapeHtml(model)} device visual" loading="lazy" decoding="async">
-        <div class="device-stage-fallback"><i class="fa-solid fa-mobile-screen-button"></i></div>
         <div class="device-stage-copy">
             <span class="device-stage-brand">${escapeHtml(deviceName)}</span>
             <strong>${escapeHtml(model)}</strong>
@@ -205,17 +205,6 @@ function filteredLogs(logs) {
     return result;
 }
 
-function buildBottomNav() {
-    return `
-        <nav class="logs-bottom-nav" aria-label="Quick navigation">
-            <a href="/panel" class="logs-nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
-            <a href="/logs" class="logs-nav-item active"><i class="fa-solid fa-file-lines"></i><span>Logs</span></a>
-            <a href="/activity" class="logs-nav-item"><i class="fa-solid fa-chart-column"></i><span>Analytics</span></a>
-            <a href="/settings" class="logs-nav-item"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
-            <button type="button" class="logs-fab" id="logsFab" aria-label="Refresh logs"><i class="fa-solid fa-plus"></i></button>
-        </nav>`;
-}
-
 function renderLogs(data) {
     const container = document.getElementById("userLogsContainer");
     if (!container) return;
@@ -249,7 +238,6 @@ function renderLogs(data) {
 
         <div class="logs-toolbar">
             <label class="logs-search"><i class="fa-solid fa-magnifying-glass"></i><input id="logsSearch" type="search" autocomplete="off" placeholder="Search by device, model, ID, player..." value="${escapeHtml(searchTerm)}"></label>
-            <button class="filter-square" id="logsFilterBtn" type="button" aria-label="Toggle failed filter"><i class="fa-solid fa-filter"></i></button>
         </div>
 
         <div class="logs-controls">
@@ -303,7 +291,10 @@ function renderLogs(data) {
                 </header>
 
                 <div class="log-status-row">
-                    <span class="status-pill ${success ? "success" : "failed"}"><i class="fa-solid ${success ? "fa-circle-check" : "fa-circle-xmark"}"></i>${success ? "Success" : "Failed"}</span>
+                    <div class="status-stack">
+                        <span class="status-pill ${success ? "success" : "failed"}"><i class="fa-solid ${success ? "fa-circle-check" : "fa-circle-xmark"}"></i>${success ? "Success" : "Failed"}</span>
+                        <span class="license-badge ${licenseType}"><i class="fa-solid ${licenseType === "premium" ? "fa-crown" : "fa-globe"}"></i>${escapeHtml(log.licenseType || "Public")}</span>
+                    </div>
                     <div class="log-time"><i class="fa-regular fa-clock"></i><span>${escapeHtml(getLastSeen(log.createdAt))}</span><small>${escapeHtml(formatDate(log.createdAt))}</small></div>
                 </div>
 
@@ -315,11 +306,7 @@ function renderLogs(data) {
                         <div class="meta-item"><i class="fa-solid fa-cube"></i><div><span>App Version</span><strong>${escapeHtml(log.appVersion || "—")}</strong></div></div>
                     </div>
                 </div>
-
-                <div class="log-footer">
-                    <button class="details-btn" type="button" data-details="${escapeHtml(serial)}"><i class="fa-regular fa-eye"></i> View Full Details <i class="fa-solid fa-arrow-right"></i></button>
-                    <span class="license-badge ${licenseType}"><i class="fa-solid ${licenseType === "premium" ? "fa-crown" : "fa-globe"}"></i>${escapeHtml(log.licenseType || "Public")}</span>
-                </div>
+                <div class="log-footer"><span class="log-footer-hint"><i class="fa-solid fa-shield-halved"></i>${success ? "Verified activity" : "Attention required"}</span></div>
                 ${isBanned ? `<div class="banned-ribbon"><i class="fa-solid fa-ban"></i> Banned Device</div>` : ""}
                 ${!success && log.reason ? `<div class="reason-box"><strong>Reason</strong><span>${escapeHtml(log.reason)}</span></div>` : ""}
             </article>
@@ -333,7 +320,6 @@ function renderLogs(data) {
             <span>Page <strong>${data.currentPage}</strong> of <strong>${data.totalPages || 1}</strong></span>
             <button id="nextBtn" class="page-btn" ${data.currentPage === data.totalPages ? "disabled" : ""}>Next <i class="fa-solid fa-arrow-right"></i></button>
         </div>
-        ${buildBottomNav()}
     `;
 
     container.innerHTML = html;
@@ -360,11 +346,6 @@ function bindLogControls(data) {
         renderLogs(data);
     });
 
-    document.getElementById("logsFilterBtn")?.addEventListener("click", () => {
-        activeStatusFilter = activeStatusFilter === "failed" ? "all" : "failed";
-        renderLogs(data);
-    });
-
     document.getElementById("logsAlert")?.addEventListener("click", async () => {
         const button = document.getElementById("logsAlert");
         button?.classList.add("is-refreshing");
@@ -374,8 +355,6 @@ function bindLogControls(data) {
             button?.classList.remove("is-refreshing");
         }
     });
-    document.getElementById("logsFab")?.addEventListener("click", () => loadLogs(currentPage));
-
     document.querySelectorAll(".device-action,.more-btn").forEach(button => button.addEventListener("click", () => showDeviceMenu(button.dataset.serial)));
     document.querySelectorAll(".copy-id").forEach(button => button.addEventListener("click", async () => {
         try {
@@ -383,28 +362,8 @@ function bindLogControls(data) {
             if (typeof showToast === "function") showToast("Copied", "Log ID copied to clipboard.", "success");
         } catch (_) {}
     }));
-    document.querySelectorAll(".details-btn").forEach(button => button.addEventListener("click", () => {
-        const log = allLogs.find(x => x.serial === button.dataset.details);
-        if (!log) return;
-        showLogDetails(log);
-    }));
-
     document.getElementById("prevBtn")?.addEventListener("click", () => loadLogs(currentPage - 1));
     document.getElementById("nextBtn")?.addEventListener("click", () => loadLogs(currentPage + 1));
-}
-
-function showLogDetails(log) {
-    const theme = detectDeviceTheme(log);
-    const message = [
-        `Device: ${log.deviceMarketingName || log.deviceBrand || log.deviceModel || "Unknown"}`,
-        `Model: ${log.deviceModel || "—"}`,
-        `Android: ${log.androidVersion || "—"}`,
-        `App: ${log.appVersion || "—"}`,
-        `Player: ${log.playerName || "—"}`,
-        `Status: ${log.status || "—"}`,
-        `ID: ${log.serial || "—"}`
-    ].join("\n");
-    if (typeof showToast === "function") showToast(theme.className.toUpperCase(), message, log.status === "success" ? "success" : "error");
 }
 
 async function loadLogs(page = currentPage, isAutoRefresh = false) {

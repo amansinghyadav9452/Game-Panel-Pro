@@ -222,6 +222,61 @@ app.use(
     })
 );
 
+
+// Same-origin device-visual renderer. It fetches only allow-listed product-image hosts,
+// embeds the image into a transparent SVG, and applies a lightweight 3D perspective,
+// edge fade and shadow so cards never render a second rectangular image box.
+const deviceVisualCache = new Map();
+const DEVICE_VISUAL_HOSTS = new Set(["c.ndtvimg.com", "tse1.mm.bing.net"]);
+
+app.get("/logs/device-visual", async (req, res) => {
+    try {
+        const raw = String(req.query.src || "").trim();
+        if (!raw) return res.status(400).end();
+        const target = new URL(raw);
+        if (!DEVICE_VISUAL_HOSTS.has(target.hostname)) return res.status(403).end();
+        if (!/^https?:$/.test(target.protocol)) return res.status(403).end();
+
+        const cacheKey = target.toString();
+        let payload = deviceVisualCache.get(cacheKey);
+        if (!payload) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 7000);
+            const response = await fetch(target, {
+                signal: controller.signal,
+                headers: {"User-Agent": "GamePanelPro/1.0 device-visual"}
+            });
+            clearTimeout(timer);
+            if (!response.ok) return res.status(404).end();
+            const contentType = String(response.headers.get("content-type") || "image/jpeg");
+            if (!contentType.startsWith("image/")) return res.status(415).end();
+            const bytes = Buffer.from(await response.arrayBuffer());
+            if (bytes.length > 4 * 1024 * 1024) return res.status(413).end();
+            payload = { mime: contentType.split(";")[0], data: bytes.toString("base64") };
+            deviceVisualCache.set(cacheKey, payload);
+            if (deviceVisualCache.size > 80) deviceVisualCache.delete(deviceVisualCache.keys().next().value);
+        }
+
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="520" height="320" viewBox="0 0 520 320">
+  <defs>
+    <linearGradient id="edge" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".22" stop-color="#000" stop-opacity=".28"/><stop offset=".72" stop-color="#000" stop-opacity="1"/><stop offset="1" stop-color="#000" stop-opacity="1"/></linearGradient>
+    <linearGradient id="bottomFade" y1="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset=".72" stop-color="#000" stop-opacity=".92"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+    <mask id="softMask"><rect width="520" height="320" fill="url(#edge)"/><rect width="520" height="320" fill="url(#bottomFade)" opacity=".92"/></mask>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <g transform="translate(250 10) rotate(3) skewY(-2)" mask="url(#softMask)">
+    <image href="data:${payload.mime};base64,${payload.data}" x="0" y="0" width="300" height="290" preserveAspectRatio="xMidYMid meet" style="mix-blend-mode:multiply"/>
+  </g>
+  <ellipse cx="405" cy="286" rx="110" ry="16" fill="#000" opacity=".30" filter="url(#shadow)"/>
+</svg>`;
+        res.set("Content-Type", "image/svg+xml");
+        res.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+        return res.send(svg);
+    } catch (error) {
+        return res.status(404).end();
+    }
+});
+
 app.use(morgan("dev"));
 app.use(rateLimiter, authRoutes);
 app.use(rateLimiter, dashboardRoutes);
