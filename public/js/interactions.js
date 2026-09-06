@@ -29,7 +29,7 @@ document.addEventListener("pointerdown", function (e) {
     if (!rect.width || !rect.height) return;
 
     target.classList.add("gp-pressed");
-    window.setTimeout(() => target.classList.remove("gp-pressed"), 180);
+    window.setTimeout(() => target.classList.remove("gp-pressed"), 140);
 
     const ripple = document.createElement("span");
     const size = Math.max(rect.width, rect.height) * 1.65;
@@ -50,7 +50,7 @@ document.addEventListener("pointerdown", function (e) {
     target.appendChild(ripple);
     ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
 
-    gpHaptic(8);
+    gpHaptic(6);
 
 }, true);
 
