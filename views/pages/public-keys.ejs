@@ -23,81 +23,109 @@
 
         <%- include("../partials/topbar") %>
 
-                <section class="table-section">
+                <section class="table-section public-keys-page" id="publicKeysPage">
 
-            <div class="table-header">
-
-                <h2>Licenses</h2>
-
-<button
-    id="openCreateModal"
-    class="create-btn">
-
-    <i class="fa-solid fa-plus"></i>
-
-    Create Key
-
-</button>
-
+    <div class="pk-list-view" id="pkListView">
+        <div class="pk-page-heading">
+            <div>
+                <span class="pk-eyebrow"><i class="fa-solid fa-shield-halved"></i> Access control</span>
+                <h1>Licenses</h1>
+                <p>Manage your active access keys and device limits.</p>
             </div>
+            <button id="openCreateModal" class="create-btn">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create Key</span>
+            </button>
+        </div>
 
-            <div class="filter-bar">
+        <div class="pk-stat-grid" id="licenseStats" aria-label="License statistics">
+            <div class="pk-stat-card"><span class="pk-stat-icon"><i class="fa-solid fa-key"></i></span><div><small>Total Keys</small><strong id="statTotal">0</strong></div></div>
+            <div class="pk-stat-card"><span class="pk-stat-icon green"><i class="fa-solid fa-circle-check"></i></span><div><small>Active</small><strong id="statActive">0</strong></div></div>
+            <div class="pk-stat-card"><span class="pk-stat-icon blue"><i class="fa-solid fa-mobile-screen-button"></i></span><div><small>Devices</small><strong id="statDevices">0</strong></div></div>
+        </div>
 
-    <button class="filter-btn active" data-filter="all">
-        All
-    </button>
+        <div class="pk-toolbar">
+            <div class="filter-bar" role="tablist" aria-label="License status filters">
+                <button class="filter-btn active" data-filter="all">All <span id="filterAllCount">0</span></button>
+                <button class="filter-btn" data-filter="active">Active <span id="filterActiveCount">0</span></button>
+                <button class="filter-btn" data-filter="banned">Banned <span id="filterBannedCount">0</span></button>
+                <button class="filter-btn" data-filter="expired">Expired <span id="filterExpiredCount">0</span></button>
+            </div>
+            <label class="pk-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="licenseSearch" type="search" placeholder="Search keys..." autocomplete="off">
+                <kbd>/</kbd>
+            </label>
+        </div>
 
-    <button class="filter-btn" data-filter="active">
-        Active
-    </button>
-
-    <button class="filter-btn" data-filter="banned">
-        Banned
-    </button>
-
-    <button class="filter-btn" data-filter="expired">
-        Expired
-    </button>
-
-</div>
-
-            <div class="table-responsive">
-
+        <div class="table-responsive">
             <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Key</th>
-
-                        <th>Status</th>
-
-                        <th>Expiry</th>
-
-                        <th>Devices</th>
-
-                        <th>Action</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody id="licenseTable">
-
-                </tbody>
-
+                <thead><tr><th>Key</th><th>Status</th><th>Expiry</th><th>Devices</th><th>Action</th></tr></thead>
+                <tbody id="licenseTable"></tbody>
             </table>
+        </div>
+
+        <div id="mobileLicenseList" class="mobile-license-list"></div>
+        <div id="licenseEmpty" class="pk-empty" hidden>
+            <span><i class="fa-solid fa-key"></i></span>
+            <h3>No licenses found</h3>
+            <p>Try another filter or search term.</p>
+        </div>
+    </div>
+
+    <section class="pk-details-view" id="pkDetailsView" hidden aria-label="Key details">
+        <div class="pk-details-topbar">
+            <button type="button" id="backToKeys" class="pk-back-btn"><i class="fa-solid fa-arrow-left"></i><span>Public Keys</span></button>
+            <button type="button" class="pk-more-btn" aria-label="More actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+        </div>
+
+        <div class="pk-detail-hero">
+            <div class="pk-key-avatar"><i class="fa-solid fa-key"></i></div>
+            <div class="pk-detail-title">
+                <h1 id="detailKeyName">-</h1>
+                <span id="detailStatus" class="pk-status active"><i class="fa-solid fa-circle"></i> Active</span>
+                <p>License access key with multi-device support.</p>
             </div>
+        </div>
 
-            <div
-    id="mobileLicenseList"
-    class="mobile-license-list">
+        <div class="pk-detail-actions">
+            <button type="button" id="detailViewKeyBtn" class="pk-primary-action"><i class="fa-solid fa-eye"></i> View Key</button>
+            <button type="button" id="detailCopyBtn" class="pk-secondary-action"><i class="fa-regular fa-copy"></i> Copy Key</button>
+            <button type="button" id="detailBanBtn" class="pk-neutral-action"><i class="fa-solid fa-ban"></i> <span>Ban</span></button>
+            <button type="button" id="detailExtendBtn" class="pk-neutral-action"><i class="fa-solid fa-calendar-plus"></i> Extend</button>
+            <button type="button" id="detailResetBtn" class="pk-neutral-action"><i class="fa-solid fa-rotate"></i> Reset Device</button>
+            <button type="button" id="detailDeleteBtn" class="pk-danger-action"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
 
-</div>
+        <div class="pk-detail-card">
+            <div class="pk-card-title"><h2>Key Information</h2><span><i class="fa-solid fa-fingerprint"></i></span></div>
+            <div class="pk-info-list">
+                <div><span><i class="fa-solid fa-shield-halved"></i> Status</span><strong id="detailInfoStatus">-</strong></div>
+                <div><span><i class="fa-regular fa-calendar-plus"></i> Created On</span><strong id="detailCreated">-</strong></div>
+                <div><span><i class="fa-regular fa-calendar"></i> Expiry Date</span><strong id="detailExpiry">-</strong></div>
+                <div><span><i class="fa-regular fa-clock"></i> Days Left</span><strong id="detailDaysLeft">-</strong></div>
+                <div><span><i class="fa-solid fa-clock-rotate-left"></i> Last Used</span><strong id="detailLastUsed">-</strong></div>
+                <div><span><i class="fa-solid fa-mobile-screen-button"></i> Devices</span><strong id="detailDevices">-</strong></div>
+            </div>
+        </div>
 
-        </section>
+        <div class="pk-detail-card">
+            <div class="pk-card-title"><h2>Usage Statistics</h2><span><i class="fa-solid fa-chart-column"></i></span></div>
+            <div class="pk-usage-summary">
+                <div><strong id="usageUsed">0</strong><small>Devices Used</small></div>
+                <div><strong id="usageAllowed">0</strong><small>Total Allowed</small></div>
+            </div>
+            <div class="pk-progress"><span id="detailProgress"></span></div>
+            <div class="pk-progress-label"><span>Device utilization</span><strong id="detailProgressText">0%</strong></div>
+        </div>
 
+        <div class="pk-detail-card">
+            <div class="pk-card-title"><h2>Registered Devices</h2><span id="deviceCountBadge">0</span></div>
+            <div id="registeredDevices" class="pk-device-list"></div>
+        </div>
+    </section>
+
+</section>
         <%- include("../partials/modals") %>
 
 <script src="/js/utils.js"></script>

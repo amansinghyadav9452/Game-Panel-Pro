@@ -5,10 +5,26 @@ let allLicenses = [];
 
 let currentFilter = "all";
 
+// License values originate from the API and may contain user-controlled data.
+// Escape before inserting any value into an HTML template to prevent DOM XSS.
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function safeLicenseStatus(value) {
+    const status = String(value ?? "").toLowerCase();
+    return ["active", "banned", "expired"].includes(status) ? status : "unknown";
+}
+
 const filterButtons =
 document.querySelectorAll(".filter-btn");
 
-async function loadLicenses(endpoint = currentEndpoint) {
+window.loadLicenses = async function loadLicenses(endpoint = currentEndpoint) {
 
     if (window.GPLoading) {
         const table = document.getElementById("licenseTable");
@@ -51,7 +67,7 @@ async function loadLicenses(endpoint = currentEndpoint) {
 
 }
 
-function initLicenseManager(endpoint) {
+window.initLicenseManager = function initLicenseManager(endpoint) {
 
     currentEndpoint = endpoint;
 
@@ -71,7 +87,7 @@ function formatLastUsed(lastUsed) {
 
 }
 
-function renderLicenses(licenses) {
+window.renderLicenses = function renderLicenses(licenses) {
 
     const table = document.getElementById("licenseTable");
     const mobileList = document.getElementById("mobileLicenseList");
@@ -91,23 +107,23 @@ function renderLicenses(licenses) {
 
         <tr>
 
-            <td>${license.key}</td>
+            <td>${escapeHtml(license.key)}</td>
 
             <td>
-                <span class="status ${license.status}">
-                    ${license.status}
+                <span class="status ${safeLicenseStatus(license.status)}">
+                    ${escapeHtml(license.status)}
                 </span>
             </td>
 
-            <td>${formatDate(license.expiry)}</td>
+            <td>${escapeHtml(formatDate(license.expiry))}</td>
 
-            <td>${license.usedCount}/${license.maxUses}</td>
+            <td>${escapeHtml(license.usedCount)}/${escapeHtml(license.maxUses)}</td>
 
             <td>
 
                 <button
                     class="action-btn view-btn"
-                    data-key="${license.key}">
+                    data-key="${escapeHtml(license.key)}">
 
                     <i class="fa-solid fa-eye"></i>
 
@@ -125,15 +141,15 @@ function renderLicenses(licenses) {
 
         <div class="license-card">
 
-            <h3>${license.key}</h3>
+            <h3>${escapeHtml(license.key)}</h3>
 
             <p>
 
                 <strong>Status :</strong>
 
-                <span class="status ${license.status}">
+                <span class="status ${safeLicenseStatus(license.status)}">
 
-                    ${license.status}
+                    ${escapeHtml(license.status)}
 
                 </span>
 
@@ -143,7 +159,7 @@ function renderLicenses(licenses) {
 
                 <strong>Expiry :</strong>
 
-                ${formatDate(license.expiry)}
+                ${escapeHtml(formatDate(license.expiry))}
 
             </p>
 
@@ -151,14 +167,14 @@ function renderLicenses(licenses) {
 
                 <strong>Devices :</strong>
 
-                ${license.usedCount}/${license.maxUses}
+                ${escapeHtml(license.usedCount)}/${escapeHtml(license.maxUses)}
 
             </p>
             <p>
 
                 <strong>Last Used :</strong>
 
-                ${formatLastUsed(license.lastUsed)}
+                ${escapeHtml(formatLastUsed(license.lastUsed))}
 
             </p>
 
@@ -166,7 +182,7 @@ function renderLicenses(licenses) {
 
     <button
         class="action-btn view-btn"
-        data-key="${license.key}">
+        data-key="${escapeHtml(license.key)}">
 
         <i class="fa-solid fa-eye"></i>
 
@@ -176,7 +192,7 @@ function renderLicenses(licenses) {
 
     <button
         class="action-btn copy-btn"
-        data-key="${license.key}">
+        data-key="${escapeHtml(license.key)}">
 
         <i class="fa-regular fa-copy"></i>
 
@@ -194,7 +210,7 @@ function renderLicenses(licenses) {
 
 }
 
-function applyFilters() {
+window.applyFilters = function applyFilters() {
 
     let filtered = allLicenses.filter((license) => {
 
@@ -234,6 +250,11 @@ filterButtons.forEach((button) => {
 
 async function openLicenseModal(key){
 
+    if (typeof window.openKeyDetails === "function") {
+        window.openKeyDetails(key);
+        return;
+    }
+
     try{
 
 const endpoint =
@@ -241,7 +262,7 @@ const endpoint =
     "/dashboard/license";
 
 const response = await apiFetch(
-    `${endpoint}/${key}`
+    `${endpoint}/${encodeURIComponent(key)}`
 );
 
         const data = await response.json();
@@ -258,19 +279,19 @@ if (!data.success) {
         currentLicenseKey = license.key;
 
         document.getElementById("modalKey").textContent =
-            license.key;
+            String(license.key ?? "");
 
         document.getElementById("modalStatus").textContent =
-            license.status;
+            String(license.status ?? "");
 
         document.getElementById("modalExpiry").textContent =
             formatDate(license.expiry);
 
         document.getElementById("modalDevices").textContent =
-            `${license.usedCount}/${license.maxUses}`;
+            `${escapeHtml(license.usedCount)}/${escapeHtml(license.maxUses)}`;
 
         document.getElementById("modalLastDevice").textContent =
-            license.lastDevice || "N/A";
+            String(license.lastDevice ?? "N/A");
 
             const banBtn =
 document.getElementById("banLicenseBtn");
