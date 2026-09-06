@@ -141,13 +141,12 @@ async function searchLicense(type, key) {
 
 }
 
-async function deleteLicense(key) {
+async function deleteLicense(key, type = null) {
 
-    return await License.findOneAndDelete({
+    const filter = { key };
+    if (type) filter.type = type;
 
-        key
-
-    });
+    return await License.findOneAndDelete(filter);
 
 }
 

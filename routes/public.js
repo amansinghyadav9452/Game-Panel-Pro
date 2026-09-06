@@ -210,7 +210,8 @@ router.delete("/public/delete/:key", auth, apiAccess("public"), async (req, res)
     try {
 
 const license = await deleteLicense(
-    req.params.key
+    req.params.key,
+    "public"
 );
 
         if (!license) {

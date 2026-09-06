@@ -13,11 +13,11 @@ const __role = (typeof getPanelRole === "function") ? getPanelRole() : (localSto
 
 if (__role === "customer") {
 
-    initLicenseManager("/customer/public/list");
+    initLicenseManager("/customer/premium/list");
 
     window.LICENSE_DETAILS_ENDPOINT = "/customer/dashboard/license";
-    window.CREATE_LICENSE_ENDPOINT = "/customer/public/create";
-    window.DELETE_LICENSE_ENDPOINT = "/customer/public/delete";
+    window.CREATE_LICENSE_ENDPOINT = "/customer/premium/create";
+    window.DELETE_LICENSE_ENDPOINT = "/customer/premium/delete";
     window.BAN_LICENSE_ENDPOINT = "/customer/dashboard/ban";
     window.UNBAN_LICENSE_ENDPOINT = "/customer/dashboard/unban";
     window.EXTEND_LICENSE_ENDPOINT = "/customer/dashboard/extend";
@@ -25,14 +25,15 @@ if (__role === "customer") {
 
 } else {
 
-    initLicenseManager("/dashboard/licenses");
+    initLicenseManager("/premium/list");
 
-    window.LICENSE_DETAILS_ENDPOINT = "/dashboard/license";
-    window.DELETE_LICENSE_ENDPOINT ="/public/delete";
-    window.BAN_LICENSE_ENDPOINT = "/dashboard/ban";
-    window.UNBAN_LICENSE_ENDPOINT = "/dashboard/unban";
-    window.EXTEND_LICENSE_ENDPOINT ="/dashboard/extend";
-    window.RESET_DEVICE_ENDPOINT ="/dashboard/reset-device";
+    window.LICENSE_DETAILS_ENDPOINT = "/premium/license";
+    window.CREATE_LICENSE_ENDPOINT = "/premium/create";
+    window.DELETE_LICENSE_ENDPOINT = "/premium/delete";
+    window.BAN_LICENSE_ENDPOINT = "/premium/ban";
+    window.UNBAN_LICENSE_ENDPOINT = "/premium/unban";
+    window.EXTEND_LICENSE_ENDPOINT = "/premium/extend";
+    window.RESET_DEVICE_ENDPOINT = "/premium/reset-device";
 
 }
 
