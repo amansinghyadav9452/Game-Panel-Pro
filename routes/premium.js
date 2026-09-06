@@ -377,7 +377,7 @@ router.put("/premium/extend/:key", auth, apiAccess("premium"), async (req, res) 
 
         if (mode === "device") {
 
-            const addCount = Math.min(100, Math.floor(value));
+            const addCount = Math.min(10000, Math.floor(value));
 
             license.maxUses = (license.maxUses || 0) + addCount;
 

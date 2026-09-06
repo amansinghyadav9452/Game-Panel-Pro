@@ -1,6 +1,8 @@
 const express = require("express");
 const auth = require("../middleware/auth");
 const License = require("../models/License");
+const UserLog = require("../models/UserLog");
+const { resolveMarketingName } = require("../services/deviceLookup");
 const {
     syncLicenseStatus,
     listLicenses,
@@ -141,30 +143,63 @@ router.get("/dashboard/license/:key", auth, async (req, res) => {
 
     try {
 
-        const license = await License.findOne({
-
-            key: req.params.key
-
-        });
+        const license = await License.findOne({ key: req.params.key }).lean();
 
         if (!license) {
 
             return res.status(404).json({
-
                 success: false,
-
                 message: "License Not Found"
-
             });
 
         }
 
+        const serials = Array.isArray(license.devices) ? license.devices.filter(Boolean) : [];
+        const logs = serials.length
+            ? await UserLog.find({
+                licenseKey: license.key,
+                serial: { $in: serials },
+                status: "success"
+            })
+                .sort({ createdAt: -1 })
+                .select("serial deviceMarketingName deviceBrand deviceModel androidVersion createdAt")
+                .lean()
+            : [];
+
+        const latestBySerial = new Map();
+        for (const log of logs) {
+            if (log.serial && !latestBySerial.has(log.serial)) latestBySerial.set(log.serial, log);
+        }
+
+        const devices = await Promise.all(serials.map(async (serial, index) => {
+            const log = latestBySerial.get(serial);
+            let name = log?.deviceMarketingName || "";
+
+            if (!name && log?.deviceModel) {
+                const resolved = await resolveMarketingName(log.deviceModel);
+                name = resolved?.marketingName || "";
+            }
+
+            if (!name && log?.deviceBrand && log?.deviceModel) {
+                name = `${log.deviceBrand} ${log.deviceModel}`.trim();
+            }
+
+            if (!name && log?.deviceModel) name = log.deviceModel;
+            if (!name && log?.deviceBrand) name = `${log.deviceBrand} device`;
+            if (!name) name = `Registered Device ${index + 1}`;
+
+            return {
+                name,
+                brand: log?.deviceBrand || "",
+                model: log?.deviceModel || "",
+                androidVersion: log?.androidVersion || "",
+                registeredAt: log?.createdAt || null
+            };
+        }));
+
         res.json({
-
             success: true,
-
-            license
-
+            license: { ...license, devices }
         });
 
     } catch (err) {
@@ -172,11 +207,8 @@ router.get("/dashboard/license/:key", auth, async (req, res) => {
         console.error(err);
 
         res.status(500).json({
-
             success: false,
-
             message: "Server Error"
-
         });
 
     }
@@ -332,7 +364,7 @@ if (!license) {
 
 if (mode === "device") {
 
-    const addCount = Math.min(100, Math.floor(value));
+    const addCount = Math.min(10000, Math.floor(value));
 
     license.maxUses = (license.maxUses || 0) + addCount;
 

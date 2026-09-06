@@ -765,9 +765,9 @@ async function extendLicense() {
             document.getElementById("extendDeviceCount").value
         );
 
-        if (!count || count <= 0) {
+        if (!Number.isInteger(count) || count <= 0 || count > 10000) {
 
-            showToast("Error", "Enter a valid device count", "error");
+            showToast("Error", "Enter a whole number between 1 and 10,000", "error");
 
             return;
 

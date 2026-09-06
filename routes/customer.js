@@ -17,6 +17,7 @@ const {
     getCustomerCrudLogModel,
     getCustomerActivityLogModel
 } = require("../services/customerModels");
+const { resolveMarketingName } = require("../services/deviceLookup");
 
 const router = express.Router();
 const fetch = global.fetch;
@@ -861,20 +862,59 @@ router.get("/customer/dashboard/license/:key", customerAuth, async (req, res) =>
     try {
 
         const KeyModel = getCustomerKeyModel(req.customer._id);
-
         const doc = await KeyModel.findOne({ key: req.params.key }).lean();
 
         if (!doc) {
-
             return res.status(404).json({ success: false, message: "License Not Found" });
-
         }
 
-        res.json({ success: true, license: keyToLicenseShape(doc) });
+        const serials = Array.isArray(doc.devices) ? doc.devices.filter(Boolean) : [];
+        const ActivityLog = getCustomerActivityLogModel(req.customer._id);
+        const logs = serials.length
+            ? await ActivityLog.find({
+                licenseKey: doc.key,
+                serial: { $in: serials },
+                status: "success"
+            })
+                .sort({ createdAt: -1 })
+                .select("serial deviceBrand deviceModel androidVersion createdAt")
+                .lean()
+            : [];
 
-    }
+        const latestBySerial = new Map();
+        for (const log of logs) {
+            if (log.serial && !latestBySerial.has(log.serial)) latestBySerial.set(log.serial, log);
+        }
 
-    catch (err) {
+        const devices = await Promise.all(serials.map(async (serial, index) => {
+            const log = latestBySerial.get(serial);
+            let name = "";
+
+            if (log?.deviceModel) {
+                const resolved = await resolveMarketingName(log.deviceModel);
+                name = resolved?.marketingName || "";
+            }
+
+            if (!name && log?.deviceBrand && log?.deviceModel) name = `${log.deviceBrand} ${log.deviceModel}`.trim();
+            if (!name && log?.deviceModel) name = log.deviceModel;
+            if (!name && log?.deviceBrand) name = `${log.deviceBrand} device`;
+            if (!name) name = `Registered Device ${index + 1}`;
+
+            return {
+                name,
+                brand: log?.deviceBrand || "",
+                model: log?.deviceModel || "",
+                androidVersion: log?.androidVersion || "",
+                registeredAt: log?.createdAt || null
+            };
+        }));
+
+        res.json({
+            success: true,
+            license: { ...keyToLicenseShape(doc), devices }
+        });
+
+    } catch (err) {
 
         console.error(err);
 
@@ -1057,7 +1097,7 @@ router.put("/customer/dashboard/extend/:key", customerAuth, async (req, res) => 
 
         if (mode === "device") {
 
-            const addCount = Math.min(100, Math.floor(value));
+            const addCount = Math.min(10000, Math.floor(value));
 
             doc.maxUses = (doc.maxUses || 0) + addCount;
 

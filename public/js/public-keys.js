@@ -144,10 +144,11 @@ if (__role === "customer") {
             const percent = max > 0 ? Math.min(100, Math.round((used / max) * 100)) : 0;
 
             document.getElementById("detailKeyName").textContent = l.key;
+            const safeStatus = ["active", "banned", "expired"].includes(l.status) ? l.status : "unknown";
             const status = document.getElementById("detailStatus");
-            status.className = `pk-status ${l.status}`;
-            status.innerHTML = `<i class="fa-solid fa-circle"></i> ${esc(l.status)}`;
-            document.getElementById("detailInfoStatus").textContent = l.status;
+            status.className = `pk-status ${safeStatus}`;
+            status.innerHTML = `<i class="fa-solid fa-circle"></i> ${esc(safeStatus)}`;
+            document.getElementById("detailInfoStatus").textContent = safeStatus;
             document.getElementById("detailCreated").textContent = prettyDateTime(l.createdAt);
             document.getElementById("detailExpiry").textContent = prettyDate(l.expiry);
             document.getElementById("detailDaysLeft").textContent = days > 0 ? `${days} days` : "Expired";
@@ -162,13 +163,16 @@ if (__role === "customer") {
 
             const deviceList = document.getElementById("registeredDevices");
             const devices = Array.isArray(l.devices) ? l.devices : [];
-            deviceList.innerHTML = devices.length ? devices.map((device, i) => `
-                <div class="pk-device-row"><span class="pk-device-avatar"><i class="fa-solid fa-mobile-screen-button"></i></span><div><strong>${esc(device || `Device ${i + 1}`)}</strong><small>Registered device</small></div><i class="fa-solid fa-circle-check"></i></div>`).join("") : `<div class="pk-no-devices"><i class="fa-solid fa-mobile-screen-button"></i><span>No registered devices yet.</span></div>`;
+            deviceList.innerHTML = devices.length ? devices.map((device, i) => {
+                const d = typeof device === "string" ? { name: device } : (device || {});
+                const meta = [d.brand, d.model, d.androidVersion ? `Android ${d.androidVersion}` : ""].filter(Boolean).join(" • ");
+                return `<div class="pk-device-row"><span class="pk-device-avatar"><i class="fa-solid fa-mobile-screen-button"></i></span><div><strong title="${esc(d.name || `Registered Device ${i + 1}`)}">${esc(d.name || `Registered Device ${i + 1}`)}</strong><small>${esc(meta || "Registered device")}</small></div><i class="fa-solid fa-circle-check"></i></div>`;
+            }).join("") : `<div class="pk-no-devices"><i class="fa-solid fa-mobile-screen-button"></i><span>No registered devices yet.</span></div>`;
 
             const ban = document.getElementById("detailBanBtn");
             ban.querySelector("span")?.remove();
-            ban.innerHTML = `<i class="fa-solid fa-${l.status === "banned" ? "circle-check" : "ban"}"></i><span>${l.status === "banned" ? "Unban" : "Ban"}</span>`;
-            ban.classList.toggle("is-banned", l.status === "banned");
+            ban.innerHTML = `<i class="fa-solid fa-${safeStatus === "banned" ? "circle-check" : "ban"}"></i><span>${safeStatus === "banned" ? "Unban" : "Ban"}</span>`;
+            ban.classList.toggle("is-banned", safeStatus === "banned");
             details.hidden = false;
             list.hidden = true;
             document.body.classList.add("pk-details-open");

@@ -6,7 +6,7 @@
 <%- include("../partials/head") %>
 </head>
 
-<body>
+<body class="public-keys-context">
 
 <div id="overlay"></div>
 
@@ -76,7 +76,6 @@
     <section class="pk-details-view" id="pkDetailsView" hidden aria-label="Key details">
         <div class="pk-details-topbar">
             <button type="button" id="backToKeys" class="pk-back-btn"><i class="fa-solid fa-arrow-left"></i><span>Public Keys</span></button>
-            <button type="button" class="pk-more-btn" aria-label="More actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>
         </div>
 
         <div class="pk-detail-hero">
@@ -131,7 +130,7 @@
 <script src="/js/utils.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/license-manager.js"></script>
-<script src="/js/public-keys.js"></script>
+<script src="/js/public-keys.js?v=2"></script>
 
 </body>
 
