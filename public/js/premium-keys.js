@@ -174,6 +174,7 @@ if (__role === "customer") {
             ban.querySelector("span")?.remove();
             ban.innerHTML = `<i class="fa-solid fa-${safeStatus === "banned" ? "circle-check" : "ban"}"></i><span>${safeStatus === "banned" ? "Unban" : "Ban"}</span>`;
             ban.classList.toggle("is-banned", safeStatus === "banned");
+            ban.dataset.banAction = safeStatus === "banned" ? "unban" : "ban";
             details.hidden = false;
             list.hidden = true;
             document.body.classList.add("pk-details-open");
@@ -225,10 +226,10 @@ if (__role === "customer") {
         name.dataset.revealed = hidden ? "true" : "false";
         e.currentTarget.innerHTML = hidden ? '<i class="fa-solid fa-eye-slash"></i> Hide Key' : '<i class="fa-solid fa-eye"></i> View Key';
     });
-    document.getElementById("detailBanBtn")?.addEventListener("click", () => {
+    document.getElementById("detailBanBtn")?.addEventListener("click", (e) => {
         if (!selectedKey) return;
         currentLicenseKey = selectedKey;
-        banLicense();
+        banLicense(e.currentTarget);
     });
     document.getElementById("detailExtendBtn")?.addEventListener("click", () => {
         if (!selectedKey) return;

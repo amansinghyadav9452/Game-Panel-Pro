@@ -274,7 +274,8 @@ router.put("/dashboard/unban/:key", auth, async (req, res) => {
 
         const license = await License.findOne({
 
-            key: req.params.key
+            key: req.params.key,
+            type: "public"
 
         });
 

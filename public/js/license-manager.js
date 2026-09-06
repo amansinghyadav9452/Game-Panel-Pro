@@ -299,6 +299,7 @@ document.getElementById("banLicenseBtn");
 if (license.status === "banned") {
 
     banBtn.textContent = "Unban";
+    banBtn.dataset.banAction = "unban";
 
     banBtn.classList.remove("ban-btn");
 
@@ -307,6 +308,7 @@ if (license.status === "banned") {
 } else {
 
     banBtn.textContent = "Ban";
+    banBtn.dataset.banAction = "ban";
 
     banBtn.classList.remove("extend-btn");
 
@@ -364,16 +366,24 @@ closeModal.addEventListener("click",()=>{
 document.getElementById("banLicenseBtn")
 .addEventListener("click",banLicense);
 
-async function banLicense(){
+async function banLicense(sourceButton = null){
 
     try{
 
-const banBtn = document.getElementById("banLicenseBtn");
+const banBtn = sourceButton || document.getElementById("banLicenseBtn");
 
-const endpoint =
-    banBtn.textContent.trim() === "Unban"
-        ? window.UNBAN_LICENSE_ENDPOINT
-        : window.BAN_LICENSE_ENDPOINT;
+const action = banBtn?.dataset?.banAction ||
+    (banBtn?.textContent || "").trim().toLowerCase();
+
+const isUnban = action === "unban";
+const endpoint = isUnban
+    ? window.UNBAN_LICENSE_ENDPOINT
+    : window.BAN_LICENSE_ENDPOINT;
+
+if (!endpoint || !currentLicenseKey) {
+    showToast("Error", "License action is unavailable", "error");
+    return;
+}
 
 const response = await apiFetch(
 
@@ -391,11 +401,19 @@ const response = await apiFetch(
 
             showToast("Success", data.message);
 
-            modal.classList.remove("active");
+            const isDetailAction = banBtn?.id === "detailBanBtn";
+
+            if (isDetailAction && typeof window.openKeyDetails === "function") {
+                // Re-fetch the selected key so the detail screen immediately
+                // reflects the new status instead of showing stale "Banned" UI.
+                await window.openKeyDetails(currentLicenseKey, false);
+            } else {
+                modal.classList.remove("active");
+            }
 
             if (typeof loadStats === "function") {
-    loadStats();
-}
+                loadStats();
+            }
             loadLicenses();
 
         }else{
