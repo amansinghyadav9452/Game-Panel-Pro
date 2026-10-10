@@ -206,3 +206,25 @@ body.sidebar-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
     .layout .content { transition: none !important; transform: none !important; }
 }
+
+
+/* Cheetah-run page transition overlay (transparent WebM, AMOLED-friendly). */
+#gp-page-transition {
+    position: fixed; inset: 0; z-index: 100000;
+    display: grid; place-items: center;
+    background: rgba(0, 0, 0, .94);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 160ms ease, visibility 160ms ease;
+    contain: layout paint;
+}
+#gp-page-transition.is-visible { opacity: 1; visibility: visible; }
+#gp-page-transition.is-hiding { opacity: 0; }
+.gp-transition-scene { display:flex; flex-direction:column; align-items:center; gap:10px; width:min(78vw, 320px); }
+.gp-transition-cheetah { display:block; width:100%; height:auto; aspect-ratio:4/3; object-fit:contain; }
+.gp-transition-label { color:#c6a15b; font:600 11px/1.2 system-ui,sans-serif; letter-spacing:.28em; }
+.gp-transition-label::after { content:""; display:inline-block; width:14px; height:1px; margin:0 0 3px 9px; background:#c6a15b; animation:gp-loading-line .55s ease-in-out infinite alternate; }
+@keyframes gp-loading-line { from { transform:scaleX(.25); opacity:.35; } to { transform:scaleX(1); opacity:1; } }
+@media (prefers-reduced-motion: reduce) {
+    #gp-page-transition { transition:none; }
+    .gp-transition-label::after { animation:none; }
+}

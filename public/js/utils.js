@@ -108,6 +108,33 @@ function copyText(text, btnEl) {
 }
 
 let gpSidebarHistoryEntry = false;
+let gpTransitionTimer = null;
+
+function showCheetahTransition() {
+    let overlay = document.getElementById("gp-page-transition");
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "gp-page-transition";
+        overlay.setAttribute("aria-hidden", "true");
+        overlay.innerHTML = '<div class="gp-transition-scene"><video class="gp-transition-cheetah" muted playsinline preload="auto"><source src="/media/gp-cheetah-transition.webm" type="video/webm"></video><span class="gp-transition-label">LOADING</span></div>';
+        document.body.appendChild(overlay);
+    }
+    const video = overlay.querySelector("video");
+    overlay.classList.remove("is-visible", "is-hiding");
+    // Restart the short running-cheetah clip on every navigation/back restore.
+    if (video) {
+        try { video.pause(); video.currentTime = 0; const p = video.play(); if (p && p.catch) p.catch(() => {}); } catch (_) {}
+    }
+    requestAnimationFrame(() => overlay.classList.add("is-visible"));
+    clearTimeout(gpTransitionTimer);
+    gpTransitionTimer = setTimeout(() => {
+        overlay.classList.add("is-hiding");
+        setTimeout(() => {
+            overlay.classList.remove("is-visible", "is-hiding");
+            if (video) { try { video.pause(); video.currentTime = 0; } catch (_) {} }
+        }, 180);
+    }, 520);
+}
 
 function openSidebar() {
 
@@ -162,16 +189,20 @@ function initSidebar() {
     window.addEventListener("popstate", () => {
         if (document.querySelector(".sidebar.active") || document.getElementById("overlay")?.classList.contains("active")) {
             closeSidebar(true);
-        } else {
-            gpSidebarHistoryEntry = false;
+            return;
         }
+        gpSidebarHistoryEntry = false;
+        // Browser/Android Back: animate the restored page as it becomes active.
+        showCheetahTransition();
     });
 
-    window.addEventListener("pageshow", () => {
+    window.addEventListener("pageshow", (event) => {
         closeSidebar(true);
         document.body.classList.remove("page-leaving");
         document.body.classList.add("page-entering");
         requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove("page-entering")));
+        // bfcache restores do not execute a fresh page load, so explicitly play the transition.
+        if (event.persisted) showCheetahTransition();
     });
 
     // A real route change gets a short exit transition. If a drawer history
@@ -189,13 +220,14 @@ function initSidebar() {
         event.preventDefault();
         closeSidebar(true);
         document.body.classList.add("page-leaving");
+        showCheetahTransition();
         const destination = url.href;
         const navigate = () => { location.href = destination; };
         if (history.state && history.state.__gpSidebarOpen) {
             try { history.back(); } catch (_) {}
             setTimeout(navigate, 40);
         } else {
-            setTimeout(navigate, 140);
+            setTimeout(navigate, 480);
         }
     });
 }
