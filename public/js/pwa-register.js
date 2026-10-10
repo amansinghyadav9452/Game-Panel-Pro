@@ -19,19 +19,8 @@ if ("serviceWorker" in navigator) {
 
     });
 
-    // Naya service worker activate hote hi (sw.js me skipWaiting +
-    // clients.claim() already set hai) yeh event fire hota hai - page
-    // ko ek baar apne aap refresh kar do taaki naya update turant dikhe,
-    // bina user ko kuch manually karna pade.
-    let refreshed = false;
-
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-
-        if (refreshed) return;
-        refreshed = true;
-
-        window.location.reload();
-
-    });
+    // Do not reload the page when a Service Worker takes control.
+    // Auto-reloading here interrupted users when they opened the login page.
+    // The updated worker can take control without forcing a navigation.
 
 }
