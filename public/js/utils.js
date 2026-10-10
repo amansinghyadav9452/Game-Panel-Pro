@@ -107,6 +107,8 @@ function copyText(text, btnEl) {
 
 }
 
+let gpSidebarHistoryEntry = false;
+
 function openSidebar() {
 
     const sidebar = document.querySelector(".sidebar");
@@ -116,39 +118,86 @@ function openSidebar() {
 
     sidebar.classList.add("active");
     overlay.classList.add("active");
+    document.body.classList.add("sidebar-open");
 
+    // Add one disposable history entry so Android/browser Back closes the
+    // drawer before navigating away from the current page.
+    if (!gpSidebarHistoryEntry) {
+        try {
+            history.pushState({ ...(history.state || {}), __gpSidebarOpen: true }, "", location.href);
+            gpSidebarHistoryEntry = true;
+        } catch (_) {}
+    }
 }
 
-function closeSidebar() {
+function closeSidebar(fromPopState = false) {
 
     const sidebar = document.querySelector(".sidebar");
     const overlay = document.getElementById("overlay");
 
-    if (!sidebar || !overlay) return;
+    if (sidebar) sidebar.classList.remove("active");
+    if (overlay) overlay.classList.remove("active");
+    document.body.classList.remove("sidebar-open");
 
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
-
+    if (!fromPopState && gpSidebarHistoryEntry && history.state && history.state.__gpSidebarOpen) {
+        gpSidebarHistoryEntry = false;
+        history.back();
+    } else if (fromPopState) {
+        gpSidebarHistoryEntry = false;
+    }
 }
 
-    function initSidebar() {
+function initSidebar() {
 
     const menuBtn = document.getElementById("menuBtn");
     const overlay = document.getElementById("overlay");
     const closeBtn = document.getElementById("closeSidebar");
 
-    if (menuBtn) {
-        menuBtn.addEventListener("click", openSidebar);
-    }
+    if (menuBtn) menuBtn.addEventListener("click", openSidebar);
+    if (overlay) overlay.addEventListener("click", () => closeSidebar());
+    if (closeBtn) closeBtn.addEventListener("click", () => closeSidebar());
 
-    if (overlay) {
-        overlay.addEventListener("click", closeSidebar);
-    }
+    // Back closes an open drawer. pageshow also runs when Android restores a
+    // page from the back-forward cache, where old CSS classes can survive.
+    window.addEventListener("popstate", () => {
+        if (document.querySelector(".sidebar.active") || document.getElementById("overlay")?.classList.contains("active")) {
+            closeSidebar(true);
+        } else {
+            gpSidebarHistoryEntry = false;
+        }
+    });
 
-    if (closeBtn) {
-        closeBtn.addEventListener("click", closeSidebar);
-    }
+    window.addEventListener("pageshow", () => {
+        closeSidebar(true);
+        document.body.classList.remove("page-leaving");
+        document.body.classList.add("page-entering");
+        requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove("page-entering")));
+    });
 
+    // A real route change gets a short exit transition. If a drawer history
+    // entry exists, remove it first so Back does not reopen the previous drawer.
+    document.addEventListener("click", (event) => {
+        const link = event.target.closest("a[href]");
+        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (link.target === "_blank" || link.hasAttribute("download")) return;
+        const url = new URL(link.href, location.href);
+        if (url.origin !== location.origin || url.pathname === location.pathname && url.search === location.search && url.hash) return;
+        if (link.getAttribute("href").startsWith("javascript:")) return;
+
+        // Only animate panel navigation, not external anchors or in-page jumps.
+        if (!document.querySelector(".layout .content")) return;
+        event.preventDefault();
+        closeSidebar(true);
+        document.body.classList.add("page-leaving");
+        const destination = url.href;
+        const navigate = () => { location.href = destination; };
+        if (history.state && history.state.__gpSidebarOpen) {
+            try { history.back(); } catch (_) {}
+            setTimeout(navigate, 40);
+        } else {
+            setTimeout(navigate, 140);
+        }
+    });
 }
 
 function initAutoLogout(timeout = 15 * 60 * 1000) {

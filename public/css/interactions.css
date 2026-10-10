@@ -186,3 +186,23 @@
 @media (prefers-reduced-motion: reduce) {
     .gp-ripple, .gp-click-flash, .gp-pressed { animation:none !important; transition:none !important; }
 }
+
+
+/* Consistent page navigation transitions and mobile drawer state. */
+.layout .content {
+    transition: opacity 140ms ease, transform 140ms ease;
+    will-change: opacity, transform;
+}
+body.page-entering .layout .content {
+    opacity: .72;
+    transform: translateY(5px);
+}
+body.page-leaving .layout .content {
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+}
+body.sidebar-open { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+    .layout .content { transition: none !important; transform: none !important; }
+}
