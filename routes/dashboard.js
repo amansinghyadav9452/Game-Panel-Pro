@@ -369,6 +369,15 @@ if (mode === "device") {
 
     await license.save();
 
+    // Track public-key device-limit extensions in the dashboard activity feed.
+    await logActivity({
+        action: "EXTEND",
+        licenseKey: license.key,
+        licenseType: license.type || "public",
+        admin: req.admin.username,
+        details: `Device limit +${addCount} (now ${license.maxUses})`
+    });
+
     return res.json({
 
         success: true,

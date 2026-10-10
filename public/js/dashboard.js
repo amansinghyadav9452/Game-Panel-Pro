@@ -156,6 +156,12 @@ if (activity.action === "CREATE") {
             ? "Premium Key Created"
             : "Public Key Created";
 
+} else if (activity.action === "EXTEND" && /device\s+limit/i.test(activity.details || "")) {
+
+    actionText = activity.licenseType === "premium"
+        ? "Premium Device Limit Extended"
+        : "Public Device Limit Extended";
+
 }
 
     container.innerHTML += `
