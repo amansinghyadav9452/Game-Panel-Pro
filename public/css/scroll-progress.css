@@ -1,0 +1,39 @@
+/* Global page scroll progress indicator */
+#gp-scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 2147483000;
+  pointer-events: none;
+  background: rgba(148, 163, 184, 0.14);
+}
+#gp-scroll-progress-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, #60a5fa 0%, #34d399 55%, #a78bfa 100%);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
+  transition: width 80ms linear;
+}
+#gp-scroll-status {
+  position: fixed;
+  top: 9px;
+  right: 9px;
+  z-index: 2147482999;
+  pointer-events: none;
+  padding: 4px 8px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.82);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font: 600 10px/1.2 "Plus Jakarta Sans", system-ui, sans-serif;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  opacity: .92;
+}
+@media (prefers-reduced-motion: reduce) {
+  #gp-scroll-progress-fill { transition: none; }
+}
