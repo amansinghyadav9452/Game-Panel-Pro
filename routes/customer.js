@@ -735,6 +735,21 @@ router.get("/customer/dashboard/stats", customerAuth, async (req, res) => {
 
         const KeyModel = getCustomerKeyModel(req.customer._id);
 
+        // Keep customer key statuses in sync with their actual expiry before
+        // computing dashboard totals. Unlike admin keys, customer keys do not
+        // use the global License maintenance job.
+        const now = new Date();
+        await Promise.all([
+            KeyModel.updateMany(
+                { status: "active", expiry: { $lte: now } },
+                { $set: { status: "expired" } }
+            ),
+            KeyModel.updateMany(
+                { status: "expired", expiry: { $gt: now } },
+                { $set: { status: "active" } }
+            )
+        ]);
+
         const counts = await KeyModel.aggregate([
             { $group: { _id: "$status", count: { $sum: 1 } } }
         ]);
@@ -750,14 +765,19 @@ router.get("/customer/dashboard/stats", customerAuth, async (req, res) => {
         }
 
         const totalKeys = activeKeys + expiredKeys + bannedKeys;
+        const CrudLog = getCustomerCrudLogModel(req.customer._id);
+        const indiaNow = new Date(now.getTime() + 330 * 60 * 1000);
+        const dayStart = new Date(Date.UTC(indiaNow.getUTCFullYear(), indiaNow.getUTCMonth(), indiaNow.getUTCDate()) - 330 * 60 * 1000);
+        const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+        const todayLogs = await CrudLog.find({ createdAt: { $gte: dayStart, $lt: dayEnd } }).select("action").lean();
+        const today = {
+            totalKeys: todayLogs.filter(x => x.action === "created").length,
+            activeKeys: todayLogs.filter(x => ["created", "unbanned"].includes(x.action)).length,
+            expiredKeys: await KeyModel.countDocuments({ status: "expired", expiry: { $gte: dayStart, $lt: dayEnd } }),
+            bannedKeys: todayLogs.filter(x => x.action === "banned").length
+        };
 
-        res.json({
-
-            success: true,
-
-            stats: { totalKeys, activeKeys, expiredKeys, bannedKeys }
-
-        });
+        res.json({ success: true, stats: { totalKeys, activeKeys, expiredKeys, bannedKeys, today } });
 
     }
 

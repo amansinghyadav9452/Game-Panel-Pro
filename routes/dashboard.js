@@ -81,23 +81,21 @@ router.get("/dashboard", auth, async (req, res) => {
 
         const totalKeys = activeKeys + expiredKeys + bannedKeys;
 
-        res.json({
+        // Counts are based on real records for the current India-local day.
+        const Activity = require("../models/Activity");
+        const now = new Date();
+        const indiaNow = new Date(now.getTime() + 330 * 60 * 1000);
+        const dayStart = new Date(Date.UTC(indiaNow.getUTCFullYear(), indiaNow.getUTCMonth(), indiaNow.getUTCDate()) - 330 * 60 * 1000);
+        const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+        const todayActivities = await Activity.find({ createdAt: { $gte: dayStart, $lt: dayEnd } }).select("action").lean();
+        const today = {
+            totalKeys: todayActivities.filter(x => x.action === "CREATE").length,
+            activeKeys: todayActivities.filter(x => ["CREATE", "UNBAN"].includes(x.action)).length,
+            expiredKeys: await License.countDocuments({ status: "expired", expiry: { $gte: dayStart, $lt: dayEnd } }),
+            bannedKeys: todayActivities.filter(x => x.action === "BAN").length
+        };
 
-            success: true,
-
-            stats: {
-
-                totalKeys,
-
-                activeKeys,
-
-                expiredKeys,
-
-                bannedKeys
-
-            }
-
-        });
+        res.json({ success: true, stats: { totalKeys, activeKeys, expiredKeys, bannedKeys, today } });
 
     } catch (err) {
 
@@ -440,6 +438,14 @@ router.put("/dashboard/reset-device/:key", auth, async (req, res) => {
         license.lastUsed = null;
 
         await license.save();
+
+        await logActivity({
+            action: "RESET_DEVICE",
+            licenseKey: license.key,
+            licenseType: license.type,
+            admin: req.admin.username,
+            details: "Device reset; registered devices cleared"
+        });
 
         res.json({
             success: true,

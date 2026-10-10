@@ -34,6 +34,12 @@ if (!data.success) {
 
         animateCounter(document.getElementById("bannedKeys"), data.stats.bannedKeys);
 
+        const today = data.stats.today || {};
+        [["trendTotal", today.totalKeys, "Created Today"], ["trendActive", today.activeKeys, "Activated Today"], ["trendExpired", today.expiredKeys, "Expired Today"], ["trendBanned", today.bannedKeys, "Banned Today"]].forEach(([id, count, label]) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = `<i class="fa-solid fa-calendar-day"></i> ${Number(count || 0)} ${label}`;
+        });
+
     } catch (err) {
 
         console.error(err);
