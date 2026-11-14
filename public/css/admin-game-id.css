@@ -1,345 +1,292 @@
-/* =========================================================
-   ADMIN GAME ID
-   ========================================================= */
-
+/* Compact Admin Game ID tile: matches the other Settings tiles. */
 .admin-game-id-card {
-    position: relative;
-    overflow: hidden;
-}
-
-.admin-game-id-card .setting-description {
-    margin-bottom: 18px;
-}
-
-
-/* ---------------------------------------------------------
-   INPUT + SAVE ROW
-   --------------------------------------------------------- */
-
-.admin-game-id-field {
     display: flex;
-    align-items: stretch;
-    gap: 10px;
-    width: 100%;
-    margin-top: 16px;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+    padding: 18px 20px;
+    cursor: default;
 }
 
+.admin-game-id-card:hover {
+    transform: none;
+}
 
-/* ---------------------------------------------------------
-   INPUT
-   --------------------------------------------------------- */
+.admin-game-id-card .admin-game-id-icon {
+    float: none !important;
+    margin: 0 !important;
+    width: 62px;
+    height: 62px;
+    flex: 0 0 62px;
+}
 
-.admin-game-id-input {
+.admin-game-id-main {
     flex: 1 1 auto;
     min-width: 0;
-
-    height: 48px;
-
-    padding: 0 15px;
-
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 12px;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.055),
-            rgba(255, 255, 255, 0.025)
-        );
-
-    color: #ffffff;
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 500;
-
-    outline: none;
-
-    text-transform: uppercase;
-    letter-spacing: 0.055em;
-
-    box-sizing: border-box;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease,
-        transform 0.15s ease;
 }
 
-
-.admin-game-id-input::placeholder {
-    color: rgba(255, 255, 255, 0.38);
-
-    text-transform: none;
-    letter-spacing: normal;
+.admin-game-id-card .setting-info h3 {
+    margin: 0;
 }
 
-
-.admin-game-id-input:hover {
-    border-color: rgba(255, 255, 255, 0.16);
+.admin-game-id-card .setting-info p {
+    margin: 5px 0 0;
 }
 
-
-.admin-game-id-input:focus {
-    border-color: #7567ff;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(117, 103, 255, 0.10),
-            rgba(255, 255, 255, 0.035)
-        );
-
-    box-shadow:
-        0 0 0 3px rgba(117, 103, 255, 0.13),
-        0 8px 25px rgba(0, 0, 0, 0.16);
+.admin-game-id-saved {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 9px;
+    color: #9ce8c2;
+    font-size: 13px;
+    font-weight: 600;
 }
 
-
-/* Error state */
-
-.admin-game-id-input.input-error {
-    border-color: #ff6262;
-
-    box-shadow:
-        0 0 0 3px rgba(255, 98, 98, 0.10);
+.admin-game-id-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    color: #071b14;
+    background: #35d49a;
+    font-size: 10px;
 }
 
-
-/* Success state */
-
-.admin-game-id-input.input-success {
-    border-color: #35d49a;
-
-    box-shadow:
-        0 0 0 3px rgba(53, 212, 154, 0.10);
-}
-
-
-/* ---------------------------------------------------------
-   SAVE BUTTON
-   --------------------------------------------------------- */
-
+.admin-game-id-edit,
+.admin-game-id-cancel,
 .admin-game-id-save {
-    flex: 0 0 104px;
-
-    height: 48px;
-
-    padding: 0 16px;
-
-    border: 0;
-    border-radius: 12px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #7667ff,
-            #6555ed
-        );
-
-    color: #ffffff;
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 7px 20px rgba(101, 85, 237, 0.20);
-
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.2s ease,
-        opacity 0.2s ease,
-        filter 0.2s ease;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-
+    min-height: 42px;
+    padding: 0 16px;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
     white-space: nowrap;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease, opacity .18s ease;
 }
 
+.admin-game-id-edit {
+    flex: 0 0 auto;
+    color: #e8c27c;
+    background: rgba(201, 151, 74, .08);
+    border: 1px solid rgba(201, 151, 74, .32);
+}
+
+.admin-game-id-edit:hover,
+.admin-game-id-cancel:hover {
+    background: rgba(201, 151, 74, .16);
+    border-color: rgba(201, 151, 74, .6);
+}
+
+.admin-game-id-editor {
+    margin-top: 12px;
+}
+
+.admin-game-id-editor[hidden],
+.admin-game-id-saved[hidden],
+.admin-game-id-edit[hidden],
+.admin-game-id-cancel[hidden] {
+    display: none !important;
+}
+
+.admin-game-id-field {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+}
+
+.admin-game-id-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 42px;
+    padding: 0 13px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 11px;
+    background: rgba(0,0,0,.18);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.admin-game-id-input::placeholder {
+    color: rgba(255,255,255,.4);
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+}
+
+.admin-game-id-input:focus {
+    border-color: var(--brass, #c9974a);
+    box-shadow: 0 0 0 3px rgba(201,151,74,.12);
+}
+
+.admin-game-id-input.input-error {
+    border-color: #ff6262;
+    box-shadow: 0 0 0 3px rgba(255,98,98,.1);
+}
+
+.admin-game-id-input.input-success {
+    border-color: #35d49a;
+}
+
+.admin-game-id-save {
+    flex: 0 0 92px;
+    min-height: 42px;
+    color: #fff;
+    border: 0;
+    background: linear-gradient(135deg, #7667ff, #6555ed);
+    box-shadow: 0 6px 16px rgba(101,85,237,.18);
+}
 
 .admin-game-id-save:hover {
-    filter: brightness(1.06);
-
-    box-shadow:
-        0 9px 25px rgba(101, 85, 237, 0.30);
-
+    filter: brightness(1.07);
     transform: translateY(-1px);
 }
 
-
-.admin-game-id-save:active {
-    transform: translateY(1px);
-
-    box-shadow:
-        0 4px 12px rgba(101, 85, 237, 0.20);
-}
-
-
 .admin-game-id-save:disabled {
-    opacity: 0.65;
+    opacity: .65;
     cursor: not-allowed;
-
     transform: none;
-
-    box-shadow:
-        0 5px 14px rgba(101, 85, 237, 0.12);
 }
 
-
-/* ---------------------------------------------------------
-   LOADING SPINNER
-   --------------------------------------------------------- */
-
-.game-id-spinner {
-    width: 15px;
-    height: 15px;
-
-    border: 2px solid rgba(255, 255, 255, 0.35);
-    border-top-color: #ffffff;
-
-    border-radius: 50%;
-
-    animation: gameIdSpin 0.7s linear infinite;
+.admin-game-id-cancel {
+    flex: 0 0 auto;
+    color: #cbd5e1;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.12);
 }
-
-
-@keyframes gameIdSpin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-
-/* ---------------------------------------------------------
-   STATUS MESSAGE
-   --------------------------------------------------------- */
 
 .admin-game-id-status {
-    min-height: 20px;
-
-    margin-top: 9px;
-
-    font-size: 13px;
+    min-height: 0;
+    margin-top: 0;
+    font-size: 12px;
+    line-height: 18px;
     font-weight: 500;
-
-    line-height: 20px;
-
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
 }
 
-
-.admin-game-id-status.success {
-    color: #35d49a;
+.admin-game-id-status:not(:empty) {
+    margin-top: 7px;
 }
 
+.admin-game-id-status.success { color: #35d49a; }
+.admin-game-id-status.error { color: #ff7777; }
 
-.admin-game-id-status.error {
-    color: #ff6b6b;
+.game-id-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: gameIdSpin .7s linear infinite;
 }
 
-/* =========================================================
-   FIX: KEEP FORM CONTROLS ABOVE DECORATIVE CARD LAYERS
-   ========================================================= */
+@keyframes gameIdSpin { to { transform: rotate(360deg); } }
 
-.admin-game-id-card {
-    position: relative;
-    z-index: 5;
-    isolation: isolate;
-}
-
-.admin-game-id-card .admin-game-id-field,
-.admin-game-id-card .admin-game-id-status {
-    position: relative;
-    z-index: 10;
-}
-
-.admin-game-id-card .admin-game-id-input,
-.admin-game-id-card .admin-game-id-save {
-    position: relative;
-    z-index: 11;
-
-    pointer-events: auto;
-    touch-action: manipulation;
-}
-
-/* Prevent decorative effects from ever blocking taps */
 .admin-game-id-card::before,
 .admin-game-id-card::after {
     pointer-events: none !important;
 }
 
-
-/* ---------------------------------------------------------
-   MOBILE
-   --------------------------------------------------------- */
-
-/*
- * DON'T stack the input and button.
- * Keep them side-by-side like a proper control instead
- * of making the Save button occupy half the planet.
- */
-
 @media (max-width: 560px) {
-
-    .admin-game-id-field {
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-
-        gap: 8px;
+    .admin-game-id-card {
+        gap: 14px;
+        padding: 16px;
+        border-radius: 22px;
     }
 
-    .admin-game-id-input {
-        height: 46px;
-
-        padding-left: 13px;
-        padding-right: 13px;
-
-        font-size: 14px;
-
-        border-radius: 11px;
+    .admin-game-id-card .admin-game-id-icon {
+        width: 62px;
+        height: 62px;
+        flex-basis: 62px;
+        border-radius: 18px;
     }
 
-    .admin-game-id-save {
-        flex: 0 0 92px;
-
-        height: 46px;
-
-        padding: 0 10px;
-
-        font-size: 14px;
-
-        border-radius: 11px;
+    .admin-game-id-card .setting-info h3 {
+        font-size: 18px;
     }
-}
 
+    .admin-game-id-card .setting-info p {
+        font-size: 13px;
+        line-height: 1.4;
+    }
 
-/* Very small screens */
-
-@media (max-width: 360px) {
+    .admin-game-id-edit {
+        min-height: 40px;
+        padding: 0 12px;
+        font-size: 13px;
+    }
 
     .admin-game-id-field {
         gap: 7px;
     }
 
     .admin-game-id-input {
+        height: 42px;
+        padding: 0 10px;
         font-size: 13px;
-
-        letter-spacing: 0.035em;
     }
 
     .admin-game-id-save {
-        flex-basis: 82px;
-
+        flex-basis: 78px;
+        min-height: 42px;
+        padding: 0 8px;
         font-size: 13px;
+    }
+
+    .admin-game-id-cancel {
+        min-height: 42px;
+        padding: 0 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 380px) {
+    .admin-game-id-card {
+        gap: 11px;
+        padding: 14px;
+    }
+
+    .admin-game-id-card .admin-game-id-icon {
+        width: 54px;
+        height: 54px;
+        flex-basis: 54px;
+    }
+
+    .admin-game-id-edit span {
+        display: none;
+    }
+
+    .admin-game-id-edit {
+        width: 40px;
+        min-width: 40px;
+        padding: 0;
+    }
+
+    .admin-game-id-field {
+        flex-wrap: wrap;
+    }
+
+    .admin-game-id-input {
+        flex: 1 1 100%;
+    }
+
+    .admin-game-id-save,
+    .admin-game-id-cancel {
+        flex: 1 1 0;
     }
 }
