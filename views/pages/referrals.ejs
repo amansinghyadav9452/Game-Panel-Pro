@@ -3,8 +3,7 @@
 <head>
 <title>Game Panel | Referrals</title>
 <%- include("../partials/head") %>
-<link rel="stylesheet" href="/css/customer.css">
-    <link rel="stylesheet" href="/css/theme.css?v=6" id="fixed-light-last">
+<link rel="stylesheet" href="/css/customer.css?v=2">
 </head>
 <body class="referrals-page">
 <div id="overlay"></div>
@@ -18,7 +17,7 @@
         <section class="overview-section referral-console">
             <div class="cust-toolbar referral-toolbar">
                 <h2><i class="fa-solid fa-ticket"></i> Referral Codes</h2>
-                <input type="number" id="refExpiryDays" placeholder="Valid for (days)" min="1" max="3650" value="30" aria-label="Referral validity in days">
+                <label class="referral-expiry-create"><span>Code valid until</span><input type="datetime-local" id="refExpiryAt" aria-label="Referral expiry date and time" required></label>
                 <button id="createReferralBtn" class="cust-primary-btn" type="button">
                     <i class="fa-solid fa-plus"></i> Generate Code
                 </button>
@@ -33,6 +32,6 @@
 </div>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
-<script src="/js/referrals.js"></script>
+<script src="/js/referrals.js?v=2"></script>
 </body>
 </html>

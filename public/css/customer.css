@@ -428,3 +428,148 @@
         transition:none;
     }
 }
+
+
+/* Referral expiry controls */
+.referral-expiry-create {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    color: #AEB7C4;
+    font-family: var(--font-display, sans-serif);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .35px;
+    text-transform: uppercase;
+}
+
+.referral-expiry-create input,
+.referral-expiry-input {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: 1px solid #303640;
+    border-radius: 8px;
+    background: #0D1015;
+    color: #F8FAFC;
+    color-scheme: dark;
+    font-family: var(--font-mono, monospace);
+    font-size: 12px;
+}
+
+.referral-expiry-create input:focus,
+.referral-expiry-input:focus {
+    border-color: #C9974A !important;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(201,151,74,.14) !important;
+}
+
+.referral-card-main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.referral-expiry-editor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 9px;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #303640;
+    border-radius: 10px;
+    background: #10141A;
+}
+
+.referral-expiry-editor[hidden] {
+    display: none !important;
+}
+
+.referral-expiry-editor label {
+    display: flex;
+    flex: 1 1 210px;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    color: #AEB7C4;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+}
+
+.referral-expiry-editor small {
+    flex: 1 0 100%;
+    color: #8B95A3;
+    font-size: 10px;
+}
+
+.referral-expiry-editor-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.referral-expiry-editor-actions button,
+.referral-actions button.expiry-edit {
+    min-height: 36px;
+    padding: 8px 11px;
+    border: 1px solid #414956;
+    border-radius: 8px;
+    background: #1A1E26 !important;
+    color: #E8D3B1 !important;
+    font-family: var(--font-display, sans-serif);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.referral-expiry-editor-actions button.expiry-save {
+    border-color: #A77A3A;
+    background: linear-gradient(135deg, #E0B471, #C9974A) !important;
+    color: #17130D !important;
+}
+
+.referral-expiry-note {
+    margin-top: 7px;
+    color: #AEB7C4;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+@media (max-width: 680px) {
+    .referral-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    .referral-expiry-create input,
+    .referral-toolbar .cust-primary-btn {
+        width: 100%;
+    }
+
+    .referral-swipe-content {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .referral-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .referral-expiry-editor {
+        align-items: stretch;
+    }
+
+    .referral-expiry-editor-actions {
+        width: 100%;
+    }
+
+    .referral-expiry-editor-actions button {
+        flex: 1 1 0;
+    }
+}

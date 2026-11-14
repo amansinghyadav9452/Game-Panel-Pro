@@ -38,21 +38,32 @@ router.post("/referral", auth, async (req, res) => {
 
     try {
 
-        const { expiryDays, note } = req.body;
+        const { expiryAt: requestedExpiryAt, expiryDays, note } = req.body;
 
-        const days = Number(expiryDays);
+        // Exact date/time is used by the current admin UI. Keep expiryDays
+        // support for older clients and integrations.
+        let expiryAt;
 
-        if (!Number.isFinite(days) || days <= 0) {
-
-            return res.status(400).json({
-                success: false,
-                message: "Valid expiryDays is required."
-            });
-
+        if (requestedExpiryAt) {
+            expiryAt = new Date(requestedExpiryAt);
+        } else {
+            const days = Number(expiryDays);
+            if (!Number.isFinite(days) || days <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Choose a valid referral expiry date."
+                });
+            }
+            expiryAt = new Date();
+            expiryAt.setDate(expiryAt.getDate() + days);
         }
 
-        const expiryAt = new Date();
-        expiryAt.setDate(expiryAt.getDate() + days);
+        if (Number.isNaN(expiryAt.getTime()) || expiryAt <= new Date()) {
+            return res.status(400).json({
+                success: false,
+                message: "Referral expiry must be a valid future date and time."
+            });
+        }
 
         let code = randomCode();
 
@@ -100,6 +111,69 @@ router.get("/referral", auth, async (req, res) => {
         console.error(err);
 
         res.status(500).json({ success: false, message: "Server Error" });
+
+    }
+
+});
+
+
+// Change an unused referral code's redemption deadline and the access
+// duration that will be copied to a customer if the code is redeemed later.
+// Already-created customer accounts keep their own independent expiryAt.
+router.put("/referral/:id/expiry", auth, async (req, res) => {
+
+    try {
+
+        const requestedExpiryAt = req.body.expiryAt;
+        const expiryAt = new Date(requestedExpiryAt);
+
+        if (!requestedExpiryAt || Number.isNaN(expiryAt.getTime())) {
+            return res.status(400).json({
+                success: false,
+                message: "Choose a valid expiry date and time."
+            });
+        }
+
+        const referral = await ReferralCode.findById(req.params.id);
+
+        if (!referral) {
+            return res.status(404).json({
+                success: false,
+                message: "Referral code not found."
+            });
+        }
+
+        if (referral.status === "used") {
+            return res.status(409).json({
+                success: false,
+                message: "This code has already been redeemed. Manage the customer's access from Customer management."
+            });
+        }
+
+        if (referral.status === "revoked") {
+            return res.status(409).json({
+                success: false,
+                message: "This referral code has been revoked and cannot be edited."
+            });
+        }
+
+        // Past dates are intentionally allowed so an admin can expire a code immediately.
+        referral.expiryAt = expiryAt;
+        await referral.save();
+
+        return res.json({
+            success: true,
+            message: "Referral expiry updated successfully.",
+            referral
+        });
+
+    } catch (err) {
+
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
 
     }
 

@@ -15,6 +15,18 @@
         return new Date(d).toLocaleString();
     }
 
+    function toLocalDateTimeValue(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function localDateTimeToIso(value) {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date.toISOString();
+    }
+
     function statusFor(r) {
         if (r.status === "used") return "used";
         if (r.status === "revoked") return "revoked";
@@ -23,7 +35,8 @@
 
     function referralItemHtml(r) {
         const status = statusFor(r);
-        const used = status === "used";
+        const used = r.status === "used";
+        const editable = r.status !== "used" && r.status !== "revoked";
 
         return `
             <div class="referral-swipe-item" data-id="${r._id}" data-used="${used}">
@@ -31,16 +44,30 @@
                     <i class="fa-solid fa-trash"></i>
                 </button>
                 <div class="referral-swipe-content">
-                    <div>
+                    <div class="referral-card-main">
                         <div class="referral-code">${r.code}</div>
                         <div class="referral-meta">
-                            <span>EXP ${fmtDate(r.expiryAt)}</span>
+                            <span>EXPIRES ${fmtDate(r.expiryAt)}</span>
                             ${r.usedBy ? `<span>USED BY ${r.usedBy.username}</span>` : ""}
                             <span class="referral-status ${status}">${status}</span>
                         </div>
+                        ${editable ? `
+                            <div class="referral-expiry-editor" hidden>
+                                <label>
+                                    <span>New expiry date &amp; time</span>
+                                    <input type="datetime-local" class="referral-expiry-input" value="${toLocalDateTimeValue(r.expiryAt)}">
+                                </label>
+                                <div class="referral-expiry-editor-actions">
+                                    <button type="button" data-action="save-expiry" class="expiry-save">Save expiry</button>
+                                    <button type="button" data-action="cancel-expiry">Cancel</button>
+                                </div>
+                                <small>Setting a past date expires this code immediately.</small>
+                            </div>
+                        ` : used ? `<div class="referral-expiry-note">Redeemed. Customer access expiry is managed separately.</div>` : ""}
                     </div>
                     <div class="referral-actions">
                         <button data-action="copy">Copy</button>
+                        ${editable ? `<button data-action="edit-expiry" class="expiry-edit"><i class="fa-solid fa-calendar-days"></i> Edit expiry</button>` : ""}
                         ${r.status === "active" ? `<button data-action="revoke" class="danger">Revoke</button>` : ""}
                         ${!used ? `<button data-action="delete" class="danger desktop-only">Delete</button>` : ""}
                     </div>
@@ -71,18 +98,22 @@
     }
 
     async function createReferral() {
-        const expiryDays = Number(document.getElementById("refExpiryDays").value);
+        const expiryInput = document.getElementById("refExpiryAt");
+        const expiryAt = localDateTimeToIso(expiryInput?.value || "");
         const btn = document.getElementById("createReferralBtn");
-        if (!Number.isFinite(expiryDays) || expiryDays < 1 || expiryDays > 3650) {
-            showToast("Error", "Validity must be between 1 and 3650 days.", "error");
+
+        if (!expiryAt || new Date(expiryAt) <= new Date()) {
+            showToast("Error", "Choose a future expiry date and time.", "error");
+            expiryInput?.focus();
             return;
         }
+
         btn.disabled = true;
         try {
             const res = await apiFetch("/referral", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ expiryDays })
+                body: JSON.stringify({ expiryAt })
             });
             const data = await res.json();
             if (!data.success) {
@@ -97,6 +128,13 @@
         } finally {
             btn.disabled = false;
         }
+    }
+
+    const createExpiryInput = document.getElementById("refExpiryAt");
+    if (createExpiryInput && !createExpiryInput.value) {
+        const defaultExpiry = new Date();
+        defaultExpiry.setDate(defaultExpiry.getDate() + 30);
+        createExpiryInput.value = toLocalDateTimeValue(defaultExpiry);
     }
 
     document.getElementById("createReferralBtn")?.addEventListener("click", createReferral);
@@ -159,6 +197,53 @@
             const code = item.querySelector(".referral-code")?.textContent || "";
             try { await navigator.clipboard.writeText(code); } catch (_) {}
             showToast("Copied", code, "success");
+            return;
+        }
+
+        const expiryEditor = item.querySelector(".referral-expiry-editor");
+
+        if (action === "edit-expiry") {
+            if (expiryEditor) {
+                expiryEditor.hidden = false;
+                expiryEditor.querySelector("input")?.focus();
+            }
+            return;
+        }
+
+        if (action === "cancel-expiry") {
+            if (expiryEditor) expiryEditor.hidden = true;
+            return;
+        }
+
+        if (action === "save-expiry") {
+            const input = expiryEditor?.querySelector(".referral-expiry-input");
+            const expiryAt = localDateTimeToIso(input?.value || "");
+            if (!expiryAt) {
+                showToast("Error", "Choose a valid expiry date and time.", "error");
+                input?.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                const res = await apiFetch(`/referral/${id}/expiry`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ expiryAt })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    showToast("Error", data.message || "Could not update expiry.", "error");
+                    return;
+                }
+                showToast("Expiry updated", "Referral code validity has been updated.", "success");
+                await loadReferrals();
+            } catch (err) {
+                console.error(err);
+                showToast("Error", "Server connection failed.", "error");
+            } finally {
+                btn.disabled = false;
+            }
             return;
         }
 
