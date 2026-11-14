@@ -537,3 +537,585 @@ input[type="range"] {
         transition-duration: .01ms !important;
     }
 }
+
+/* =========================================================
+   MOBILE LAYOUT + LIGHT THEME VISIBILITY PATCH
+   Overrides legacy page-specific dark styles without changing
+   page markup, API calls, or application behaviour.
+========================================================= */
+
+/* Fixed top navigation: reserve its actual height in document flow. */
+.topbar {
+    position: relative !important;
+    display: block !important;
+    width: 100%;
+    height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.topbar-row {
+    position: fixed !important;
+    inset: 0 0 auto 0 !important;
+    z-index: 1200 !important;
+    width: 100% !important;
+    min-height: 72px !important;
+    height: 72px;
+    padding: 12px 22px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px;
+    box-sizing: border-box !important;
+    background: rgba(255, 250, 248, .97) !important;
+    border-bottom: 1px solid #EAD5D0 !important;
+    box-shadow: 0 5px 18px rgba(104, 45, 39, .07) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.left-section {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.left-section h2,
+.topbar h2 {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-width: 0;
+    color: #25232A !important;
+    font-family: var(--font-display) !important;
+    font-size: clamp(23px, 3vw, 30px) !important;
+    line-height: 1.12 !important;
+    font-weight: 750 !important;
+    letter-spacing: -.8px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#menuBtn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 46px !important;
+    width: 46px !important;
+    height: 46px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #EAD5D0 !important;
+    border-radius: 14px !important;
+    background: #FBE9E3 !important;
+    color: #A9232B !important;
+    box-shadow: none !important;
+}
+
+.right-section {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    flex: 0 0 auto;
+    margin: 0 !important;
+}
+
+.content:has(> .topbar) {
+    padding-top: 104px !important;
+}
+
+.logs-page .content:has(> .topbar) {
+    padding-top: 104px !important;
+}
+
+.logs-page .topbar {
+    margin: 0 !important;
+}
+
+.logs-page .topbar-row {
+    background: rgba(255, 250, 248, .97) !important;
+}
+
+.logs-page .topbar h2 {
+    color: #25232A !important;
+    font-size: clamp(23px, 3vw, 30px) !important;
+    letter-spacing: -.8px !important;
+}
+
+.logs-page .logs-alert {
+    width: 46px !important;
+    height: 46px !important;
+    flex: 0 0 46px !important;
+    margin: 0 !important;
+    border: 1px solid #E8C9C3 !important;
+    border-radius: 14px !important;
+    background: #FBE9E3 !important;
+    color: #A9232B !important;
+    box-shadow: none !important;
+}
+
+/* Dashboard KPI text was inheriting the legacy near-white-on-white colour. */
+.card h3,
+.cards .card h3 {
+    color: #514A52 !important;
+}
+
+.card span,
+.cards .card span,
+.cards .card > span {
+    color: #25232A !important;
+    text-shadow: none !important;
+}
+
+.card small,
+.cards .card small {
+    color: #716B72 !important;
+    background: #FFF3EE !important;
+    border-color: #EAD5D0 !important;
+}
+
+.card .trend-pill {
+    color: #514A52 !important;
+}
+
+.card .trend-pill i {
+    color: inherit;
+}
+
+.cards .card {
+    background: linear-gradient(155deg, #FFFCFA, #FFF4EF) !important;
+    border: 1px solid #EAD5D0 !important;
+    box-shadow: 0 8px 24px rgba(104, 45, 39, .06) !important;
+}
+
+.cards .card .card-icon {
+    box-shadow: 0 6px 16px rgba(104, 45, 39, .12) !important;
+}
+
+/* Public Keys: replace all legacy navy surfaces and pale text. */
+.public-keys-page .pk-page-heading h1,
+.public-keys-page .pk-detail-title h1,
+.public-keys-page .pk-card-head h3,
+.public-keys-page .pk-table-key,
+.public-keys-page .pk-device-value,
+.public-keys-page .pk-info-list strong,
+.public-keys-page .pk-usage-summary strong {
+    color: #25232A !important;
+}
+
+.public-keys-page .pk-page-heading p,
+.public-keys-page .pk-detail-title p,
+.public-keys-page .pk-card-meta small,
+.public-keys-page .pk-last-used span,
+.public-keys-page .pk-last-used strong,
+.public-keys-page .pk-info-list span,
+.public-keys-page .pk-usage-summary small {
+    color: #716B72 !important;
+}
+
+.public-keys-page .pk-eyebrow {
+    color: #C43A35 !important;
+}
+
+.public-keys-page .pk-stat-card,
+.public-keys-page .license-card,
+.public-keys-page .pk-detail-card,
+.public-keys-page .table-responsive {
+    background: #FFFAF8 !important;
+    border: 1px solid #EAD5D0 !important;
+    box-shadow: 0 8px 24px rgba(104, 45, 39, .055) !important;
+}
+
+.public-keys-page .pk-stat-card strong {
+    color: #25232A !important;
+}
+
+.public-keys-page .pk-stat-card small {
+    color: #716B72 !important;
+}
+
+.public-keys-page .pk-card-meta > div {
+    background: #FFF1EB !important;
+    border: 1px solid #EAD5D0 !important;
+}
+
+.public-keys-page .pk-card-meta strong {
+    color: #39323A !important;
+}
+
+.public-keys-page .pk-card-progress {
+    background: #EAD5D0 !important;
+}
+
+.public-keys-page .pk-search {
+    background: #FFFAF8 !important;
+    border: 1px solid #E4CBC6 !important;
+    color: #716B72 !important;
+}
+
+.public-keys-page .pk-search input {
+    background: transparent !important;
+    color: #25232A !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.public-keys-page .pk-search input::placeholder {
+    color: #91868B !important;
+}
+
+.public-keys-page .pk-search kbd {
+    background: #FFF1EB !important;
+    border-color: #EAD5D0 !important;
+    color: #716B72 !important;
+}
+
+.public-keys-page .filter-btn {
+    background: #FFF9F6 !important;
+    border: 1px solid #EAD5D0 !important;
+    color: #514A52 !important;
+}
+
+.public-keys-page .filter-btn:hover {
+    background: #FCEBE5 !important;
+    color: #A9232B !important;
+}
+
+.public-keys-page .filter-btn.active {
+    background: #D94A3F !important;
+    border-color: #D94A3F !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 6px 16px rgba(201, 44, 42, .15) !important;
+}
+
+.public-keys-page .filter-btn span {
+    color: inherit !important;
+}
+
+.public-keys-page .table-responsive {
+    overflow-x: auto;
+}
+
+.public-keys-page th {
+    background: #FBE9E3 !important;
+    color: #62565D !important;
+    border-color: #EAD5D0 !important;
+}
+
+.public-keys-page td {
+    color: #39323A !important;
+    border-color: #EAD5D0 !important;
+}
+
+.public-keys-page tbody tr,
+.public-keys-page tbody tr:hover {
+    background: #FFFAF8 !important;
+}
+
+.public-keys-page tbody tr:nth-child(even) {
+    background: #FFF5F1 !important;
+}
+
+.public-keys-page .pk-key-icon {
+    background: #FFF0E8 !important;
+    border-color: #EAD5D0 !important;
+    color: #B87A2D !important;
+}
+
+.public-keys-page .pk-status.active {
+    color: #16845F !important;
+    background: rgba(32, 168, 121, .10) !important;
+    border-color: rgba(32, 168, 121, .22) !important;
+}
+
+.public-keys-page .pk-status.banned {
+    color: #B52D2A !important;
+    background: rgba(214, 83, 74, .10) !important;
+}
+
+.public-keys-page .pk-status.expired {
+    color: #95601B !important;
+    background: rgba(198, 138, 53, .12) !important;
+}
+
+.public-keys-page .copy-btn,
+.public-keys-page .pk-secondary-action {
+    background: #FFF1EB !important;
+    color: #A9232B !important;
+    border: 1px solid #EAD5D0 !important;
+}
+
+/* User Logs: light cards, readable controls, consistent text contrast. */
+.logs-page {
+    background: linear-gradient(145deg, #FFF7F2 0%, #FFF0E8 52%, #FFEAE2 100%) !important;
+    color: #25232A !important;
+}
+
+.logs-page::before {
+    opacity: .06 !important;
+}
+
+.logs-page .logs-intro {
+    align-items: center !important;
+}
+
+.logs-page .logs-kicker {
+    color: #B33A35 !important;
+}
+
+.logs-page .logs-subtitle {
+    color: #716B72 !important;
+}
+
+.logs-page .logs-stats .stat-card {
+    background: #FFFAF8 !important;
+    border: 1px solid #EAD5D0 !important;
+    box-shadow: 0 8px 22px rgba(104, 45, 39, .07) !important;
+}
+
+.logs-page .stat-number {
+    color: #25232A !important;
+    text-shadow: none !important;
+}
+
+.logs-page .stat-label {
+    color: #716B72 !important;
+}
+
+.logs-page .logs-search {
+    background: #FFFAF8 !important;
+    border: 1px solid #E4CBC6 !important;
+    color: #A9232B !important;
+    box-shadow: 0 5px 16px rgba(104, 45, 39, .045) !important;
+}
+
+.logs-page .logs-search input {
+    background: transparent !important;
+    color: #25232A !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.logs-page .logs-search input::placeholder {
+    color: #91868B !important;
+}
+
+.logs-page .log-filter,
+.logs-page .sort-control {
+    background: #FFFAF8 !important;
+    border: 1px solid #EAD5D0 !important;
+    color: #514A52 !important;
+    box-shadow: none !important;
+}
+
+.logs-page .log-filter.active {
+    background: #D94A3F !important;
+    border-color: #D94A3F !important;
+    color: #FFFFFF !important;
+}
+
+.logs-page .log-filter.active i {
+    color: #FFFFFF !important;
+}
+
+.logs-page .sort-select {
+    color: #39323A !important;
+    background: transparent !important;
+}
+
+.logs-page .sort-select option {
+    background: #FFFAF8 !important;
+    color: #25232A !important;
+}
+
+.logs-page .logs-info {
+    color: #716B72 !important;
+}
+
+.logs-page .log-card {
+    background: linear-gradient(145deg, #FFFCFA, #FFF5F1) !important;
+    border: 1px solid #EAD5D0 !important;
+    box-shadow: 0 10px 26px rgba(104, 45, 39, .07) !important;
+    color: #25232A !important;
+}
+
+.logs-page .log-title-row h3,
+.logs-page .log-uuid,
+.logs-page .log-time,
+.logs-page .log-time span,
+.logs-page .log-time small,
+.logs-page .meta-item strong,
+.logs-page .log-footer-hint,
+.logs-page .reason-box,
+.logs-page .reason-box span {
+    color: #39323A !important;
+}
+
+.logs-page .meta-item span {
+    color: #716B72 !important;
+}
+
+.logs-page .device-action {
+    color: #A9232B !important;
+    background: #FFF1EB !important;
+    border-color: #EAD5D0 !important;
+}
+
+.logs-page .meta-panel {
+    background: #FFF0E8 !important;
+    border: 1px solid #EAD5D0 !important;
+    border-radius: 16px;
+}
+
+.logs-page .log-footer {
+    border-color: #EAD5D0 !important;
+}
+
+.logs-page .logs-pagination {
+    color: #514A52 !important;
+}
+
+.logs-page .page-btn {
+    background: #FFFAF8 !important;
+    color: #A9232B !important;
+    border: 1px solid #EAD5D0 !important;
+}
+
+.logs-page .logs-empty,
+.logs-page .logs-error {
+    background: #FFFAF8 !important;
+    color: #514A52 !important;
+    border-color: #EAD5D0 !important;
+}
+
+/* Floating helpers should not dominate or obscure small-screen content. */
+.dev-chat-toggle,
+.ai-copilot-fab {
+    width: 46px !important;
+    height: 46px !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    box-shadow: 0 5px 16px rgba(70, 35, 35, .14) !important;
+    opacity: .94;
+}
+
+.dev-chat-toggle {
+    left: 12px !important;
+}
+
+.ai-copilot-fab {
+    right: 12px !important;
+}
+
+@media (max-width: 900px) {
+    .content:has(> .topbar),
+    .logs-page .content:has(> .topbar) {
+        padding: 98px 14px 24px !important;
+    }
+
+    .topbar-row {
+        min-height: 72px !important;
+        height: 72px !important;
+        padding: 10px 14px !important;
+    }
+
+    .left-section h2,
+    .topbar h2,
+    .logs-page .topbar h2 {
+        font-size: clamp(22px, 6vw, 28px) !important;
+        line-height: 1.1 !important;
+    }
+
+    .logs-page .overview-section {
+        padding-top: 0 !important;
+    }
+
+    .logs-page .logs-intro {
+        min-height: 54px !important;
+        margin-top: 0 !important;
+        margin-bottom: 14px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .content:has(> .topbar),
+    .logs-page .content:has(> .topbar) {
+        padding: 96px 12px 24px !important;
+    }
+
+    .topbar-row {
+        min-height: 68px !important;
+        height: 68px !important;
+        padding: 9px 12px !important;
+    }
+
+    #menuBtn {
+        flex-basis: 42px !important;
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 13px !important;
+    }
+
+    .left-section {
+        gap: 10px !important;
+    }
+
+    .left-section h2,
+    .topbar h2,
+    .logs-page .topbar h2 {
+        font-size: clamp(21px, 6vw, 26px) !important;
+    }
+
+    .logs-page .logs-alert {
+        width: 42px !important;
+        height: 42px !important;
+        flex-basis: 42px !important;
+    }
+
+    .logs-page .logs-intro {
+        min-height: 48px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .logs-page .logs-subtitle {
+        font-size: 12px !important;
+    }
+
+    .logs-page .logs-controls {
+        gap: 6px !important;
+    }
+
+    .logs-page .log-filter {
+        font-size: 10px !important;
+    }
+
+    .public-keys-page .pk-page-heading h1 {
+        font-size: 27px !important;
+    }
+
+    .public-keys-page .pk-stat-card strong {
+        font-size: 18px !important;
+    }
+
+    .public-keys-page .license-card {
+        padding: 15px !important;
+    }
+
+    .cards .card {
+        min-width: 0;
+        padding: 15px !important;
+    }
+
+    .cards .card span {
+        font-size: 30px !important;
+    }
+
+    .dev-chat-toggle,
+    .ai-copilot-fab {
+        width: 42px !important;
+        height: 42px !important;
+    }
+}
