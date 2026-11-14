@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/settings.css">
     <link rel="stylesheet" href="/css/admin-game-id.css">
 
+    <link rel="stylesheet" href="/css/theme.css?v=5" id="fixed-light-last">
 </head>
 
 <body>
@@ -51,46 +52,28 @@
 
             </div>
 
-            <div class="admin-game-id-card setting-item" id="adminGameIdCard">
+            <div class="admin-game-id-card setting-item" style="display:block; cursor:default;">
 
-                <div class="setting-icon cyan admin-game-id-icon">
+                <div class="setting-icon cyan" style="float:left; margin-right:14px;">
                     <i class="fa-solid fa-fingerprint"></i>
                 </div>
 
-                <div class="admin-game-id-main">
-                    <div class="setting-info">
-                        <h3>Admin Game ID</h3>
-                        <p id="adminGameIdDescription">Checking saved Game ID...</p>
-                    </div>
-
-                    <div id="adminGameIdSaved" class="admin-game-id-saved" hidden>
-                        <span class="admin-game-id-check"><i class="fa-solid fa-check"></i></span>
-                        <span>Game ID already saved</span>
-                    </div>
-
-                    <div id="adminGameIdEditor" class="admin-game-id-editor" hidden>
-                        <div class="admin-game-id-field">
-                            <input
-                                id="adminGameId"
-                                class="admin-game-id-input"
-                                type="text"
-                                maxlength="64"
-                                autocomplete="off"
-                                spellcheck="false"
-                                placeholder="Enter Game ID"
-                                aria-label="Admin Game ID">
-                            <button id="saveAdminGameId" class="admin-game-id-save" type="button">Save</button>
-                            <button id="cancelAdminGameId" class="admin-game-id-cancel" type="button" hidden>Cancel</button>
-                        </div>
-                    </div>
-
-                    <div id="adminGameIdStatus" class="admin-game-id-status" aria-live="polite"></div>
+                <div class="setting-info">
+                    <h3>Admin Game ID</h3>
+                    <p>Set the Game ID used by your game build and admin licenses.</p>
                 </div>
 
-                <button id="editAdminGameId" class="admin-game-id-edit" type="button" hidden>
-                    <i class="fa-solid fa-pen"></i>
-                    <span>Edit</span>
-                </button>
+                <div class="admin-game-id-field">
+                    <input
+                        id="adminGameId"
+                        class="admin-game-id-input"
+                        type="text"
+                        maxlength="64"
+                        autocomplete="off"
+                        placeholder="Enter Game ID">
+                    <button id="saveAdminGameId" class="admin-game-id-save" type="button">Save</button>
+                </div>
+                <div id="adminGameIdStatus" class="admin-game-id-status" aria-live="polite"></div>
 
             </div>
 
@@ -215,28 +198,7 @@
                     <i class="fa-solid fa-chevron-right"></i>
 
                 </a>
-
-                <a href="/settings/appearance" class="setting-item">
-
-                    <div class="setting-icon pink">
-
-                        <i class="fa-solid fa-palette"></i>
-
-                    </div>
-
-                    <div class="setting-info">
-
-                        <h3>Appearance</h3>
-
-                        <p>Theme & colors</p>
-
-                    </div>
-
-                    <i class="fa-solid fa-chevron-right"></i>
-
-                </a>
-
-                <a href="/settings/notifications" class="setting-item">
+<a href="/settings/notifications" class="setting-item">
 
                     <div class="setting-icon cyan">
 
