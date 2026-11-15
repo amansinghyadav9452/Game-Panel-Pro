@@ -842,3 +842,10 @@
         padding: 0 10px !important;
     }
 }
+
+
+/* Keep the shared sidebar brand text white on the light referrals page.
+   The referrals page sets a dark inherited text color on its body. */
+.referrals-page #adminDisplayName {
+    color: #FFFFFF !important;
+}
