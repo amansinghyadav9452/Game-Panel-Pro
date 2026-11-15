@@ -7,6 +7,9 @@
             <% if (activePage === "dashboard") { %>
             <span class="dashboard-brand-mark" aria-hidden="true"><i></i><i></i></span>
             <% } %>
+            <% if (activePage === "public-keys" || activePage === "premium-keys") { %>
+            <span class="keys-brand-mark" aria-hidden="true"><i></i><i></i></span>
+            <% } %>
             <h2><%= pageTitle %></h2>
         </div>
         <% if (activePage === "logs") { %>

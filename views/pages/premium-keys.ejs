@@ -26,17 +26,17 @@
                 <section class="table-section premium-keys-page" id="premiumKeysPage">
 
     <div class="pk-list-view" id="pkListView">
-        <div class="pk-page-heading">
-            <div>
-                <span class="pk-eyebrow premium-eyebrow"><i class="fa-solid fa-crown"></i> Premium access</span>
-                <h1>Licenses</h1>
+        <section class="keys-hero-banner" aria-label="Premium access">
+            <div class="keys-hero-copy">
+                <span class="keys-hero-eyebrow"><i class="fa-solid fa-crown"></i> Premium access</span>
+                <h1>Premium <span>Keys</span></h1>
                 <p>Manage premium access keys, device limits and priority licenses.</p>
+                <button id="openCreateModal" class="create-btn keys-hero-create" type="button">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create Premium Key</span>
+                </button>
             </div>
-            <button id="openCreateModal" class="create-btn">
-                <i class="fa-solid fa-plus"></i>
-                <span>Create Premium Key</span>
-            </button>
-        </div>
+        </section>
 
         <div class="pk-stat-grid" id="licenseStats" aria-label="License statistics">
             <div class="pk-stat-card"><span class="pk-stat-icon"><i class="fa-solid fa-key"></i></span><div><small>Total Keys</small><strong id="statTotal">0</strong></div></div>
@@ -54,7 +54,6 @@
             <label class="pk-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input id="licenseSearch" type="search" placeholder="Search keys..." autocomplete="off">
-                <kbd>/</kbd>
             </label>
         </div>
 

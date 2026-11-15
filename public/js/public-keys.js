@@ -99,20 +99,31 @@ if (__role === "customer") {
             const key = card.querySelector("h3")?.textContent || "";
             const license = allLicenses.find(x => x.key === key);
             if (!license) return;
+            const used = Number(license.usedCount || 0);
+            const max = Number(license.maxUses || 0);
+            const percent = max > 0 ? Math.min(100, Math.round((used / max) * 100)) : 0;
             card.innerHTML = `
                 <div class="pk-card-head">
-                    <div class="pk-card-key"><span class="pk-key-icon"><i class="fa-solid fa-key"></i></span><h3 title="${esc(license.key)}">${esc(license.key)}</h3></div>
+                    <div class="pk-card-key">
+                        <span class="pk-key-icon"><i class="fa-solid fa-key"></i></span>
+                        <h3 title="${esc(license.key)}">${esc(license.key)}</h3>
+                    </div>
                     <span class="pk-status ${esc(license.status)}"><i class="fa-solid fa-circle"></i>${esc(license.status)}</span>
                 </div>
                 <div class="pk-card-meta">
-                    <div><small>EXPIRY</small><strong>${esc(prettyDate(license.expiry))}</strong></div>
-                    <div><small>DEVICES</small><strong>${Number(license.usedCount || 0)} / ${Number(license.maxUses || 0)}</strong></div>
+                    <div><span class="pk-meta-icon"><i class="fa-regular fa-calendar"></i></span><span class="pk-meta-copy"><small>EXPIRY</small><strong>${esc(prettyDate(license.expiry))}</strong></span></div>
+                    <div><span class="pk-meta-icon"><i class="fa-solid fa-laptop"></i></span><span class="pk-meta-copy"><small>DEVICES</small><strong>${used} / ${max}</strong></span></div>
                 </div>
-                <div class="pk-last-used"><span><i class="fa-regular fa-clock"></i> Last used</span><strong>${esc(prettyDateTime(license.lastUsed))}</strong></div>
-                <div class="pk-card-progress"><span style="width:${Math.min(100, Number(license.maxUses) ? (Number(license.usedCount || 0) / Number(license.maxUses)) * 100 : 0)}%"></span></div>
-                <div class="card-actions">
-                    <button class="action-btn view-btn" data-key="${esc(license.key)}"><i class="fa-solid fa-eye"></i> View</button>
-                    <button class="action-btn copy-btn" data-key="${esc(license.key)}"><i class="fa-regular fa-copy"></i> Copy</button>
+                <div class="pk-card-usage">
+                    <div class="pk-card-progress"><span style="width:${percent}%"></span></div>
+                    <strong>${percent}% <small>Used</small></strong>
+                </div>
+                <div class="pk-card-footer">
+                    <div class="pk-last-used"><i class="fa-regular fa-clock"></i><span>Last used: ${esc(prettyDateTime(license.lastUsed))}</span></div>
+                    <div class="card-actions">
+                        <button class="action-btn view-btn" data-key="${esc(license.key)}"><i class="fa-regular fa-eye"></i> View</button>
+                        <button class="action-btn copy-btn" data-key="${esc(license.key)}"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
                 </div>`;
         });
 

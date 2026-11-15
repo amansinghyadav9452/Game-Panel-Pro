@@ -3,7 +3,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<% if (activePage === "dashboard") { %>
+<% if (["dashboard", "public-keys", "premium-keys"].includes(activePage)) { %>
 <meta name="color-scheme" content="light">
 <% } else { %>
 <meta name="color-scheme" content="dark">
@@ -47,11 +47,11 @@ href="/css/toast.css">
 <link rel="stylesheet" href="/css/loading.css">
 
 <% if (activePage === "public-keys") { %>
-<link rel="stylesheet" href="/css/public-keys.css?v=2">
+<link rel="stylesheet" href="/css/public-keys.css?v=7">
 <% } %>
 
 <% if (activePage === "premium-keys") { %>
-<link rel="stylesheet" href="/css/premium-keys.css?v=3">
+<link rel="stylesheet" href="/css/premium-keys.css?v=7">
 <% } %>
 
 <% if (activePage !== "logs") { %>
@@ -60,8 +60,8 @@ href="/css/toast.css">
 
 <link rel="manifest" href="/manifest.json">
 
-<% if (activePage === "dashboard") { %>
-<meta name="theme-color" content="#F7F3EC">
+<% if (["dashboard", "public-keys", "premium-keys"].includes(activePage)) { %>
+<meta name="theme-color" content="#F1F1F1">
 <% } else { %>
 <meta name="theme-color" content="#0F172A">
 <% } %>
