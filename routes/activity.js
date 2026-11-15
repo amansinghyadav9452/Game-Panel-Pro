@@ -11,7 +11,7 @@ router.get("/activity/recent", auth, async (req, res) => {
         const activities = await Activity
             .find()
             .sort({ createdAt: -1 })
-            .limit(10);
+            .lean();
 
         res.json({
 

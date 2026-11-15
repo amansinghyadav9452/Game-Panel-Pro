@@ -2,16 +2,29 @@ const express = require("express");
 
 const router = express.Router();
 
+
+// Count every API-authorized key-verification request at the route boundary,
+// including malformed encrypted payloads and replay attempts.
+async function countVerificationRequest(req, res, next) {
+    try {
+        await recordVerificationRequest();
+    } catch (error) {
+        console.error("Verification activity counter error:", error);
+    }
+    next();
+}
+
 const apiAccess = require("../middleware/apiAccess");
 
 const {
     verifyPublicLicense,
     verifyPremiumLicense,
     verifyEncryptedConnect,
+    recordVerificationRequest,
     saveClientLog
 } = require("../services/connectService");
 
-router.post("/bhuka_cheeta-premium", apiAccess("premium"), async (req, res) => {
+router.post("/bhuka_cheeta-premium", apiAccess("premium"), countVerificationRequest, async (req, res) => {
     console.log("Premium License called");
 
     try {
@@ -40,7 +53,7 @@ router.post("/bhuka_cheeta-premium", apiAccess("premium"), async (req, res) => {
 
 });
 
-router.post("/bhuka_cheeta-public", apiAccess("public"), async (req, res) => {
+router.post("/bhuka_cheeta-public", apiAccess("public"), countVerificationRequest, async (req, res) => {
 
     try {
         const result = (req.body && req.body.encryptedData)

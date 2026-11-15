@@ -2,6 +2,7 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const License = require("../models/License");
 const UserLog = require("../models/UserLog");
+const DailyVerificationStat = require("../models/DailyVerificationStat");
 const { resolveMarketingName } = require("../services/deviceLookup");
 const {
     syncLicenseStatus,
@@ -111,6 +112,55 @@ router.get("/dashboard", auth, async (req, res) => {
 
     }
 
+});
+
+// Daily key-verification request totals (all successful + failed attempts).
+// Dates use the same India-local calendar boundary as the request counter.
+router.get("/dashboard/user-activity", auth, async (req, res) => {
+    try {
+        const allowedRanges = [7, 30, 90];
+        const requestedRange = Number.parseInt(req.query.range, 10);
+        const range = allowedRanges.includes(requestedRange) ? requestedRange : 7;
+        const indiaToday = new Date(Date.now() + 330 * 60 * 1000);
+        const todayKey = indiaToday.toISOString().slice(0, 10);
+        const todayUtc = new Date(`${todayKey}T00:00:00.000Z`);
+        const firstUtc = new Date(todayUtc.getTime() - (range - 1) * 86400000);
+        const firstKey = firstUtc.toISOString().slice(0, 10);
+        const [rows, firstRecordedRow] = await Promise.all([
+            DailyVerificationStat.find({ dayKey: { $gte: firstKey, $lte: todayKey } })
+                .select("dayKey requestCount")
+                .sort({ dayKey: 1 })
+                .lean(),
+            DailyVerificationStat.findOne({})
+                .select("dayKey")
+                .sort({ dayKey: 1 })
+                .lean()
+        ]);
+        const trackingStartedAt = firstRecordedRow?.dayKey || null;
+        const byDay = new Map(rows.map(row => [row.dayKey, Number(row.requestCount) || 0]));
+        const days = [];
+        for (let index = 0; index < range; index += 1) {
+            const date = new Date(firstUtc.getTime() + index * 86400000);
+            const dayKey = date.toISOString().slice(0, 10);
+            // Before the first recorded day history is unknown; after tracking
+            // has begun, a missing daily row correctly means zero requests.
+            const requests = byDay.has(dayKey)
+                ? byDay.get(dayKey)
+                : (trackingStartedAt && dayKey >= trackingStartedAt ? 0 : null);
+            days.push({ dayKey, requests });
+        }
+        const trackedDays = days.filter(day => day.requests !== null).length;
+        res.json({
+            success: true,
+            range,
+            days,
+            trackingStartedAt,
+            trackedDays
+        });
+    } catch (err) {
+        console.error("Dashboard user activity error:", err);
+        res.status(500).json({ success: false, message: "Unable to load user activity." });
+    }
 });
 
 router.get("/dashboard/licenses", auth, async (req, res) => {

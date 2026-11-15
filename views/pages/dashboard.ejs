@@ -1,157 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <title>Game Panel | Dashboard</title>
-
 <%- include("../partials/head") %>
-
 </head>
-
-<body>
-
+<body class="dashboard-page">
 <div id="overlay"></div>
-
 <%- include("../partials/toast") %>
-
 <%- include("../partials/dev-chat-widget") %>
-
 <div class="layout">
-
     <%- include("../partials/sidebar") %>
-
     <main class="content">
-
-<%- include("../partials/topbar") %>
-
-<section class="dashboard-hero">
-
-    <div class="hero-left">
-
-        <h1>Welcome Back 👋</h1>
-
-        <p>
-            Manage licenses, monitor activity and keep your panel secure.
-        </p>
-
-    </div>
-
-    <div class="hero-right">
-
-        <div class="hero-chip online">
-
-            <span class="dot"></span>
-
-            System Online
-
-        </div>
-
-        <div class="hero-chip">
-
-            ⚡ Live Monitoring
-
-        </div>
-
-        <div class="hero-chip customer-game-id-chip" id="customerGameIdChip" style="display:none;">
-
-            <span>GAME ID: <code id="customerGameId">—</code></span>
-            <button type="button" id="copyCustomerGameId" class="copy-customer-game-id" aria-label="Copy Game ID" title="Copy Game ID">
-                <i class="fa-regular fa-copy"></i>
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-        <section class="cards">
-
-            <div class="card">
-                <div class="top-accent blue"></div>
-
-                <div class="card-icon blue">
-    <i class="fa-solid fa-key"></i>
-</div>
-
-<h3>Total</h3>
-
-                <span id="totalKeys" class="gp-skeleton">0</span>
-                <small>Live Data</small>
-
-<div class="trend-pill blue-pill" id="trendTotal"><i class="fa-solid fa-calendar-day"></i> 0 Created Today</div>
-            </div>
-
-            <div class="card">
-                <div class="top-accent green"></div>
-
-                <div class="card-icon green">
-                    <i class="fa-solid fa-bolt"></i>
+        <%- include("../partials/topbar") %>
+        <section class="dashboard-hero" aria-labelledby="dashboardWelcome">
+            <div class="hero-copy">
+                <span class="hero-eyebrow"><span></span> WELCOME BACK</span>
+                <h1 id="dashboardWelcome">Bhukha Cheeta Panel</h1>
+                <p>Manage licenses, monitor activity and keep your panel secure.</p>
+                <div class="hero-status-row">
+                    <div class="hero-chip online"><span class="dot"></span>System Online</div>
+                    <div class="hero-chip monitoring"><i class="fa-solid fa-wave-square" aria-hidden="true"></i>Live Monitoring</div>
+                    <div class="hero-chip customer-game-id-chip" id="customerGameIdChip" style="display:none;">
+                        <span>GAME ID: <code id="customerGameId">—</code></span>
+                        <button type="button" id="copyCustomerGameId" class="copy-customer-game-id" aria-label="Copy Game ID" title="Copy Game ID"><i class="fa-regular fa-copy"></i></button>
+                    </div>
                 </div>
-
-                <h3>Active</h3>
-
-                <span id="activeKeys" class="gp-skeleton">0</span>
-                <small>Currently Active</small>
-
-<div class="trend-pill green-pill" id="trendActive"><i class="fa-solid fa-calendar-day"></i> 0 Activated Today</div>
             </div>
-
-            <div class="card">
-                <div class="top-accent orange"></div>
-
-                <div class="card-icon orange">
-    <i class="fa-solid fa-clock"></i>
-</div>
-
-<h3>Expired</h3>
-
-                <span id="expiredKeys" class="gp-skeleton">0</span>
-                <small>Need Attention</small>
-
-<div class="trend-pill orange-pill" id="trendExpired"><i class="fa-solid fa-calendar-day"></i> 0 Expired Today</div>
-
-            </div>
-
-            <div class="card">
-                <div class="top-accent red"></div>
-
-                <div class="card-icon red">
-    <i class="fa-solid fa-shield-halved"></i>
-</div>
-
-<h3>Banned</h3>
-
-                <span id="bannedKeys" class="gp-skeleton">0</span>
-                <small>Blocked Keys</small>
-
-<div class="trend-pill red-pill" id="trendBanned"><i class="fa-solid fa-calendar-day"></i> 0 Banned Today</div>
-            </div>
-
         </section>
 
-<section class="overview-section">
+        <section class="cards dashboard-metrics" aria-label="License overview">
+            <article class="card metric-card metric-total">
+                <div class="metric-icon"><i class="fa-solid fa-key" aria-hidden="true"></i></div>
+                <div class="metric-copy"><h3>Total Keys</h3><span id="totalKeys" class="gp-skeleton">0</span></div>
+            </article>
+            <article class="card metric-card metric-active">
+                <div class="metric-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></div>
+                <div class="metric-copy"><h3>Active</h3><span id="activeKeys" class="gp-skeleton">0</span></div>
+            </article>
+            <article class="card metric-card metric-expired">
+                <div class="metric-icon"><i class="fa-regular fa-clock" aria-hidden="true"></i></div>
+                <div class="metric-copy"><h3>Expired</h3><span id="expiredKeys" class="gp-skeleton">0</span></div>
+            </article>
+            <article class="card metric-card metric-banned">
+                <div class="metric-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
+                <div class="metric-copy"><h3>Banned</h3><span id="bannedKeys" class="gp-skeleton">0</span></div>
+            </article>
+        </section>
 
-    <h2>Recent Activity</h2>
+        <section class="user-activity-panel" id="userActivityPanel" aria-labelledby="userActivityHeading">
+            <div class="panel-section-heading">
+                <div class="panel-heading-copy">
+                    <span class="section-icon"><i class="fa-solid fa-chart-column" aria-hidden="true"></i></span>
+                    <div><h2 id="userActivityHeading">User Activity</h2><p>Key verification requests to server (per day)</p></div>
+                </div>
+                <label class="activity-range-label" for="activityRange">
+                    <span class="sr-only">Activity period</span>
+                    <select id="activityRange" aria-label="Activity period">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </label>
+            </div>
+            <div class="activity-chart-wrap">
+                <div id="userActivityChart" class="activity-chart" role="img" aria-label="Daily key verification requests chart">
+                    <div class="chart-loading"><span class="chart-spinner"></span>Loading request activity</div>
+                </div>
+            </div>
+            <p class="activity-data-note" id="activityDataNote">Counts include successful and failed key verification attempts.</p>
+            <div class="activity-summary" aria-live="polite">
+                <div class="summary-item summary-peak"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i><div><strong id="activityPeak">—</strong><span id="activityPeakLabel">Highest day</span></div></div>
+                <div class="summary-item"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><div><strong id="activityAverage">—</strong><span>Daily Average</span></div></div>
+                <div class="summary-item"><i class="fa-solid fa-database" aria-hidden="true"></i><div><strong id="activityTotal">—</strong><span>Total Requests</span></div></div>
+            </div>
+        </section>
 
-    <div id="recentActivityList">
-
-        <div class="gp-skeleton-line" style="width:85%;height:52px;"></div>
-        <div class="gp-skeleton-line" style="width:70%;height:52px;"></div>
-        <div class="gp-skeleton-line" style="width:78%;height:52px;"></div>
-
-    </div>
-
-</section>
-
-<%- include("../partials/modals") %>
-
+        <section class="overview-section recent-activity-panel" aria-labelledby="recentActivityHeading">
+            <div class="recent-heading">
+                <div><span class="section-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span><h2 id="recentActivityHeading">Recent Activity</h2></div>
+            </div>
+            <div id="recentActivityList" class="recent-activity-list">
+                <div class="gp-skeleton-line" style="width:85%;height:52px;"></div>
+                <div class="gp-skeleton-line" style="width:70%;height:52px;"></div>
+                <div class="gp-skeleton-line" style="width:78%;height:52px;"></div>
+            </div>
+        </section>
+        <%- include("../partials/modals") %>
+    </main>
+</div>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/license-manager.js"></script>
-<script src="/js/dashboard.js"></script>
-
+<script src="/js/dashboard.js?v=9"></script>
 </body>
-
 </html>

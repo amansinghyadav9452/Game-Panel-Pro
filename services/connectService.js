@@ -1,5 +1,6 @@
 const License = require("../models/License");
 const UserLog = require("../models/UserLog");
+const DailyVerificationStat = require("../models/DailyVerificationStat");
 const BannedDevice = require("../models/BannedDevice");
 const KeyIndex = require("../models/KeyIndex");
 const Customer = require("../models/Customer");
@@ -28,6 +29,35 @@ function getEncryptionCode() {
 
     return code;
 
+}
+
+
+// Store exact daily verification request counts in India-local calendar days.
+// This counter is independent of UserLog's 15-second success-log deduplication.
+function indiaDayKey(date = new Date()) {
+    return new Date(date.getTime() + 330 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+async function recordVerificationRequest() {
+    const dayKey = indiaDayKey();
+    try {
+        await DailyVerificationStat.updateOne(
+            { dayKey },
+            { $inc: { requestCount: 1 }, $setOnInsert: { dayKey } },
+            { upsert: true }
+        );
+    } catch (error) {
+        // Two first requests can race while creating the day's unique row.
+        // If the unique index wins that race, retry as a normal increment.
+        if (error && error.code === 11000) {
+            await DailyVerificationStat.updateOne(
+                { dayKey },
+                { $inc: { requestCount: 1 } }
+            );
+            return;
+        }
+        throw error;
+    }
 }
 
 // A key is valid only inside the application (Game ID) that owns it.
@@ -661,5 +691,6 @@ module.exports = {
     verifyPublicLicense,
     verifyPremiumLicense,
     verifyEncryptedConnect,
+    recordVerificationRequest,
     saveClientLog
 };

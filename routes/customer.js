@@ -797,7 +797,7 @@ router.get("/customer/dashboard/recent-activity", customerAuth, async (req, res)
 
         const CrudLog = getCustomerCrudLogModel(req.customer._id);
 
-        const logs = await CrudLog.find({}).sort({ createdAt: -1 }).limit(20).lean();
+        const logs = await CrudLog.find({}).sort({ createdAt: -1 }).lean();
 
         const actionMap = {
             created: "CREATE",
