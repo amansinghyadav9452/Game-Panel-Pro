@@ -3,7 +3,10 @@
 <head>
 <title>Game Panel | Referrals</title>
 <%- include("../partials/head") %>
-<link rel="stylesheet" href="/css/customer.css?v=2">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFF5F0">
+<link rel="stylesheet" href="/css/customer.css?v=3">
+<link rel="stylesheet" href="/css/referrals-premium.css?v=4">
 </head>
 <body class="referrals-page">
 <div id="overlay"></div>
@@ -15,23 +18,69 @@
     <main class="content">
         <%- include("../partials/topbar") %>
         <section class="overview-section referral-console">
-            <div class="cust-toolbar referral-toolbar">
-                <h2><i class="fa-solid fa-ticket"></i> Referral Codes</h2>
-                <label class="referral-expiry-create"><span>Code valid until</span><input type="datetime-local" id="refExpiryAt" aria-label="Referral expiry date and time" required></label>
-                <button id="createReferralBtn" class="cust-primary-btn" type="button">
-                    <i class="fa-solid fa-plus"></i> Generate Code
-                </button>
+            <header class="referral-page-intro">
+                <p class="referral-eyebrow">ACCESS MANAGEMENT</p>
+                <h1>Referral management</h1>
+                <p>Create referral codes, track usage and manage customer access.</p>
+            </header>
+
+            <div class="referral-stats" aria-live="polite">
+                <article class="referral-stat-card">
+                    <span class="referral-stat-icon icon-amber"><i class="fa-solid fa-ticket"></i></span>
+                    <div><strong id="referralTotalCount">—</strong><span>Total codes</span></div>
+                </article>
+                <article class="referral-stat-card">
+                    <span class="referral-stat-icon icon-rose"><i class="fa-solid fa-users"></i></span>
+                    <div><strong id="referralRedeemedCount">—</strong><span>Redeemed</span></div>
+                </article>
+                <article class="referral-stat-card">
+                    <span class="referral-stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></span>
+                    <div><strong id="referralActiveCustomers">—</strong><span>Active users</span></div>
+                </article>
             </div>
-            <div id="referralsList" class="cust-list" aria-live="polite"></div>
-            <h2 class="referral-section-title">
-                <i class="fa-solid fa-users"></i> Customers
-            </h2>
-            <div id="customersList" class="cust-list" aria-live="polite"></div>
+
+            <section class="referral-generator" aria-labelledby="generateReferralTitle">
+                <div class="referral-generator-heading">
+                    <span class="referral-generator-icon"><i class="fa-solid fa-ticket"></i></span>
+                    <div>
+                        <h2 id="generateReferralTitle">Generate referral code</h2>
+                        <p>Create a new code with a custom expiry.</p>
+                    </div>
+                </div>
+                <div class="referral-generator-controls">
+                    <label class="referral-expiry-create">
+                        <span>Code valid until</span>
+                        <span class="referral-date-field"><i class="fa-regular fa-calendar"></i><input type="datetime-local" id="refExpiryAt" aria-label="Referral code expiry date and time" required></span>
+                    </label>
+                    <button id="createReferralBtn" class="cust-primary-btn" type="button">
+                        <i class="fa-solid fa-plus"></i> Generate code
+                    </button>
+                </div>
+            </section>
+
+            <section class="referral-section" aria-labelledby="referralCodesTitle">
+                <div class="referral-section-heading">
+                    <h2 id="referralCodesTitle"><i class="fa-solid fa-layer-group"></i> Referral codes</h2>
+                    <label class="referral-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" id="referralSearch" placeholder="Search code or user..." autocomplete="off">
+                    </label>
+                </div>
+                <div id="referralsList" class="cust-list referral-cards" aria-live="polite"></div>
+            </section>
+
+            <section class="referral-section customer-section" aria-labelledby="referralCustomersTitle">
+                <div class="referral-section-heading">
+                    <h2 id="referralCustomersTitle"><i class="fa-solid fa-users"></i> Customers</h2>
+                    <span class="referral-active-pill"><i class="fa-solid fa-circle"></i><span id="customerActiveCount">0 active</span></span>
+                </div>
+                <div id="customersList" class="cust-list customer-cards" aria-live="polite"></div>
+            </section>
         </section>
     </main>
 </div>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
-<script src="/js/referrals.js?v=2"></script>
+<script src="/js/referrals.js?v=4"></script>
 </body>
 </html>

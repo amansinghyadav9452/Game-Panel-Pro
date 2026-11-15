@@ -1,0 +1,844 @@
+/* Premium light referral workspace */
+.referrals-page {
+    color-scheme: light;
+    background: #FFF5F0 !important;
+    color: #32151D !important;
+}
+.referrals-page .content,
+.referrals-page .overview-section,
+.referrals-page .referral-console {
+    background: #FFF5F0 !important;
+    color: #32151D !important;
+}
+.referrals-page .topbar {
+    padding-top: 92px !important;
+    margin-bottom: 0 !important;
+}
+.referrals-page .topbar-row {
+    background: rgba(255, 248, 244, .96) !important;
+    border-bottom: 1px solid #F0DCD5 !important;
+    box-shadow: 0 8px 24px rgba(105, 45, 53, .06) !important;
+    backdrop-filter: blur(16px);
+}
+.referrals-page .topbar h2 {
+    color: #35131D !important;
+    font-family: "Plus Jakarta Sans", sans-serif !important;
+    font-size: clamp(20px, 4vw, 27px) !important;
+    font-weight: 800 !important;
+    letter-spacing: -.7px !important;
+}
+.referrals-page .topbar #menuBtn,
+.referrals-page .topbar button {
+    color: #6F1D32 !important;
+}
+.referrals-page .topbar #menuBtn {
+    background: #FBE8E2 !important;
+    border: 1px solid #F2D4CB !important;
+    border-radius: 15px !important;
+}
+.referrals-page .referral-console {
+    width: min(100%, 1120px) !important;
+    margin: 0 auto !important;
+    padding: 26px 24px 88px !important;
+    box-sizing: border-box;
+}
+.referral-page-intro { margin: 0 0 24px; }
+.referral-eyebrow {
+    margin: 0 0 7px;
+    color: #B75A62;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+}
+.referral-page-intro h1 {
+    margin: 0;
+    color: #35131D;
+    font: 800 clamp(25px, 5vw, 36px)/1.15 "Plus Jakarta Sans", sans-serif;
+    letter-spacing: -1.1px;
+}
+.referral-page-intro > p:last-child {
+    margin: 9px 0 0;
+    color: #77656B;
+    font: 500 13px/1.6 "Plus Jakarta Sans", sans-serif;
+}
+.referral-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 22px;
+}
+.referral-stat-card {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 14px;
+    border: 1px solid #F3DFD9;
+    border-radius: 17px;
+    background: rgba(255,255,255,.72);
+    box-shadow: 0 8px 20px rgba(113, 49, 57, .07);
+}
+.referral-stat-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 16px;
+}
+.referral-stat-icon.icon-amber { color: #B96716; background: #FFF0DF; }
+.referral-stat-icon.icon-rose { color: #8D2941; background: #FCE8E8; }
+.referral-stat-icon.icon-green { color: #16834D; background: #E6F5E8; }
+.referral-stat-card strong {
+    display: block;
+    color: #27131A;
+    font: 800 24px/1.05 "Space Grotesk", sans-serif;
+    font-variant-numeric: tabular-nums;
+}
+.referral-stat-card span:last-child {
+    display: block;
+    margin-top: 4px;
+    color: #796970;
+    font: 600 10px/1.3 "Plus Jakarta Sans", sans-serif;
+}
+.referral-generator {
+    position: relative;
+    overflow: hidden;
+    margin: 0 0 30px;
+    padding: 20px;
+    border: 1px solid #F5D4CC;
+    border-radius: 20px;
+    background: linear-gradient(120deg, #FFF0EA 0%, #FFF9F5 54%, #FCE9E7 100%);
+    box-shadow: 0 10px 24px rgba(149, 57, 67, .09);
+}
+.referral-generator::after {
+    content: "";
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    right: -50px;
+    top: -90px;
+    border: 22px solid rgba(194, 80, 91, .055);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.referral-generator-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.referral-generator-icon {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #84243A;
+    background: #FCE0DC;
+    font-size: 18px;
+}
+.referral-generator-heading h2 {
+    margin: 0;
+    color: #35131D;
+    font: 800 18px/1.25 "Plus Jakarta Sans", sans-serif;
+    letter-spacing: -.4px;
+}
+.referral-generator-heading p {
+    margin: 4px 0 0;
+    color: #806C72;
+    font: 500 12px/1.4 "Plus Jakarta Sans", sans-serif;
+}
+.referral-generator-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 12px;
+}
+.referral-expiry-create {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+    color: #5B2735;
+    font: 700 11px/1.3 "Plus Jakarta Sans", sans-serif;
+}
+.referral-date-field {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 13px;
+    border: 1px solid #EBD5D1;
+    border-radius: 12px;
+    background: rgba(255,255,255,.85);
+    color: #7D263B;
+    box-shadow: inset 0 1px 2px rgba(76, 29, 39, .025);
+}
+.referral-date-field input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    color: #3A2028 !important;
+    color-scheme: light;
+    font: 600 12px "JetBrains Mono", monospace !important;
+    box-shadow: none !important;
+}
+.referral-generator .cust-primary-btn {
+    min-width: 174px;
+    height: 48px;
+    padding: 0 20px;
+    border: 1px solid #8D1D3A !important;
+    border-radius: 12px !important;
+    background: linear-gradient(110deg, #A72D4A, #78172F) !important;
+    color: #FFF9F7 !important;
+    box-shadow: 0 8px 18px rgba(132, 28, 54, .18) !important;
+    font: 800 12px "Plus Jakarta Sans", sans-serif !important;
+}
+.referral-generator .cust-primary-btn:hover {
+    background: linear-gradient(110deg, #B43B56, #861D38) !important;
+    transform: translateY(-1px);
+}
+.referral-section { margin-top: 26px; }
+.referral-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.referral-section-heading h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 !important;
+    color: #391722 !important;
+    font: 800 19px/1.25 "Plus Jakarta Sans", sans-serif !important;
+    letter-spacing: -.5px;
+}
+.referral-section-heading h2 i { color: #8C2941; font-size: 17px; }
+.referral-search {
+    width: min(310px, 52%);
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 13px;
+    border: 1px solid #F0DCD6;
+    border-radius: 999px;
+    background: rgba(255,255,255,.7);
+    color: #8A4352;
+}
+.referral-search input {
+    width: 100%;
+    min-width: 0;
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    color: #39232B !important;
+    font: 500 11px "Plus Jakarta Sans", sans-serif !important;
+    box-shadow: none !important;
+}
+.referral-search input::placeholder { color: #A18C91; }
+.referral-cards { gap: 12px !important; }
+.referral-code-card {
+    overflow: hidden;
+    border: 1px solid #F0DDD7 !important;
+    border-left: 4px solid #E7A05B !important;
+    border-radius: 17px !important;
+    background: rgba(255,255,255,.8) !important;
+    box-shadow: 0 8px 20px rgba(108, 43, 54, .065);
+}
+.referral-code-card:nth-child(even) { border-left-color: #C58AA8 !important; }
+.referral-code-card:hover {
+    border-color: #E9C9C1 !important;
+    box-shadow: 0 11px 24px rgba(108, 43, 54, .09);
+}
+.referral-delete-reveal {
+    background: #B52F3D !important;
+    color: #fff !important;
+}
+.referral-swipe-content {
+    min-height: 0 !important;
+    padding: 17px 17px 15px !important;
+    background: transparent !important;
+    color: #38232B !important;
+}
+.referral-card-main { width: 100%; }
+.referral-card-topline {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    margin-bottom: 12px;
+}
+.referral-card-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #FFF0E6;
+    color: #A13A42;
+    font-size: 16px;
+}
+.referral-code-wrap {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+.referral-code {
+    overflow-wrap: anywhere;
+    color: #321720 !important;
+    font: 800 13px/1.4 "JetBrains Mono", monospace !important;
+    letter-spacing: .1px;
+}
+.referral-copy-icon {
+    width: 29px;
+    height: 29px;
+    flex: 0 0 29px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #8B2B41;
+    cursor: pointer;
+}
+.referral-copy-icon:hover { background: #FBEAE5; }
+.referral-status-badge,
+.customer-status-pill,
+.referral-active-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font: 700 10px "Plus Jakarta Sans", sans-serif;
+}
+.referral-status-badge.active,
+.customer-status-pill.active,
+.referral-active-pill { background: #E6F5E9; color: #197446; }
+.referral-status-badge.used { background: #FFF0DB; color: #A45A0D; }
+.referral-status-badge.expired,
+.referral-status-badge.revoked,
+.customer-status-pill.expired,
+.customer-status-pill.disabled { background: #FCE8E7; color: #B33B42; }
+.referral-status-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.referral-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin: 7px 0 0 53px;
+    color: #796970;
+    font: 500 11px/1.5 "Plus Jakarta Sans", sans-serif;
+    overflow-wrap: anywhere;
+}
+.referral-detail-row i { width: 13px; margin-top: 2px; color: #9B5864; }
+.referral-detail-row strong { color: #85263C; font-weight: 800; }
+.referral-redeemed-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 13px 0 0 53px;
+    padding-top: 11px;
+    border-top: 1px solid #F1E4DF;
+    color: #87777C;
+    font: 500 10px/1.5 "Plus Jakarta Sans", sans-serif;
+}
+.referral-redeemed-note i { color: #9D5360; margin-top: 1px; }
+.referral-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 14px 0 0 53px;
+}
+.referral-card-actions button,
+.referral-expiry-editor-actions button {
+    min-height: 34px;
+    padding: 7px 11px;
+    border: 1px solid #EBDAD5;
+    border-radius: 9px;
+    background: #FFFAF8 !important;
+    color: #6E2739 !important;
+    font: 700 10px "Plus Jakarta Sans", sans-serif;
+    cursor: pointer;
+}
+.referral-card-actions button:hover,
+.referral-expiry-editor-actions button:hover { background: #FCEEE9 !important; border-color: #E3C4BB; }
+.referral-card-actions .referral-action-danger { color: #B33B42 !important; }
+.referral-card-actions .referral-action-quiet { color: #88777D !important; }
+.referral-expiry-editor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 9px;
+    margin: 13px 0 0 53px;
+    padding: 12px;
+    border: 1px solid #F0DAD3;
+    border-radius: 12px;
+    background: #FFF8F5;
+}
+.referral-expiry-editor[hidden] { display: none !important; }
+.referral-expiry-editor label {
+    display: flex;
+    flex: 1 1 190px;
+    flex-direction: column;
+    gap: 6px;
+    color: #6D3442;
+    font: 700 10px "Plus Jakarta Sans", sans-serif;
+}
+.referral-expiry-input {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 0 9px;
+    border: 1px solid #EBD6D0 !important;
+    border-radius: 9px;
+    background: #fff !important;
+    color: #39232B !important;
+    color-scheme: light;
+    font: 11px "JetBrains Mono", monospace !important;
+}
+.referral-expiry-editor small { flex: 1 0 100%; color: #9A858B; font: 10px "Plus Jakarta Sans", sans-serif; }
+.referral-expiry-editor-actions { display: flex; gap: 7px; }
+.referral-expiry-editor-actions .expiry-save {
+    background: #8B203A !important;
+    border-color: #8B203A;
+    color: #fff !important;
+}
+.customer-section { margin-top: 32px; }
+.referral-active-pill { font-size: 10px; }
+.referral-active-pill i { font-size: 7px; }
+.customer-cards { gap: 12px !important; }
+.customer-management-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 16px !important;
+    border: 1px solid #F0DDD7 !important;
+    border-radius: 17px !important;
+    background: rgba(255,255,255,.82) !important;
+    box-shadow: 0 8px 20px rgba(108, 43, 54, .06);
+}
+.customer-avatar {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #FCE1D8, #F7B9A9);
+    color: #81233B;
+    font: 800 17px "Plus Jakarta Sans", sans-serif;
+}
+.customer-info { min-width: 0; flex: 1; }
+.customer-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.customer-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: #321720 !important;
+    font: 800 13px "JetBrains Mono", monospace !important;
+}
+.customer-status-pill { font-size: 9px; }
+.customer-status-pill i { font-size: 6px; }
+.customer-meta {
+    margin-top: 7px !important;
+    color: #84747A !important;
+    font: 500 10px "Plus Jakarta Sans", sans-serif !important;
+}
+.customer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start !important;
+    gap: 7px;
+    margin-top: 12px;
+}
+.customer-actions button {
+    min-height: 35px !important;
+    padding: 7px 11px !important;
+    border: 1px solid #EBDAD5 !important;
+    border-radius: 9px !important;
+    background: #FFFAF8 !important;
+    color: #70283A !important;
+    font: 700 10px "Plus Jakarta Sans", sans-serif !important;
+}
+.customer-actions button.danger { color: #B33B42 !important; }
+.referrals-page .cust-empty {
+    border: 1px dashed #E7CFC8 !important;
+    background: rgba(255,255,255,.55) !important;
+    color: #987F86 !important;
+    border-radius: 14px !important;
+    padding: 25px 16px !important;
+    font: 500 12px "Plus Jakarta Sans", sans-serif !important;
+}
+.referrals-page .gp-loading-card {
+    background: linear-gradient(90deg, #FFF9F6, #FBEDE8, #FFF9F6) !important;
+    border: 1px solid #F0DDD7 !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+}
+@media (max-width: 700px) {
+    .referrals-page .referral-console { padding: 22px 16px 76px !important; }
+    .referral-page-intro { margin-bottom: 19px; }
+    .referral-stats { gap: 8px; }
+    .referral-stat-card { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 10px; border-radius: 14px; }
+    .referral-stat-icon { width: 34px; height: 34px; flex-basis: 34px; font-size: 14px; }
+    .referral-stat-card strong { font-size: 21px; }
+    .referral-stat-card span:last-child { font-size: 9px; }
+    .referral-generator { padding: 16px; border-radius: 17px; }
+    .referral-generator-heading h2 { font-size: 16px; }
+    .referral-generator-controls { grid-template-columns: minmax(0,1fr); }
+    .referral-generator .cust-primary-btn { width: 100%; }
+    .referral-section-heading { align-items: flex-start; flex-direction: column; }
+    .referral-search { width: 100%; box-sizing: border-box; }
+    .referral-section-heading h2 { font-size: 17px !important; }
+    .referral-swipe-content { padding: 14px 13px !important; }
+    .referral-card-topline { gap: 8px; }
+    .referral-card-icon { width: 36px; height: 36px; flex-basis: 36px; }
+    .referral-code { font-size: 11px !important; }
+    .referral-status-badge { padding: 5px 8px; font-size: 9px; }
+    .referral-detail-row,
+    .referral-redeemed-note,
+    .referral-card-actions,
+    .referral-expiry-editor { margin-left: 44px; }
+    .customer-management-item { align-items: flex-start; padding: 13px !important; }
+    .customer-actions button { flex: 1 1 auto; }
+}
+@media (max-width: 380px) {
+    .referrals-page .referral-console { padding-left: 12px !important; padding-right: 12px !important; }
+    .referral-stat-card { padding: 10px 8px; }
+    .referral-card-topline { flex-wrap: wrap; }
+    .referral-status-badge { margin-left: auto; }
+    .customer-card-heading { align-items: flex-start; flex-direction: column; }
+}
+
+
+/* Mobile referral-card overflow and swipe reveal corrections */
+.referrals-page,
+.referrals-page .layout,
+.referrals-page .content,
+.referrals-page main.content,
+.referrals-page .overview-section,
+.referrals-page .referral-console {
+    background-color: #FFF5F0 !important;
+}
+.referrals-page .referral-cards {
+    min-width: 0;
+    overflow: visible;
+}
+.referrals-page .referral-code-card {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    isolation: isolate;
+}
+.referrals-page .referral-delete-reveal {
+    z-index: 0;
+    width: 88px;
+    min-width: 88px;
+    inset: 0 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    border-radius: 0 16px 16px 0;
+    background: #9F2940 !important;
+    color: #FFF !important;
+}
+.referrals-page .referral-swipe-content {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    transform: translateX(0) !important;
+    transition: transform .2s ease !important;
+    will-change: transform;
+    background: #FFFCFA !important;
+}
+.referrals-page .referral-swipe-item:not(.swiped) .referral-swipe-content {
+    transform: translateX(0) !important;
+}
+.referrals-page .referral-swipe-item.swiped .referral-swipe-content {
+    transform: translateX(-88px) !important;
+}
+.referrals-page .referral-swipe-item.swiped .referral-delete-reveal {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+.referrals-page .referral-card-main {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+.referrals-page .referral-card-topline {
+    width: 100%;
+    min-width: 0;
+}
+.referrals-page .referral-code-wrap {
+    min-width: 0;
+    max-width: 100%;
+}
+.referrals-page .referral-code {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.referrals-page .referral-detail-row {
+    min-width: 0;
+    max-width: 100%;
+}
+.referrals-page .referral-detail-row span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.referrals-page .referral-redeemed-note {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.referrals-page .customer-management-item {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid #EAD4CD !important;
+    background: #FFFCFA !important;
+    box-shadow: 0 7px 18px rgba(105, 45, 53, .075) !important;
+}
+.referrals-page .customer-info {
+    min-width: 0;
+    width: 100%;
+}
+.referrals-page .customer-actions {
+    min-width: 0;
+}
+.referrals-page .customer-actions button {
+    white-space: nowrap;
+}
+@media (max-width: 430px) {
+    .referrals-page .referral-swipe-content {
+        padding: 14px 12px !important;
+    }
+    .referrals-page .referral-card-topline {
+        display: grid;
+        grid-template-columns: 36px minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: 8px;
+    }
+    .referrals-page .referral-card-icon {
+        width: 36px;
+        height: 36px;
+    }
+    .referrals-page .referral-code-wrap {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .referrals-page .referral-code {
+        font-size: 10px !important;
+        line-height: 1.35 !important;
+    }
+    .referrals-page .referral-status-badge {
+        max-width: 72px;
+        white-space: nowrap;
+        padding: 5px 7px;
+        font-size: 8px;
+    }
+    .referrals-page .referral-detail-row,
+    .referrals-page .referral-redeemed-note,
+    .referrals-page .referral-card-actions,
+    .referrals-page .referral-expiry-editor {
+        margin-left: 44px;
+    }
+    .referrals-page .referral-detail-row {
+        font-size: 10px;
+    }
+    .referrals-page .customer-management-item {
+        align-items: flex-start;
+    }
+}
+
+
+/* Tighten the fixed-header clearance on the referrals page.
+   The global mobile content offset and this page's topbar spacer were stacking. */
+@media (max-width: 700px) {
+    .referrals-page .content {
+        padding-top: 32px !important;
+    }
+    .referrals-page .topbar {
+        padding-top: 46px !important;
+        margin-bottom: 0 !important;
+    }
+    .referrals-page .referral-console {
+        padding-top: 12px !important;
+    }
+}
+
+
+
+/* Premium compact styling for the customer access-expiry editor.
+   Explicitly overrides global form/label/button rules used elsewhere in the panel. */
+.referrals-page .customer-expiry-editor {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px !important;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 12px 0 10px !important;
+    padding: 12px !important;
+    border: 1px solid #EAD6D0 !important;
+    border-radius: 13px !important;
+    background: #FFF7F3 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+.referrals-page .customer-expiry-editor[hidden] {
+    display: none !important;
+}
+.referrals-page .customer-expiry-editor label {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px !important;
+    width: 100%;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #713A49 !important;
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    letter-spacing: .01em !important;
+    text-transform: none !important;
+}
+.referrals-page .customer-expiry-editor label span {
+    display: block;
+    margin: 0 !important;
+    color: #713A49 !important;
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+}
+.referrals-page .customer-expiry-input {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: 43px !important;
+    min-height: 43px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border: 1px solid #DEC5BE !important;
+    border-radius: 9px !important;
+    outline: none !important;
+    background: #FFFFFF !important;
+    color: #30232A !important;
+    -webkit-text-fill-color: #30232A !important;
+    color-scheme: light;
+    font-family: inherit !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0 !important;
+    box-shadow: 0 1px 3px rgba(70,30,40,.05) !important;
+}
+.referrals-page .customer-expiry-input:focus {
+    border-color: #A64B60 !important;
+    box-shadow: 0 0 0 3px rgba(166,75,96,.12) !important;
+}
+.referrals-page .customer-expiry-editor-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 8px !important;
+    width: 100%;
+    margin: 0 !important;
+}
+.referrals-page .customer-expiry-editor-actions button {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto !important;
+    min-width: 92px;
+    min-height: 37px !important;
+    height: 37px !important;
+    margin: 0 !important;
+    padding: 0 13px !important;
+    border: 1px solid #E1CBC5 !important;
+    border-radius: 9px !important;
+    background: #FFFFFF !important;
+    color: #713A49 !important;
+    -webkit-text-fill-color: #713A49 !important;
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+}
+.referrals-page .customer-expiry-editor-actions button.customer-expiry-save {
+    border-color: #8E3048 !important;
+    background: #8E3048 !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+.referrals-page .customer-expiry-editor-actions button:active {
+    transform: translateY(1px);
+}
+.referrals-page .customer-expiry-editor small {
+    display: block !important;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #8A747B !important;
+    font-family: inherit !important;
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    line-height: 1.45 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+@media (max-width: 430px) {
+    .referrals-page .customer-expiry-editor {
+        gap: 8px !important;
+        padding: 10px !important;
+    }
+    .referrals-page .customer-expiry-input {
+        height: 41px !important;
+        min-height: 41px !important;
+        font-size: 12px !important;
+    }
+    .referrals-page .customer-expiry-editor-actions button {
+        min-width: 0;
+        flex: 1 1 0 !important;
+        padding: 0 10px !important;
+    }
+}

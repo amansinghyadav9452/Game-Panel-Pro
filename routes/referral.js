@@ -320,6 +320,42 @@ router.put("/customers/:id/status", auth, async (req, res) => {
 
 });
 
+
+// Set a customer's access expiry to an exact admin-selected date/time.
+// Past dates are allowed and immediately make the account expired.
+router.put("/customers/:id/expiry", auth, async (req, res) => {
+    try {
+        const { expiryAt: requestedExpiryAt } = req.body || {};
+        const expiryAt = new Date(requestedExpiryAt);
+
+        if (!requestedExpiryAt || Number.isNaN(expiryAt.getTime())) {
+            return res.status(400).json({
+                success: false,
+                message: "Choose a valid expiry date and time."
+            });
+        }
+
+        const customer = await Customer.findById(req.params.id);
+        if (!customer) {
+            return res.status(404).json({
+                success: false,
+                message: "Customer not found."
+            });
+        }
+
+        customer.expiryAt = expiryAt;
+        await customer.save();
+
+        res.json({
+            success: true,
+            customer: { ...customer.toObject(), password: undefined }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+});
+
 // Extend a customer's access without issuing a new referral code.
 router.put("/customers/:id/extend", auth, async (req, res) => {
 

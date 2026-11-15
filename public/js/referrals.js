@@ -10,6 +10,15 @@
 
     const referralsList = document.getElementById("referralsList");
     const customersList = document.getElementById("customersList");
+    const referralSearch = document.getElementById("referralSearch");
+    let allReferrals = [];
+    let allCustomers = [];
+
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[char]));
+    }
 
     function fmtDate(d) {
         return new Date(d).toLocaleString();
@@ -37,20 +46,28 @@
         const status = statusFor(r);
         const used = r.status === "used";
         const editable = r.status !== "used" && r.status !== "revoked";
+        const code = escapeHtml(r.code);
+        const username = r.usedBy ? escapeHtml(r.usedBy.username) : "";
+        const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
 
         return `
-            <div class="referral-swipe-item" data-id="${r._id}" data-used="${used}">
-                <button class="referral-delete-reveal" data-action="delete" aria-label="Delete referral ${r.code}">
-                    <i class="fa-solid fa-trash"></i>
+            <article class="referral-code-card referral-swipe-item" data-id="${escapeHtml(r._id)}" data-search="${escapeHtml(`${r.code} ${r.usedBy?.username || ""}`.toLowerCase())}" data-used="${used}">
+                <button class="referral-delete-reveal" data-action="delete" aria-label="Delete referral ${code}">
+                    <i class="fa-regular fa-trash-can"></i><span>Delete</span>
                 </button>
                 <div class="referral-swipe-content">
                     <div class="referral-card-main">
-                        <div class="referral-code">${r.code}</div>
-                        <div class="referral-meta">
-                            <span>EXPIRES ${fmtDate(r.expiryAt)}</span>
-                            ${r.usedBy ? `<span>USED BY ${r.usedBy.username}</span>` : ""}
-                            <span class="referral-status ${status}">${status}</span>
+                        <div class="referral-card-topline">
+                            <span class="referral-card-icon"><i class="fa-solid fa-ticket"></i></span>
+                            <div class="referral-code-wrap">
+                                <strong class="referral-code">${code}</strong>
+                                <button class="referral-copy-icon" data-action="copy" type="button" aria-label="Copy referral code"><i class="fa-regular fa-copy"></i></button>
+                            </div>
+                            <span class="referral-status-badge ${status}">${statusLabel}</span>
                         </div>
+                        <div class="referral-detail-row"><i class="fa-regular fa-calendar"></i><span>Expires ${escapeHtml(fmtDate(r.expiryAt))}</span></div>
+                        ${r.usedBy ? `<div class="referral-detail-row"><i class="fa-regular fa-user"></i><span>Used by <strong>${username}</strong></span></div>` : `<div class="referral-detail-row"><i class="fa-regular fa-user"></i><span>Not redeemed yet</span></div>`}
+                        ${used ? `<div class="referral-redeemed-note"><i class="fa-solid fa-circle-info"></i> Redeemed. Customer access expiry is managed separately.</div>` : ""}
                         ${editable ? `
                             <div class="referral-expiry-editor" hidden>
                                 <label>
@@ -58,22 +75,42 @@
                                     <input type="datetime-local" class="referral-expiry-input" value="${toLocalDateTimeValue(r.expiryAt)}">
                                 </label>
                                 <div class="referral-expiry-editor-actions">
-                                    <button type="button" data-action="save-expiry" class="expiry-save">Save expiry</button>
+                                    <button type="button" data-action="save-expiry" class="expiry-save"><i class="fa-solid fa-check"></i> Save expiry</button>
                                     <button type="button" data-action="cancel-expiry">Cancel</button>
                                 </div>
-                                <small>Setting a past date expires this code immediately.</small>
+                                <small>Set an earlier date to expire this code immediately.</small>
                             </div>
-                        ` : used ? `<div class="referral-expiry-note">Redeemed. Customer access expiry is managed separately.</div>` : ""}
-                    </div>
-                    <div class="referral-actions">
-                        <button data-action="copy">Copy</button>
-                        ${editable ? `<button data-action="edit-expiry" class="expiry-edit"><i class="fa-solid fa-calendar-days"></i> Edit expiry</button>` : ""}
-                        ${r.status === "active" ? `<button data-action="revoke" class="danger">Revoke</button>` : ""}
-                        ${!used ? `<button data-action="delete" class="danger desktop-only">Delete</button>` : ""}
+                        ` : ""}
+                        <div class="referral-card-actions">
+                            ${editable ? `<button data-action="edit-expiry" class="expiry-edit"><i class="fa-regular fa-calendar"></i> Edit expiry</button>` : ""}
+                            ${r.status === "active" ? `<button data-action="revoke" class="referral-action-danger"><i class="fa-solid fa-ban"></i> Revoke</button>` : ""}
+                            ${!used ? `<button data-action="delete" class="referral-action-quiet"><i class="fa-regular fa-trash-can"></i> Delete</button>` : ""}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </article>
         `;
+    }
+
+    function updateReferralStats() {
+        const total = allReferrals.length;
+        const redeemed = allReferrals.filter((r) => r.status === "used").length;
+        const activeUsers = allCustomers.filter((c) => c.status !== "disabled" && new Date(c.expiryAt) > new Date()).length;
+        document.getElementById("referralTotalCount").textContent = total;
+        document.getElementById("referralRedeemedCount").textContent = redeemed;
+        document.getElementById("referralActiveCustomers").textContent = activeUsers;
+        document.getElementById("customerActiveCount").textContent = `${activeUsers} active`;
+    }
+
+    function renderReferrals() {
+        const query = (referralSearch?.value || "").trim().toLowerCase();
+        const filtered = allReferrals.filter((r) => {
+            const haystack = `${r.code || ""} ${r.usedBy?.username || ""}`.toLowerCase();
+            return haystack.includes(query);
+        });
+        referralsList.innerHTML = filtered.length
+            ? filtered.map(referralItemHtml).join("")
+            : `<p class="cust-empty">${query ? "No matching referral codes." : "No referral codes yet."}</p>`;
     }
 
     function showListLoading(list, count = 4) {
@@ -82,15 +119,17 @@
     }
 
     async function loadReferrals() {
-        showListLoading(referralsList, 4);
+        showListLoading(referralsList, 3);
         try {
             const res = await apiFetch("/referral");
             const data = await res.json();
-            if (!data.success || !data.referrals.length) {
-                referralsList.innerHTML = `<p class="cust-empty">No referral codes yet.</p>`;
+            if (!data.success || !Array.isArray(data.referrals)) {
+                referralsList.innerHTML = `<p class="cust-empty">Failed to load referral codes.</p>`;
                 return;
             }
-            referralsList.innerHTML = data.referrals.map(referralItemHtml).join("");
+            allReferrals = data.referrals;
+            renderReferrals();
+            updateReferralStats();
         } catch (err) {
             console.error(err);
             referralsList.innerHTML = `<p class="cust-empty">Failed to load referral codes.</p>`;
@@ -195,8 +234,12 @@
 
         if (action === "copy") {
             const code = item.querySelector(".referral-code")?.textContent || "";
-            try { await navigator.clipboard.writeText(code); } catch (_) {}
-            showToast("Copied", code, "success");
+            try {
+                await navigator.clipboard.writeText(code);
+                showToast("Copied", code, "success");
+            } catch (_) {
+                showToast("Copy unavailable", "Select and copy the referral code manually.", "error");
+            }
             return;
         }
 
@@ -275,31 +318,52 @@
     function customerItemHtml(c) {
         const expired = new Date(c.expiryAt) <= new Date();
         const status = c.status === "disabled" ? "disabled" : (expired ? "expired" : "active");
+        const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+        const username = escapeHtml(c.username);
         return `
-            <div class="customer-management-item" data-id="${c._id}">
-                <div>
-                    <div class="customer-name">${c.username}</div>
-                    <div class="customer-meta">ACCESS UNTIL ${fmtDate(c.expiryAt)} • <span class="referral-status ${status === "active" ? "active" : "expired"}">${status}</span></div>
+            <article class="customer-management-item" data-id="${escapeHtml(c._id)}">
+                <span class="customer-avatar">${escapeHtml((c.username || "?").charAt(0).toUpperCase())}</span>
+                <div class="customer-info">
+                    <div class="customer-card-heading">
+                        <strong class="customer-name">${username}</strong>
+                        <span class="customer-status-pill ${status}"><i class="fa-solid fa-circle"></i>${statusLabel}</span>
+                    </div>
+                    <div class="customer-meta">Access until ${escapeHtml(fmtDate(c.expiryAt))}</div>
+                    <div class="customer-expiry-editor" hidden>
+                        <label>
+                            <span>Set access expiry</span>
+                            <input type="datetime-local" class="customer-expiry-input" value="${toLocalDateTimeValue(c.expiryAt)}">
+                        </label>
+                        <div class="customer-expiry-editor-actions">
+                            <button type="button" data-action="save-expiry" class="customer-expiry-save"><i class="fa-solid fa-check"></i> Save date</button>
+                            <button type="button" data-action="cancel-expiry">Cancel</button>
+                        </div>
+                        <small>Future date extends access. Past date reduces validity or expires access immediately.</small>
+                    </div>
+                    <div class="customer-actions">
+                        <button data-action="set-expiry"><i class="fa-regular fa-calendar-days"></i> Set expiry</button>
+                        ${c.status === "disabled" ? `<button data-action="enable"><i class="fa-solid fa-circle-check"></i> Enable</button>` : `<button data-action="disable" class="danger"><i class="fa-solid fa-ban"></i> Disable</button>`}
+                        <button data-action="delete" class="danger"><i class="fa-regular fa-trash-can"></i> Delete</button>
+                    </div>
                 </div>
-                <div class="customer-actions">
-                    <button data-action="extend">+30d</button>
-                    ${c.status === "disabled" ? `<button data-action="enable">Enable</button>` : `<button data-action="disable" class="danger">Disable</button>`}
-                    <button data-action="delete" class="danger">Delete</button>
-                </div>
-            </div>
+            </article>
         `;
     }
 
     async function loadCustomers() {
-        showListLoading(customersList, 3);
+        showListLoading(customersList, 2);
         try {
             const res = await apiFetch("/customers");
             const data = await res.json();
-            if (!data.success || !data.customers.length) {
-                customersList.innerHTML = `<p class="cust-empty">No customers yet.</p>`;
+            if (!data.success || !Array.isArray(data.customers)) {
+                customersList.innerHTML = `<p class="cust-empty">Failed to load customers.</p>`;
                 return;
             }
-            customersList.innerHTML = data.customers.map(customerItemHtml).join("");
+            allCustomers = data.customers;
+            customersList.innerHTML = allCustomers.length
+                ? allCustomers.map(customerItemHtml).join("")
+                : `<p class="cust-empty">No customers yet.</p>`;
+            updateReferralStats();
         } catch (err) {
             console.error(err);
             customersList.innerHTML = `<p class="cust-empty">Failed to load customers.</p>`;
@@ -313,14 +377,56 @@
         const action = btn.dataset.action;
         if (!id) return;
 
+        const customerCard = btn.closest(".customer-management-item");
+        const expiryEditor = customerCard?.querySelector(".customer-expiry-editor");
+
+        if (action === "set-expiry") {
+            if (expiryEditor) {
+                expiryEditor.hidden = false;
+                expiryEditor.querySelector("input")?.focus();
+            }
+            return;
+        }
+
+        if (action === "cancel-expiry") {
+            if (expiryEditor) expiryEditor.hidden = true;
+            return;
+        }
+
+        if (action === "save-expiry") {
+            const input = expiryEditor?.querySelector(".customer-expiry-input");
+            const expiryAt = localDateTimeToIso(input?.value || "");
+            if (!expiryAt) {
+                showToast("Error", "Choose a valid expiry date and time.", "error");
+                input?.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                const res = await apiFetch(`/customers/${id}/expiry`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ expiryAt })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    showToast("Error", data.message || "Could not update customer expiry.", "error");
+                    return;
+                }
+                showToast("Access expiry updated", "Customer validity now matches the selected date and time.", "success");
+                await loadCustomers();
+            } catch (err) {
+                console.error(err);
+                showToast("Error", "Server connection failed.", "error");
+            } finally {
+                btn.disabled = false;
+            }
+            return;
+        }
+
         let res;
-        if (action === "extend") {
-            res = await apiFetch(`/customers/${id}/extend`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ expiryDays: 30 })
-            });
-        } else if (action === "disable" || action === "enable") {
+        if (action === "disable" || action === "enable") {
             res = await apiFetch(`/customers/${id}/status`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -340,6 +446,8 @@
         showToast("Updated", "Customer record updated.", "success");
         loadCustomers();
     });
+
+    referralSearch?.addEventListener("input", renderReferrals);
 
     loadReferrals();
     loadCustomers();
