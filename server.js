@@ -76,7 +76,7 @@ app.get("/sw.js", (req, res) => {
 
 });
 
-app.use(express.static("public", {
+app.use(express.static(path.join(__dirname, "public"), {
 
     etag: true,
 
