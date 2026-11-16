@@ -214,7 +214,6 @@ function renderLogs(data) {
 
     const successLogs = data.logs.filter(log => log.status === "success").length;
     const failedLogs = data.logs.filter(log => log.status !== "success").length;
-    const premiumLogs = data.logs.filter(log => String(log.licenseType || "").toLowerCase() === "premium").length;
     const uniqueDevices = new Set(data.logs.map(log => log.serial).filter(Boolean)).size;
     const rangeLabels = {live:"Live", "2h":"Last 2 Hours", "24h":"Last 24 Hours", "7d":"Last 7 Days", "1m":"Last 1 Month"};
     const rangeLabel = rangeLabels[data.range] || "Last 24 Hours";
@@ -224,18 +223,14 @@ function renderLogs(data) {
 
     let html = `
         <div class="logs-intro">
-            <div>
-                <div class="logs-kicker">ACTIVITY CENTER</div>
-                <div class="logs-subtitle">Track · Analyze · Stay in Control</div>
-            </div>
-            <div class="logs-signature" aria-hidden="true">Every<br>Login<br>Tells a Story</div>
+            <div class="logs-subtitle">Track · Analyze · Stay in Control</div>
         </div>
 
         <div class="logs-stats">
-            <div class="stat-card total"><div class="stat-card-icon"><i class="fa-solid fa-database"></i></div><div class="stat-number">${data.totalLogs}</div><div class="stat-label">Total Logs</div><div class="stat-spark"></div></div>
-            <div class="stat-card success"><div class="stat-card-icon"><i class="fa-solid fa-circle-check"></i></div><div class="stat-number">${successLogs}</div><div class="stat-label">Successful</div><div class="stat-spark"></div></div>
-            <div class="stat-card failed"><div class="stat-card-icon"><i class="fa-solid fa-circle-xmark"></i></div><div class="stat-number">${failedLogs}</div><div class="stat-label">Failed</div><div class="stat-spark"></div></div>
-            <div class="stat-card devices"><div class="stat-card-icon"><i class="fa-solid fa-mobile-screen-button"></i></div><div class="stat-number">${uniqueDevices}</div><div class="stat-label">Devices</div><div class="stat-spark"></div></div>
+            <div class="stat-card total"><div class="stat-card-icon"><i class="fa-solid fa-database"></i></div><div class="stat-copy"><div class="stat-number">${Number(data.totalLogs || 0).toLocaleString()}</div><div class="stat-label">Total Logs</div></div><i class="stat-decoration fa-solid fa-chart-simple" aria-hidden="true"></i></div>
+            <div class="stat-card success"><div class="stat-card-icon"><i class="fa-regular fa-circle-check"></i></div><div class="stat-copy"><div class="stat-number">${successLogs.toLocaleString()}</div><div class="stat-label">Successful</div></div><i class="stat-decoration fa-solid fa-chart-line" aria-hidden="true"></i></div>
+            <div class="stat-card failed"><div class="stat-card-icon"><i class="fa-regular fa-circle-xmark"></i></div><div class="stat-copy"><div class="stat-number">${failedLogs.toLocaleString()}</div><div class="stat-label">Failed</div></div></div>
+            <div class="stat-card devices"><div class="stat-card-icon"><i class="fa-solid fa-mobile-screen-button"></i></div><div class="stat-copy"><div class="stat-number">${uniqueDevices.toLocaleString()}</div><div class="stat-label">Devices</div></div><i class="stat-decoration fa-solid fa-signal" aria-hidden="true"></i></div>
         </div>
 
         <div class="logs-toolbar">
@@ -244,9 +239,9 @@ function renderLogs(data) {
 
         <div class="logs-controls">
             <div class="filter-tabs">
-                <button class="log-filter ${activeStatusFilter === "all" ? "active" : ""}" data-filter="all"><i class="fa-solid fa-list"></i> All Logs</button>
-                <button class="log-filter ${activeStatusFilter === "success" ? "active" : ""}" data-filter="success"><i class="fa-solid fa-circle"></i> Success</button>
-                <button class="log-filter ${activeStatusFilter === "failed" ? "active" : ""}" data-filter="failed"><i class="fa-solid fa-circle"></i> Failed</button>
+                <button class="log-filter ${activeStatusFilter === "all" ? "active" : ""}" data-filter="all"><i class="fa-solid fa-list"></i><span>All Logs</span></button>
+                <button class="log-filter ${activeStatusFilter === "success" ? "active" : ""}" data-filter="success"><i class="fa-solid fa-circle"></i><span>Success</span></button>
+                <button class="log-filter ${activeStatusFilter === "failed" ? "active" : ""}" data-filter="failed"><i class="fa-solid fa-circle"></i><span>Failed</span></button>
             </div>
             <label class="sort-control" aria-label="Sort logs">
                 <i class="fa-solid fa-arrow-down-wide-short" aria-hidden="true"></i>
@@ -258,7 +253,7 @@ function renderLogs(data) {
             </label>
         </div>
 
-        <div class="logs-info"><span>Showing ${start}-${end} of ${data.totalLogs} logs</span><span class="live-indicator"><i></i>${rangeLabel}</span></div>
+        <div class="logs-info"><span>Showing ${start}–${end} of ${Number(data.totalLogs || 0).toLocaleString()} logs</span><span class="live-indicator"><i></i>${escapeHtml(rangeLabel)}</span></div>
         <div class="logs-list">
     `;
 
@@ -268,48 +263,54 @@ function renderLogs(data) {
 
     visibleLogs.forEach((log, index) => {
         const success = log.status === "success";
-        const isBanned = bannedDevices.includes(log.serial);
+        const isBanned = Boolean(log.serial) && bannedDevices.includes(log.serial);
         const theme = detectDeviceTheme(log);
         const licenseType = String(log.licenseType || "public").toLowerCase();
         const deviceName = log.deviceMarketingName || log.deviceBrand || log.deviceModel || "Unknown device";
-        const model = log.deviceModel || "—";
-        const serial = log.serial || "—";
-        const shortId = serial.length > 22 ? `${serial.slice(0, 22)}…` : serial;
+        const serial = log.serial || "";
+        const shortId = serial ? (serial.length > 22 ? `${serial.slice(0, 22)}…` : serial) : "No device ID recorded";
+
+        // Device metadata belongs to successful verifications only. Failed
+        // attempts can contain partial/untrusted request values, so do not
+        // render an empty device panel or a misleading device preview for them.
+        const metadata = success ? [
+            {icon:"fa-regular fa-user", label:"Player", value:log.playerName},
+            {icon:"fa-brands fa-android", label:"Android", value:log.androidVersion},
+            {icon:"fa-solid fa-cube", label:"App Version", value:log.appVersion}
+        ].filter(item => String(item.value || "").trim()) : [];
+        const hasDeviceIdentity = success && Boolean(
+            String(log.deviceMarketingName || "").trim() ||
+            String(log.deviceBrand || "").trim() ||
+            String(log.deviceModel || "").trim()
+        );
+        const showDeviceDetails = success && (hasDeviceIdentity || metadata.length > 0);
+        const hasVisual = success && hasDeviceIdentity;
+        const metaMarkup = metadata.length ? `
+            <div class="meta-panel ${hasVisual ? "with-device-visual" : "without-device-visual"}">
+                ${metadata.map(item => `<div class="meta-item"><i class="${item.icon}"></i><div><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong></div></div>`).join("")}
+            </div>` : "";
+        const visualMarkup = hasVisual ? deviceVisualMarkup(log, theme, deviceName) : "";
 
         html += `
-            <article class="log-card ${success ? "success" : "failed"} device-theme-${theme.className}" style="animation-delay:${index * 35}ms;${themeStyle(theme)}">
-                <div class="device-ambient" aria-hidden="true">
-                    <span class="ambient-orb"></span><span class="ambient-ring ring-one"></span><span class="ambient-ring ring-two"></span>
-                    <span class="ambient-grid"></span><span class="ambient-spark spark-one"></span><span class="ambient-spark spark-two"></span>
-                </div>
+            <article class="log-card ${success ? "success" : "failed"} ${showDeviceDetails ? "has-device-details" : "no-device-details"} device-theme-${theme.className}" style="animation-delay:${index * 25}ms;${themeStyle(theme)}">
                 <div class="status-line"></div>
                 <header class="log-card-head">
-                    <button class="device-action" data-serial="${escapeHtml(serial)}" aria-label="Device actions"><i class="fa-solid fa-mobile-screen-button"></i></button>
+                    ${serial ? `<button class="device-action" data-serial="${escapeHtml(serial)}" aria-label="Device actions"><i class="fa-solid fa-mobile-screen-button"></i></button>` : `<span class="device-action is-static" aria-hidden="true"><i class="fa-solid fa-mobile-screen-button"></i></span>`}
                     <div class="log-identity">
                         <div class="log-title-row"><h3>${escapeHtml(log.licenseKey || "Untitled license")}</h3></div>
-                        <div class="log-uuid"><span>${escapeHtml(shortId)}</span><button class="copy-id" type="button" data-copy="${escapeHtml(serial)}" aria-label="Copy ID"><i class="fa-regular fa-copy"></i></button></div>
+                        <div class="log-uuid"><span>${escapeHtml(shortId)}</span>${serial ? `<button class="copy-id" type="button" data-copy="${escapeHtml(serial)}" aria-label="Copy ID"><i class="fa-regular fa-copy"></i></button>` : ""}</div>
                     </div>
+                    <span class="status-pill ${success ? "success" : "failed"}"><i class="fa-solid ${success ? "fa-circle-check" : "fa-circle-xmark"}"></i>${success ? "Success" : "Failed"}</span>
                 </header>
 
                 <div class="log-status-row">
-                    <div class="status-stack">
-                        <span class="status-pill ${success ? "success" : "failed"}"><i class="fa-solid ${success ? "fa-circle-check" : "fa-circle-xmark"}"></i>${success ? "Success" : "Failed"}</span>
-                        <span class="license-badge ${licenseType}"><i class="fa-solid ${licenseType === "premium" ? "fa-crown" : "fa-globe"}"></i>${escapeHtml(log.licenseType || "Public")}</span>
-                    </div>
+                    <span class="license-badge ${licenseType}"><i class="fa-solid ${licenseType === "premium" ? "fa-crown" : "fa-globe"}"></i>${escapeHtml(log.licenseType || "Public")}</span>
                     <div class="log-time"><i class="fa-regular fa-clock"></i><span>${escapeHtml(getLastSeen(log.createdAt))}</span><small>${escapeHtml(formatDate(log.createdAt))}</small></div>
                 </div>
 
-                <div class="log-body">
-                    ${deviceVisualMarkup(log, theme, deviceName)}
-                    <div class="meta-panel">
-                        <div class="meta-item"><i class="fa-regular fa-user"></i><div><span>Player</span><strong>${escapeHtml(log.playerName || "—")}</strong></div></div>
-                        <div class="meta-item"><i class="fa-brands fa-android"></i><div><span>Android</span><strong>${escapeHtml(log.androidVersion || "—")}</strong></div></div>
-                        <div class="meta-item"><i class="fa-solid fa-cube"></i><div><span>App Version</span><strong>${escapeHtml(log.appVersion || "—")}</strong></div></div>
-                    </div>
-                </div>
-                <div class="log-footer"><span class="log-footer-hint"><i class="fa-solid fa-shield-halved"></i>${success ? "Verified activity" : "Attention required"}</span></div>
+                ${showDeviceDetails ? `<div class="log-body ${hasVisual ? "has-device-visual" : "metadata-only"}">${metaMarkup}${visualMarkup}</div>` : ""}
                 ${isBanned ? `<div class="banned-ribbon"><i class="fa-solid fa-ban"></i> Banned Device</div>` : ""}
-                ${!success && log.reason ? `<div class="reason-box"><strong>Reason</strong><span>${escapeHtml(log.reason)}</span></div>` : ""}
+                ${!success && log.reason ? `<div class="reason-box"><strong>Reason:</strong><span>${escapeHtml(log.reason)}</span></div>` : ""}
             </article>
         `;
     });

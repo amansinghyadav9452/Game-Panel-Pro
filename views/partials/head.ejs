@@ -3,7 +3,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<% if (["dashboard", "public-keys", "premium-keys"].includes(activePage)) { %>
+<% if (["dashboard", "public-keys", "premium-keys", "logs"].includes(activePage)) { %>
 <meta name="color-scheme" content="light">
 <% } else { %>
 <meta name="color-scheme" content="dark">
@@ -36,7 +36,7 @@ href="/css/toast.css">
 
 <link rel="stylesheet" href="/css/components/ban-modal.css">
 
-<link rel="stylesheet" href="/css/logs.css">
+<link rel="stylesheet" href="/css/logs.css?v=3">
 
 <% if (activePage !== "logs") { %>
 <link rel="stylesheet" href="/css/components/ai-copilot.css">
@@ -63,6 +63,8 @@ href="/css/toast.css">
 
 <% if (["dashboard", "public-keys", "premium-keys"].includes(activePage)) { %>
 <meta name="theme-color" content="#F1F1F1">
+<% } else if (activePage === "logs") { %>
+<meta name="theme-color" content="#FFFCF7">
 <% } else { %>
 <meta name="theme-color" content="#0F172A">
 <% } %>
