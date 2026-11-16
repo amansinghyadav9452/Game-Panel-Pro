@@ -36,6 +36,7 @@ const registerDevChat = require("./sockets/devChat");
 const ensureGameApplicationSetup = require("./services/gameApplicationSetup");
 const gameApplicationRoutes = require("./routes/gameApplications");
 const pushRoutes = require("./routes/push");
+const { configured: redisConfigured, ping: pingRedis } = require("./config/redisRest");
 
 const fs = require("fs");
 const path = require("path");
@@ -325,6 +326,14 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+server.listen(PORT, async () => {
+    console.log(`Server running on port ${PORT}`);
+    if (!redisConfigured) {
+        console.log("Redis not configured; using the built-in in-memory rate-limit and replay fallback.");
+        return;
+    }
+    const connected = await pingRedis();
+    console.log(connected
+        ? "Redis REST connected; shared rate limits and anti-replay protection are active."
+        : "Redis REST is configured but unavailable; in-memory fallback is active until it recovers.");
 });

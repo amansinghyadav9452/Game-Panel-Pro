@@ -1,23 +1,12 @@
-const rateLimit = require("express-rate-limit");
+const { createRateLimiter } = require("../config/redisRest");
 
-const connectRateLimiter = rateLimit({
-
+module.exports = createRateLimiter({
     windowMs: 60 * 1000,
-
     max: 40,
-
     standardHeaders: true,
-
     legacyHeaders: false,
-
     message: {
-
         status: false,
-
         reason: "Too many requests. Please try again later."
-
     }
-
-});
-
-module.exports = connectRateLimiter;
+}, "connect");

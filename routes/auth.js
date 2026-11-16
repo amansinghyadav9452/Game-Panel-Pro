@@ -1,6 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const rateLimit = require("express-rate-limit");
+const { createRateLimiter } = require("../config/redisRest");
 
 const Admin = require("../models/Admin");
 const Customer = require("../models/Customer");
@@ -16,7 +16,7 @@ const fetch = global.fetch;
 // ===== RATE LIMITERS =====
 
 // Strict limiter for login attempts (brute-force protection)
-const loginLimiter = rateLimit({
+const loginLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 10,                   // max 10 attempts per IP per window
     standardHeaders: true,
@@ -25,10 +25,10 @@ const loginLimiter = rateLimit({
         success: false,
         message: "Too many login attempts from this IP. Please try again later."
     }
-});
+}, "auth-login");
 
 // Slightly looser limiter for OTP verify (user may need a couple retries for typos)
-const otpVerifyLimiter = rateLimit({
+const otpVerifyLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 15,
     standardHeaders: true,
@@ -37,10 +37,10 @@ const otpVerifyLimiter = rateLimit({
         success: false,
         message: "Too many verification attempts from this IP. Please try again later."
     }
-});
+}, "auth-otp-verify");
 
 // Strict limiter for OTP resend (prevents email/SMS bombing)
-const otpResendLimiter = rateLimit({
+const otpResendLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 3,
     standardHeaders: true,
@@ -49,10 +49,10 @@ const otpResendLimiter = rateLimit({
         success: false,
         message: "Too many resend requests from this IP. Please try again later."
     }
-});
+}, "auth-otp-resend");
 
 // Strict limiter for password reset flow (prevents abuse/enumeration)
-const resetLimiter = rateLimit({
+const resetLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 5,
     standardHeaders: true,
@@ -61,7 +61,7 @@ const resetLimiter = rateLimit({
         success: false,
         message: "Too many password reset requests from this IP. Please try again later."
     }
-});
+}, "auth-password-reset");
 
 router.post("/login", loginLimiter, async (req, res) => {
 

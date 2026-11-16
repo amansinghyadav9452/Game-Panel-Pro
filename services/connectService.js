@@ -6,6 +6,7 @@ const KeyIndex = require("../models/KeyIndex");
 const Customer = require("../models/Customer");
 const GameApplication = require("../models/GameApplication");
 const md5 = require("md5");
+const { isReplay: isRedisReplay } = require("../config/redisRest");
 const { resolveMarketingName } = require("./deviceLookup");
 const { encryptAES, decryptAES, generateSignature } = require("./cryptoBridge");
 const { getCustomerKeyModel, getCustomerActivityLogModel } = require("./customerModels");
@@ -425,31 +426,23 @@ async function verifyPublicLicense(body, req) {
 const REPLAY_WINDOW_MS = 5000;
 const recentConnectRequests = new Map();
 
-function isReplay(fingerprint) {
-
-    const now = Date.now();
-    const last = recentConnectRequests.get(fingerprint);
-
-    // Opportunistically clear old entries so the map doesn't grow forever.
-    if (recentConnectRequests.size > 5000) {
-
-        for (const [key, ts] of recentConnectRequests) {
-
-            if (now - ts > REPLAY_WINDOW_MS) recentConnectRequests.delete(key);
-
+async function isReplay(fingerprint) {
+    try {
+        return await isRedisReplay(fingerprint, REPLAY_WINDOW_MS);
+    } catch (_) {
+        // Redis helper has its own in-memory fallback. Keep a final local
+        // guard here as a defensive fallback if that helper ever changes.
+        const now = Date.now();
+        const last = recentConnectRequests.get(fingerprint);
+        if (recentConnectRequests.size > 5000) {
+            for (const [key, timestamp] of recentConnectRequests) {
+                if (now - timestamp > REPLAY_WINDOW_MS) recentConnectRequests.delete(key);
+            }
         }
-
+        if (last && now - last < REPLAY_WINDOW_MS) return true;
+        recentConnectRequests.set(fingerprint, now);
+        return false;
     }
-
-    if (last && now - last < REPLAY_WINDOW_MS) {
-
-        return true;
-
-    }
-
-    recentConnectRequests.set(fingerprint, now);
-    return false;
-
 }
 
 async function verifyEncryptedConnect(body, req) {
@@ -485,7 +478,7 @@ async function verifyEncryptedConnect(body, req) {
         const userKey = decoded.slice(0, separatorIndex);
         const uuid = decoded.slice(separatorIndex + 1);
 
-        if (isReplay(`${userKey}:${uuid}`)) {
+        if (await isReplay(`${userKey}:${uuid}`)) {
 
             return {
                 status: false,
