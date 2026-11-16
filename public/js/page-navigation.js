@@ -14,7 +14,7 @@
             <div class="gp-loader-red-streak gp-loader-red-streak-top" aria-hidden="true"></div>
             <div class="gp-loader-red-streak gp-loader-red-streak-bottom" aria-hidden="true"></div>
             <div class="gp-page-loader-content">
-                <img class="gp-cheetah-runner" src="/assets/cheetah-sprint-loader.gif?v=3"
+                <img class="gp-cheetah-runner" src="/cheetah-sprint-loader.gif?v=4"
                      width="440" height="192" alt="" aria-hidden="true" decoding="async" fetchpriority="high">
                 <div class="gp-page-loader-title"><span>OPENING</span> <b>PAGE</b></div>
                 <div class="gp-page-loader-progress" role="progressbar" aria-label="Page loading" aria-valuetext="Loading">

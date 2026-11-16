@@ -54,6 +54,19 @@ app.set("views","./views/pages");
 // hash se replace kar dena taaki sabhi instances same version bheje.)
 const SW_VERSION = Date.now().toString();
 
+// Explicit loader endpoint: avoids relying on nested /assets static mapping.
+// Keep this route before express.static so it is always resolved directly.
+app.get("/cheetah-sprint-loader.gif", (req, res) => {
+    const loaderPath = path.resolve(__dirname, "public", "cheetah-sprint-loader.gif");
+    res.setHeader("Content-Type", "image/gif");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.sendFile(loaderPath, (err) => {
+        if (err && !res.headersSent) res.status(err.statusCode || 404).send("Cheetah loader asset missing on this deployment");
+    });
+});
+
 app.get("/sw.js", (req, res) => {
 
     fs.readFile(path.join(__dirname, "public", "sw.js"), "utf8", (err, content) => {
