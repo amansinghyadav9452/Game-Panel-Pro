@@ -38,6 +38,7 @@ const referralRoutes = require("./routes/referral");
 const customerRoutes = require("./routes/customer");
 const registerDevChat = require("./sockets/devChat");
 const ensureGameApplicationSetup = require("./services/gameApplicationSetup");
+const ensureDailyVerificationStatsSetup = require("./services/dailyVerificationStatsSetup");
 const gameApplicationRoutes = require("./routes/gameApplications");
 const pushRoutes = require("./routes/push");
 const { configured: redisConfigured, ping: pingRedis } = require("./config/redisRest");
@@ -120,6 +121,8 @@ connectDB().then(async () => {
     await createAdmin();
     await createSettings();
     await ensureGameApplicationSetup();
+    // Ensure owner-scoped daily counters work before accepting verification traffic.
+    await ensureDailyVerificationStatsSetup();
 
     // Background maintenance: used to run inline on every dashboard/
     // public/premium list request (that's what made pages slow). Now it

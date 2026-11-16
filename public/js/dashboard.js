@@ -228,6 +228,12 @@ if (typeof window.io === "function" && !window.__dashboardActivitySocket) {
             reconnectionDelay: 1000,
             reconnectionDelayMax: 10000
         });
+        activitySocket.on("connect", () => {
+            // Catch up after initial connection or reconnect so events missed
+            // while the dashboard was offline do not leave the graph stale.
+            const selectedRange = document.getElementById("activityRange")?.value || 7;
+            loadUserActivity(selectedRange);
+        });
         activitySocket.on("verification:request", () => {
             const selectedRange = document.getElementById("activityRange")?.value || 7;
             loadUserActivity(selectedRange);
