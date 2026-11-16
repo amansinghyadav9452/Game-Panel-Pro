@@ -199,7 +199,10 @@ async function loadUserActivity(range = 7) {
     if (!chart) return;
     chart.innerHTML = '<div class="chart-loading"><span class="chart-spinner"></span>Loading request activity</div>';
     try {
-        const response = await apiFetch(`/dashboard/user-activity?range=${encodeURIComponent(range)}`);
+        const endpoint = __dashRole === "customer"
+            ? "/customer/dashboard/user-activity"
+            : "/dashboard/user-activity";
+        const response = await apiFetch(`${endpoint}?range=${encodeURIComponent(range)}`);
         const data = await response.json();
         if (!data.success) throw new Error(data.message || "Unable to load activity");
         renderUserActivity(data);
@@ -209,18 +212,30 @@ async function loadUserActivity(range = 7) {
     }
 }
 
-if (__dashRole === "customer") {
-    const panel = document.getElementById("userActivityPanel");
-    if (panel) panel.hidden = true;
-} else {
-    loadUserActivity(7);
-    document.getElementById("activityRange")?.addEventListener("change", event => loadUserActivity(event.target.value));
-    // Keep the dashboard graph fresh while the admin leaves the page open.
-    if (!window.__dashboardActivityPoll) {
-        window.__dashboardActivityPoll = window.setInterval(() => {
+loadUserActivity(7);
+document.getElementById("activityRange")?.addEventListener("change", event => loadUserActivity(event.target.value));
+// Event-driven refresh: the server emits only after a verification request
+// has been counted, and only to the owning Admin or Customer dashboard room.
+if (typeof window.io === "function" && !window.__dashboardActivitySocket) {
+    const dashboardToken = __dashRole === "customer"
+        ? localStorage.getItem("customerToken")
+        : localStorage.getItem("token");
+    if (dashboardToken) {
+        const activitySocket = window.io({
+            auth: { token: dashboardToken },
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 10000
+        });
+        activitySocket.on("verification:request", () => {
             const selectedRange = document.getElementById("activityRange")?.value || 7;
             loadUserActivity(selectedRange);
-        }, 30000);
+        });
+        activitySocket.on("connect_error", error => {
+            console.warn("Dashboard live activity connection unavailable:", error.message);
+        });
+        window.__dashboardActivitySocket = activitySocket;
     }
 }
 

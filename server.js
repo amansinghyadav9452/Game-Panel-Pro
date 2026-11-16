@@ -3,6 +3,10 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
+const Admin = require("./models/Admin");
+const Customer = require("./models/Customer");
+const { setRealtimeServer } = require("./services/realtime");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -184,6 +188,35 @@ const io = new Server(server, {
 });
 
 registerDevChat(io);
+setRealtimeServer(io);
+
+// Dashboard realtime channel: room membership is derived from the signed-in
+// account, never accepted from client-supplied owner/customer identifiers.
+io.use(async (socket, next) => {
+    try {
+        const token = socket.handshake.auth?.token;
+        if (!token) return next(new Error("Unauthorized"));
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.scope === "customer") {
+            const customer = await Customer.findById(decoded.id).select("_id status expiryAt sessionVersion").lean();
+            if (!customer || customer.status === "disabled" || customer.expiryAt <= new Date()
+                || decoded.sessionVersion !== (Number.isInteger(customer.sessionVersion) ? customer.sessionVersion : 0)) {
+                return next(new Error("Unauthorized"));
+            }
+            socket.data.dashboardRoom = `customer:${String(customer._id)}`;
+        } else {
+            const admin = await Admin.findById(decoded.id).select("_id sessionVersion").lean();
+            if (!admin || decoded.sessionVersion !== admin.sessionVersion) return next(new Error("Unauthorized"));
+            socket.data.dashboardRoom = "admin";
+        }
+        next();
+    } catch (_) {
+        next(new Error("Unauthorized"));
+    }
+});
+io.on("connection", socket => {
+    if (socket.data.dashboardRoom) socket.join(socket.data.dashboardRoom);
+});
 
 app.use(
     helmet({

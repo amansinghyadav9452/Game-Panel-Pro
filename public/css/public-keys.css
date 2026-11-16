@@ -798,3 +798,28 @@ body.public-keys-context, body.premium-keys-context {
   .public-keys-page .pk-detail-card, .premium-keys-page .pk-detail-card { padding:13px !important; }
   .public-keys-page .pk-info-list>div, .premium-keys-page .pk-info-list>div { padding:9px !important; }
 }
+
+
+/* Mobile statistics refinement: remove excess vertical whitespace while
+   keeping the three summary cards aligned in one compact row. */
+@media (max-width: 768px) {
+  .pk-stat-grid { align-items:stretch !important; }
+  .pk-stat-card {
+    min-height:76px !important; height:76px !important;
+    padding:9px 7px !important; gap:3px !important;
+    flex-direction:column !important; justify-content:center !important;
+    align-items:center !important;
+  }
+  .pk-stat-card > div {
+    display:flex !important; flex-direction:column !important;
+    align-items:center !important; justify-content:center !important;
+    gap:2px !important; text-align:center !important;
+  }
+  .pk-stat-card small { font-size:8px !important; line-height:1.15 !important; }
+  .pk-stat-card strong { font-size:19px !important; line-height:1.05 !important; margin:0 !important; }
+}
+@media (max-width: 380px) {
+  .pk-stat-card { min-height:70px !important; height:70px !important; padding:7px 4px !important; }
+  .pk-stat-card small { font-size:7px !important; }
+  .pk-stat-card strong { font-size:17px !important; }
+}

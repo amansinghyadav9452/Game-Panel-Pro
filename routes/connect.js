@@ -7,7 +7,7 @@ const router = express.Router();
 // including malformed encrypted payloads and replay attempts.
 async function countVerificationRequest(req, res, next) {
     try {
-        await recordVerificationRequest();
+        await recordVerificationRequest(req.body || {});
     } catch (error) {
         console.error("Verification activity counter error:", error);
     }

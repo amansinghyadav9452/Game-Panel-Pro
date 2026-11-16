@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "migrate:verification-stats": "node scripts/migrateDailyVerificationStats.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,7 @@
     "morgan": "^1.11.0",
     "multer": "^2.2.0",
     "nanoid": "^5.1.16",
+    "nodemailer": "^9.0.3",
     "qrcode": "^1.5.4",
     "socket.io": "^4.8.1",
     "speakeasy": "^2.0.0",
@@ -36,8 +38,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  },
-  "overrides": {
-    "minimatch": "11.0.8"
   }
 }

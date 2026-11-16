@@ -39,91 +39,87 @@ function indiaDayKey(date = new Date()) {
     return new Date(date.getTime() + 330 * 60 * 1000).toISOString().slice(0, 10);
 }
 
-async function recordVerificationRequest() {
+async function recordVerificationRequest(body = {}) {
     const dayKey = indiaDayKey();
-    try {
-        await DailyVerificationStat.updateOne(
-            { dayKey },
-            { $inc: { requestCount: 1 }, $setOnInsert: { dayKey } },
-            { upsert: true }
-        );
-    } catch (error) {
-        // Two first requests can race while creating the day's unique row.
-        // If the unique index wins that race, retry as a normal increment.
-        if (error && error.code === 11000) {
-            await DailyVerificationStat.updateOne(
-                { dayKey },
-                { $inc: { requestCount: 1 } }
-            );
-            return;
+    const gameId = String(body.game || body.game_id || "").trim().toUpperCase();
+    let ownerKey = "unattributed";
+    let ownerType = "unattributed";
+    let customerId = null;
+
+    // Attribute requests from the registered application, never from a
+    // client-supplied customer ID. Unknown Game IDs must not pollute Admin.
+    if (gameId) {
+        const application = await GameApplication.findOne({ gameId }).select("ownerType customerId").lean();
+        if (application?.ownerType === "admin") {
+            ownerKey = "admin";
+            ownerType = "admin";
+        } else if (application?.ownerType === "customer" && application.customerId) {
+            customerId = String(application.customerId);
+            ownerKey = `customer:${customerId}`;
+            ownerType = "customer";
         }
-        throw error;
     }
+
+    const filter = { dayKey, ownerKey };
+    const update = {
+        $inc: { requestCount: 1 },
+        $setOnInsert: { dayKey, ownerKey, ownerType, customerId, gameId }
+    };
+    try {
+        await DailyVerificationStat.updateOne(filter, update, { upsert: true });
+    } catch (error) {
+        if (error && error.code === 11000) {
+            await DailyVerificationStat.updateOne(filter, { $inc: { requestCount: 1 } });
+        } else {
+            throw error;
+        }
+    }
+
+    // Push a scoped event only after the request count is persisted.
+    // Dashboards refresh on actual verification traffic, not on a timer.
+    require("./realtime").emitVerificationRequest(ownerType, customerId);
 }
 
 // A key is valid only inside the application (Game ID) that owns it.
 // Admin keys carry gameId directly; customer keys inherit the immutable
 // gameId assigned to their customer account.
 async function resolveLicenseDoc(key, type, gameId) {
-
     const normalizedGameId = String(gameId || "").trim().toUpperCase();
+    if (!normalizedGameId) return { doc: null, ownerCustomer: null, ownerType: "unattributed" };
 
-    if (!normalizedGameId) {
-        return { doc: null, ownerCustomer: null };
+    // Application ownership determines the log destination even when the
+    // supplied key is invalid. This prevents customer failures falling back
+    // into the shared Admin UserLog collection.
+    const application = await GameApplication.findOne({ gameId: normalizedGameId }).lean();
+    if (!application) return { doc: null, ownerCustomer: null, ownerType: "unattributed" };
+
+    if (application.ownerType === "customer") {
+        const ownerCustomer = await Customer.findById(application.customerId);
+        if (!ownerCustomer || ownerCustomer.gameId !== normalizedGameId) {
+            return { doc: null, ownerCustomer: null, ownerType: "unattributed" };
+        }
+        if (application.status !== "active") return { doc: null, ownerCustomer, ownerType: "customer" };
+        const indexEntry = await KeyIndex.findOne({ key, type, customerId: ownerCustomer._id });
+        if (!indexEntry) return { doc: null, ownerCustomer, ownerType: "customer" };
+        const CustomerKeyModel = getCustomerKeyModel(ownerCustomer._id);
+        const doc = await CustomerKeyModel.findOne({ key, type });
+        return { doc, ownerCustomer, ownerType: "customer" };
     }
 
-    const application = await GameApplication.findOne({
-        gameId: normalizedGameId,
-        status: "active"
-    }).lean();
-
-    if (!application) {
-        return { doc: null, ownerCustomer: null };
-    }
-
-    const adminLicense = await License.findOne({
-        key,
-        type,
-        gameId: normalizedGameId
-    });
-
-    if (adminLicense && application.ownerType === "admin") {
-
-        return { doc: adminLicense, ownerCustomer: null };
-
-    }
-
-    const indexEntry = await KeyIndex.findOne({ key, type });
-
-    if (!indexEntry) {
-
-        return { doc: null, ownerCustomer: null };
-
-    }
-
-    const ownerCustomer = await Customer.findById(indexEntry.customerId);
-
-    if (!ownerCustomer || ownerCustomer.gameId !== normalizedGameId) {
-
-        return { doc: null, ownerCustomer: null };
-
-    }
-
-    const CustomerKeyModel = getCustomerKeyModel(ownerCustomer._id);
-
-    const doc = await CustomerKeyModel.findOne({ key, type });
-
-    return { doc, ownerCustomer };
-
+    if (application.status !== "active") return { doc: null, ownerCustomer: null, ownerType: "admin" };
+    const doc = await License.findOne({ key, type, gameId: normalizedGameId });
+    return { doc, ownerCustomer: null, ownerType: "admin" };
 }
 
 // Verification-attempt logs for a customer-owned key go into that
 // customer's own isolated log collection instead of the shared
 // UserLog, so no customer's activity ever lands in another
 // collection.
-async function logAttempt(ownerCustomer, data) {
+async function logAttempt(ownerCustomer, data, ownerType = "admin") {
 
-    if (ownerCustomer) {
+    if (ownerType === "unattributed") return null;
+
+    if (ownerType === "customer" && ownerCustomer) {
 
         const ActivityLog = getCustomerActivityLogModel(ownerCustomer._id);
 
@@ -155,7 +151,7 @@ async function verifyLicense(body, req, expectedType = "public") {
 
 }
 
-    const { doc: license, ownerCustomer } = await resolveLicenseDoc(user_key, expectedType, gameId);
+    const { doc: license, ownerCustomer, ownerType } = await resolveLicenseDoc(user_key, expectedType, gameId);
 if (!license) {
 
     await logAttempt(ownerCustomer, {
@@ -169,7 +165,7 @@ if (!license) {
     reason: expectedType === "premium"
         ? "Invalid Premium Key"
         : "Invalid Public Key"
-});
+}, ownerType);
 
     return {
 
@@ -198,7 +194,7 @@ if (ownerCustomer && (ownerCustomer.status === "disabled" || ownerCustomer.expir
         androidVersion: body.android_version || "",
         status: "failed",
         reason: "Owner Access Expired"
-    });
+    }, ownerType);
 
     return {
         status: false,
@@ -218,7 +214,7 @@ if (license.expiry < new Date()) {
     androidVersion: body.android_version || "",
     status: "failed",
     reason: "License Expired"
-});
+}, ownerType);
 
     return {
         status: false,
@@ -237,7 +233,7 @@ if (license.status === "banned") {
     androidVersion: body.android_version || "",
     status: "failed",
     reason: "License Banned"
-});
+}, ownerType);
 
     return {
         status: false,
@@ -256,7 +252,7 @@ if (!serial) {
     androidVersion: body.android_version || "",
     status: "failed",
     reason: "Serial Missing"
-});
+}, ownerType);
 
     return {
 
@@ -285,7 +281,7 @@ if (bannedDevice) {
         status: "failed",
         reason: "Device Banned"
 
-    });
+    }, ownerType);
 
     return {
 
@@ -308,7 +304,7 @@ if (!game || !user_key) {
     androidVersion: body.android_version || "",
     status: "failed",
     reason: "Invalid Request"
-});
+}, ownerType);
 
     return {
 
@@ -335,7 +331,7 @@ if (!alreadyRegistered) {
     androidVersion: body.android_version || "",
     status: "failed",
     reason: "Device Limit Reached"
-});
+}, ownerType);
 
         return {
             status: false,
@@ -379,7 +375,7 @@ if (!recentSuccessLog) {
         androidVersion: body.android_version || "",
         status: "success",
         reason: ""
-    });
+    }, ownerType);
 
 }
 
@@ -562,122 +558,57 @@ async function verifyEncryptedConnect(body, req) {
 
 }
 
-async function saveClientLog(body) {
-
-    const userKey = body.user_key || "";
-    const serial = body.serial || "";
+async function saveClientLog(body = {}) {
+    const userKey = String(body.user_key || "").trim();
+    const serial = String(body.serial || "").trim();
+    if (!userKey) return { status: false, reason: "Missing key" };
 
     const deviceModel = body.device_model || "";
     const deviceBrand = body.device_brand || "";
     const androidVersion = body.android_version || "";
     const appVersion = body.app_version || "";
     const playerName = body.player_name || "";
-
     const resolved = await resolveMarketingName(deviceModel);
     const deviceMarketingName = resolved?.marketingName || "";
 
+    // KeyIndex is the authoritative owner mapping for customer keys.
+    const indexEntry = await KeyIndex.findOne({ key: userKey }).lean();
+    let LogModel = UserLog;
+    if (indexEntry?.customerId) {
+        const customer = await Customer.findById(indexEntry.customerId).select("_id gameId status expiryAt").lean();
+        if (!customer) return { status: false, reason: "Key owner unavailable" };
+        LogModel = getCustomerActivityLogModel(customer._id);
+    } else {
+        const adminLicense = await License.exists({ key: userKey });
+        if (!adminLicense) return { status: false, reason: "Key not found" };
+    }
+
     let existingLog = null;
-
     if (serial) {
-
-        existingLog = await UserLog.findOne({
-
-            licenseKey: userKey,
-
-            serial,
-
-            status: "success"
-
-        }).sort({ createdAt: -1 });
-
+        existingLog = await LogModel.findOne({ licenseKey: userKey, serial, status: "success" }).sort({ createdAt: -1 });
     }
-
     if (!existingLog) {
-
         const recentCutoff = new Date(Date.now() - 5 * 60 * 1000);
-
-        existingLog = await UserLog.findOne({
-
-            licenseKey: userKey,
-
-            status: "success",
-
-            createdAt: { $gte: recentCutoff },
-
-            $or: [
-
-                { deviceModel: { $in: [null, ""] } },
-
-                { deviceModel: { $exists: false } }
-
-            ]
-
+        existingLog = await LogModel.findOne({
+            licenseKey: userKey, status: "success", createdAt: { $gte: recentCutoff },
+            $or: [{ deviceModel: { $in: [null, ""] } }, { deviceModel: { $exists: false } }]
         }).sort({ createdAt: -1 });
-
     }
 
+    const fields = { deviceModel, deviceMarketingName, deviceBrand, androidVersion, appVersion };
+    if (playerName) fields.playerName = playerName;
+    if (serial) fields.serial = serial;
     if (existingLog) {
-
-        existingLog.deviceModel = deviceModel;
-        existingLog.deviceMarketingName = deviceMarketingName;
-        existingLog.deviceBrand = deviceBrand;
-        existingLog.androidVersion = androidVersion;
-        existingLog.appVersion = appVersion;
-
-        if (playerName) {
-            existingLog.playerName = playerName;
-        }
-
-        if (serial) {
-            existingLog.serial = serial;
-        }
-
+        Object.assign(existingLog, fields);
         await existingLog.save();
-
-        return {
-
-            status: true,
-
-            message: "Log Merged"
-
-        };
-
+        return { status: true, message: "Log Merged" };
     }
 
-    await UserLog.create({
-
-        licenseKey: userKey,
-
-        licenseType: body.license_type || "public",
-
-        serial,
-
-        deviceModel,
-
-        deviceMarketingName,
-
-        deviceBrand,
-
-        androidVersion,
-
-        appVersion,
-
-        playerName,
-
-        status: body.status || "success",
-
-        reason: body.reason || ""
-
+    await LogModel.create({
+        licenseKey: userKey, licenseType: body.license_type || "public", serial,
+        ...fields, playerName, status: body.status || "success", reason: body.reason || ""
     });
-
-    return {
-
-        status: true,
-
-        message: "Log Saved"
-
-    };
-
+    return { status: true, message: "Log Saved" };
 }
 
 module.exports = {

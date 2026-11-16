@@ -58,8 +58,11 @@ const customerActivityLogSchema = new mongoose.Schema({
     licenseType: { type: String, enum: ["public", "premium"] },
     serial: String,
     deviceModel: String,
+    deviceMarketingName: String,
     deviceBrand: String,
     androidVersion: String,
+    appVersion: String,
+    playerName: String,
     status: { type: String, enum: ["success", "failed"] },
     reason: String
 

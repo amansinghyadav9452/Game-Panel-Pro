@@ -127,11 +127,11 @@ router.get("/dashboard/user-activity", auth, async (req, res) => {
         const firstUtc = new Date(todayUtc.getTime() - (range - 1) * 86400000);
         const firstKey = firstUtc.toISOString().slice(0, 10);
         const [rows, firstRecordedRow] = await Promise.all([
-            DailyVerificationStat.find({ dayKey: { $gte: firstKey, $lte: todayKey } })
+            DailyVerificationStat.find({ ownerKey: "admin", dayKey: { $gte: firstKey, $lte: todayKey } })
                 .select("dayKey requestCount")
                 .sort({ dayKey: 1 })
                 .lean(),
-            DailyVerificationStat.findOne({})
+            DailyVerificationStat.findOne({ ownerKey: "admin" })
                 .select("dayKey")
                 .sort({ dayKey: 1 })
                 .lean()

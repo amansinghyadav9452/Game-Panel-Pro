@@ -7,6 +7,7 @@ const Settings = require("../models/Settings");
 const ReferralCode = require("../models/ReferralCode");
 const KeyIndex = require("../models/KeyIndex");
 const GameApplication = require("../models/GameApplication");
+const DailyVerificationStat = require("../models/DailyVerificationStat");
 const { generateUniqueGameId } = require("../services/gameId");
 const BannedDevice = require("../models/BannedDevice");
 const customerAuth = require("../middleware/customerAuth");
@@ -50,12 +51,12 @@ router.get("/customer/referral/me", customerAuth, async (req, res) => {
             .select("code expiryAt status createdBy note createdAt usedAt")
             .lean();
 
-        // Customer records keep their own immutable referral code and access
-        // expiry. This fallback still displays that assigned code if an admin
-        // later removes its historical ReferralCode record.
-        const expiryAt = referral?.expiryAt || req.customer.expiryAt;
-        const status = referral?.status === "revoked"
-            ? "revoked"
+        // Customer.expiryAt is the single source of truth for an account's
+        // access validity. ReferralCode.expiryAt only governs redemption of
+        // the invitation and must not override later admin changes to access.
+        const expiryAt = req.customer.expiryAt;
+        const status = req.customer.status === "disabled"
+            ? "disabled"
             : (new Date(expiryAt) <= new Date() ? "expired" : "active");
 
         return res.json({
@@ -836,6 +837,42 @@ router.get("/customer/dashboard/stats", customerAuth, async (req, res) => {
 
     }
 
+});
+
+// Customer-only verification request graph. The customer ID comes from
+// the authenticated session, never from query parameters or request bodies.
+router.get("/customer/dashboard/user-activity", customerAuth, async (req, res) => {
+    try {
+        const allowedRanges = [7, 30, 90];
+        const requestedRange = Number.parseInt(req.query.range, 10);
+        const range = allowedRanges.includes(requestedRange) ? requestedRange : 7;
+        const indiaToday = new Date(Date.now() + 330 * 60 * 1000);
+        const todayKey = indiaToday.toISOString().slice(0, 10);
+        const todayUtc = new Date(`${todayKey}T00:00:00.000Z`);
+        const firstUtc = new Date(todayUtc.getTime() - (range - 1) * 86400000);
+        const firstKey = firstUtc.toISOString().slice(0, 10);
+        const ownerKey = `customer:${req.customer._id}`;
+        const [rows, firstRecordedRow] = await Promise.all([
+            DailyVerificationStat.find({ ownerKey, dayKey: { $gte: firstKey, $lte: todayKey } })
+                .select("dayKey requestCount").sort({ dayKey: 1 }).lean(),
+            DailyVerificationStat.findOne({ ownerKey }).select("dayKey").sort({ dayKey: 1 }).lean()
+        ]);
+        const trackingStartedAt = firstRecordedRow?.dayKey || null;
+        const byDay = new Map(rows.map(row => [row.dayKey, Number(row.requestCount) || 0]));
+        const days = [];
+        for (let index = 0; index < range; index += 1) {
+            const date = new Date(firstUtc.getTime() + index * 86400000);
+            const dayKey = date.toISOString().slice(0, 10);
+            const requests = byDay.has(dayKey) ? byDay.get(dayKey)
+                : (trackingStartedAt && dayKey >= trackingStartedAt ? 0 : null);
+            days.push({ dayKey, requests });
+        }
+        res.json({ success: true, range, days, trackingStartedAt,
+            trackedDays: days.filter(day => day.requests !== null).length });
+    } catch (err) {
+        console.error("Customer verification activity error:", err);
+        res.status(500).json({ success: false, message: "Unable to load your verification activity." });
+    }
 });
 
 router.get("/customer/dashboard/recent-activity", customerAuth, async (req, res) => {
