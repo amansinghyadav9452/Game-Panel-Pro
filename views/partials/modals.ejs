@@ -72,7 +72,7 @@
     class="extend-btn"
     id="extendLicenseBtn">
 
-    Extend
+    Key Expiry
 
 </button>
 
@@ -244,7 +244,7 @@
 
         <div class="modal-header">
 
-            <h2 id="extendModalTitle">Extend License</h2>
+            <h2 id="extendModalTitle">Set Key Expiry</h2>
 
             <button id="closeExtendModal">
 
@@ -259,7 +259,7 @@
             <div class="extend-mode-toggle">
 
                 <button type="button" class="extend-mode-btn active" data-mode="license">
-                    <i class="fa-solid fa-calendar-days"></i> License
+                    <i class="fa-regular fa-calendar-check"></i> Key Expiry
                 </button>
 
                 <button type="button" class="extend-mode-btn" data-mode="device">
@@ -270,15 +270,15 @@
 
             <div class="input-group" id="extendLicenseGroup">
 
-                <label>Extend Days</label>
+                <label for="extendDays">New expiry date and time</label>
 
                 <input
-                    type="number"
+                    type="datetime-local"
                     id="extendDays"
-                    value="30"
-                    min="1">
+                    step="60"
+                    required>
 
-                <p class="extend-hint">Adds days to the current expiry date.</p>
+                <p class="extend-hint">A future date extends access. A past date shortens validity or expires the key immediately. Any date and time can be selected.</p>
 
             </div>
 
@@ -303,7 +303,7 @@
 
             <button id="saveExtendBtn">
 
-                Extend License
+                Save Expiry
 
             </button>
 

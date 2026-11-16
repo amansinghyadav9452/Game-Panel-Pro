@@ -103,17 +103,6 @@
 
 }
 
-html.light-theme .settings-search input,
-.settings-search input{
-
-    border:none !important;
-
-    background:transparent !important;
-
-    box-shadow:none !important;
-
-}
-
 .settings-search input::placeholder{
 
     color:#6b7280;

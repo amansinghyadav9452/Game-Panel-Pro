@@ -25,7 +25,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <link rel="stylesheet"
 href="/css/dashboard.css?v=6">
 <link rel="stylesheet"
-href="/css/theme.css?v=4">
+href="/css/theme.css?v=5">
 
 <link rel="stylesheet"
 href="/css/toast.css">
@@ -44,19 +44,21 @@ href="/css/toast.css">
 
 <link rel="stylesheet" href="/css/interactions.css?v=2">
 
-<link rel="stylesheet" href="/css/loading.css">
+<link rel="stylesheet" href="/css/loading.css?v=3">
 
 <% if (activePage === "public-keys") { %>
-<link rel="stylesheet" href="/css/public-keys.css?v=7">
+<link rel="stylesheet" href="/css/public-keys.css?v=8">
 <% } %>
 
 <% if (activePage === "premium-keys") { %>
-<link rel="stylesheet" href="/css/premium-keys.css?v=7">
+<link rel="stylesheet" href="/css/premium-keys.css?v=8">
 <% } %>
 
 <% if (activePage !== "logs") { %>
 <link rel="stylesheet" href="/css/dev-chat.css">
 <% } %>
+
+<link rel="preload" as="image" href="/assets/cheetah-sprint-loader.gif?v=3">
 
 <link rel="manifest" href="/manifest.json">
 
@@ -75,9 +77,7 @@ href="/css/toast.css">
 <meta name="apple-mobile-web-app-title" content="Game Panel">
 
 <script src="/js/loading.js"></script>
-
-<script src="/js/theme.js"></script>
-
+<script src="/js/page-navigation.js?v=3"></script>
 <script src="/js/interactions.js"></script>
 
 <script defer src="/js/toast.js"></script>

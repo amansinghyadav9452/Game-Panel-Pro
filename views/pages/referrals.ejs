@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#FFF5F0">
 <link rel="stylesheet" href="/css/customer.css?v=3">
-<link rel="stylesheet" href="/css/referrals-premium.css?v=5">
+<link rel="stylesheet" href="/css/referrals-premium.css?v=6">
 </head>
 <body class="referrals-page">
 <div id="overlay"></div>
@@ -23,6 +23,23 @@
                 <h1>Referral management</h1>
                 <p>Create referral codes, track usage and manage customer access.</p>
             </header>
+
+            <section id="customerReferralView" class="customer-referral-view" hidden aria-labelledby="customerReferralTitle">
+                <div class="customer-referral-card">
+                    <div class="customer-referral-card-head">
+                        <span class="customer-referral-icon"><i class="fa-solid fa-ticket"></i></span>
+                        <div>
+                            <p class="referral-eyebrow">YOUR ASSIGNED ACCESS</p>
+                            <h2 id="customerReferralTitle">Your Referral</h2>
+                            <p>This referral was assigned by the panel administrator.</p>
+                        </div>
+                    </div>
+                    <div id="customerReferralDetails" class="customer-referral-details" aria-live="polite">
+                        <div class="gp-loading-card" style="min-height:120px;"></div>
+                    </div>
+                    <p class="customer-referral-note"><i class="fa-solid fa-lock"></i> This section is view-only. Referral codes can only be created or managed by the administrator.</p>
+                </div>
+            </section>
 
             <div class="referral-stats" aria-live="polite">
                 <article class="referral-stat-card">
@@ -81,6 +98,6 @@
 </div>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
-<script src="/js/referrals.js?v=4"></script>
+<script src="/js/referrals.js?v=5"></script>
 </body>
 </html>

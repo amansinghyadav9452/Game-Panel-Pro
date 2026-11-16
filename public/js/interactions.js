@@ -1,9 +1,3 @@
-function gpAnimationsDisabled() {
-
-    return document.documentElement.classList.contains("no-animations");
-
-}
-
 function gpHaptic(ms = 12) {
 
     if (navigator.vibrate) {
@@ -20,7 +14,6 @@ function gpHaptic(ms = 12) {
 
 document.addEventListener("pointerdown", function (e) {
 
-    if (gpAnimationsDisabled()) return;
 
     const target = e.target.closest("button, a, [role=button], .clickable");
     if (!target || target.disabled || target.getAttribute("aria-disabled") === "true") return;
@@ -70,16 +63,7 @@ function animateCounter(el, targetValue, duration = 900) {
     const end = Number(targetValue) || 0;
 
     el.classList.remove("gp-skeleton");
-
-    if (gpAnimationsDisabled()) {
-
-        el.textContent = end;
-
-        return;
-
-    }
-
-    const startTime = performance.now();
+const startTime = performance.now();
 
     function tick(now) {
 
@@ -108,18 +92,7 @@ function animateCounter(el, targetValue, duration = 900) {
 function gpRemoveRow(el, callback) {
 
     if (!el) return;
-
-    if (gpAnimationsDisabled()) {
-
-        el.remove();
-
-        if (callback) callback();
-
-        return;
-
-    }
-
-    el.style.maxHeight = el.offsetHeight + "px";
+el.style.maxHeight = el.offsetHeight + "px";
 
     el.style.overflow = "hidden";
 
@@ -139,7 +112,6 @@ function gpRemoveRow(el, callback) {
 
 }
 
-window.gpAnimationsDisabled = gpAnimationsDisabled;
 window.gpHaptic = gpHaptic;
 window.animateCounter = animateCounter;
 window.gpRemoveRow = gpRemoveRow;

@@ -86,16 +86,14 @@ async function resolveMarketingName(modelCode) {
 
     if (!modelCode) return null;
 
-    try {
-
-        await ensureLoaded();
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
+    // Never make a user-facing page/API request wait for the remote device
+    // catalogue. Use the in-memory index immediately when available and refresh
+    // the catalogue in the background when cold or stale.
+    const isStale = Date.now() - lastFetchedAt > REFRESH_INTERVAL_MS;
+    if (!modelIndex || isStale) {
+        ensureLoaded().catch((error) => {
+            console.error("Device DB background refresh failed:", error.message);
+        });
     }
 
     if (!modelIndex) return null;
@@ -107,11 +105,8 @@ async function resolveMarketingName(modelCode) {
     if (!hit || !hit.name) return null;
 
     return {
-
         marketingName: hit.name,
-
         brand: hit.brand
-
     };
 
 }

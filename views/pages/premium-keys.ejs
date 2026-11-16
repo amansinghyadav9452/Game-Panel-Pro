@@ -77,6 +77,30 @@
             <button type="button" id="backToKeys" class="pk-back-btn"><i class="fa-solid fa-arrow-left"></i><span>Premium Keys</span></button>
         </div>
 
+        <div class="pk-detail-loading" id="pkDetailsLoading" role="status" aria-live="polite" hidden>
+            <div class="pk-detail-loading-head">
+                <span class="pk-detail-loading-icon"></span>
+                <div class="pk-detail-loading-copy">
+                    <span class="pk-detail-loading-line medium"></span>
+                    <span class="pk-detail-loading-line short"></span>
+                </div>
+            </div>
+            <div class="pk-detail-loading-actions">
+                <span class="pk-detail-loading-action"></span><span class="pk-detail-loading-action"></span>
+                <span class="pk-detail-loading-action"></span><span class="pk-detail-loading-action"></span>
+            </div>
+            <div class="pk-detail-loading-card">
+                <span class="pk-detail-loading-line short"></span>
+                <span class="pk-detail-loading-line"></span><span class="pk-detail-loading-line medium"></span>
+                <span class="pk-detail-loading-line"></span><span class="pk-detail-loading-line medium"></span>
+            </div>
+            <div class="pk-detail-loading-card">
+                <span class="pk-detail-loading-line short"></span><span class="pk-detail-loading-line"></span>
+                <span class="pk-detail-loading-line medium"></span>
+            </div>
+        </div>
+
+        <div id="pkDetailsContent">
         <div class="pk-detail-hero">
             <div class="pk-key-avatar"><i class="fa-solid fa-crown"></i></div>
             <div class="pk-detail-title">
@@ -90,7 +114,7 @@
             <button type="button" id="detailViewKeyBtn" class="pk-primary-action"><i class="fa-solid fa-eye"></i> View Key</button>
             <button type="button" id="detailCopyBtn" class="pk-secondary-action"><i class="fa-regular fa-copy"></i> Copy Key</button>
             <button type="button" id="detailBanBtn" class="pk-neutral-action"><i class="fa-solid fa-ban"></i> <span>Ban</span></button>
-            <button type="button" id="detailExtendBtn" class="pk-neutral-action"><i class="fa-solid fa-calendar-plus"></i> Extend</button>
+            <button type="button" id="detailExtendBtn" class="pk-neutral-action"><i class="fa-regular fa-calendar-check"></i> Key Expiry</button>
             <button type="button" id="detailResetBtn" class="pk-neutral-action"><i class="fa-solid fa-rotate"></i> Reset Device</button>
             <button type="button" id="detailDeleteBtn" class="pk-danger-action"><i class="fa-solid fa-trash"></i> Delete</button>
         </div>
@@ -121,6 +145,7 @@
             <div class="pk-card-title"><h2>Registered Devices</h2><span id="deviceCountBadge">0</span></div>
             <div id="registeredDevices" class="pk-device-list"></div>
         </div>
+        </div>
     </section>
 
 </section>
@@ -128,8 +153,8 @@
 
 <script src="/js/utils.js"></script>
 <script src="/js/api.js"></script>
-<script src="/js/license-manager.js"></script>
-<script src="/js/premium-keys.js?v=3"></script>
+<script src="/js/license-manager.js?v=2"></script>
+<script src="/js/premium-keys.js?v=5"></script>
 
 </body>
 

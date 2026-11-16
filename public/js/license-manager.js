@@ -622,8 +622,8 @@ function setExtendMode(mode) {
 
         licenseGroup.style.display = "block";
         deviceGroup.style.display = "none";
-        title.textContent = "Extend License";
-        saveBtn.textContent = "Extend License";
+        title.textContent = "Set Key Expiry";
+        saveBtn.textContent = "Save Expiry";
 
     }
 
@@ -635,14 +635,35 @@ document.querySelectorAll(".extend-mode-btn").forEach(btn => {
 
 });
 
-if(extendBtn){
-extendBtn.addEventListener("click", () => {
+window.openKeyExpiryModal = function openKeyExpiryModal(key) {
+    if (key) currentLicenseKey = key;
+
+    const selectedLicense = allLicenses.find(item => item.key === currentLicenseKey);
+    const expiryInput = document.getElementById("extendDays");
+
+    if (!currentLicenseKey || !expiryInput) {
+        showToast("Error", "Select a key first.", "error");
+        return;
+    }
+
+    if (selectedLicense?.expiry) {
+        const expiryDate = new Date(selectedLicense.expiry);
+        if (!Number.isNaN(expiryDate.getTime())) {
+            const localDate = new Date(expiryDate.getTime() - expiryDate.getTimezoneOffset() * 60000);
+            expiryInput.value = localDate.toISOString().slice(0, 16);
+        } else {
+            expiryInput.value = "";
+        }
+    } else {
+        expiryInput.value = "";
+    }
 
     setExtendMode("license");
-
     extendModal.classList.add("active");
+};
 
-});
+if (extendBtn) {
+    extendBtn.addEventListener("click", () => window.openKeyExpiryModal(currentLicenseKey));
 }
 if(closeExtendModal){
 closeExtendModal.addEventListener("click", () => {
@@ -795,19 +816,15 @@ async function extendLicense() {
 
     } else {
 
-        const days = Number(
-            document.getElementById("extendDays").value
-        );
+        const selectedDateTime = document.getElementById("extendDays").value;
+        const selectedExpiry = new Date(selectedDateTime);
 
-        if (!days || days <= 0) {
-
-            showToast("Error", "Enter valid days", "error");
-
+        if (!selectedDateTime || Number.isNaN(selectedExpiry.getTime())) {
+            showToast("Error", "Choose a valid expiry date and time.", "error");
             return;
-
         }
 
-        body = { mode: "license", value: days };
+        body = { mode: "license", expiry: selectedExpiry.toISOString() };
 
     }
 
@@ -845,8 +862,8 @@ const response = await apiFetch(
             "Success",
 
             extendMode === "device"
-                ? "Device Limit Extended Successfully"
-                : "License Extended Successfully"
+                ? "Device limit updated successfully."
+                : "Key expiry updated successfully."
 
         );
 
@@ -858,7 +875,11 @@ const response = await apiFetch(
     loadStats();
 }
 
-        loadLicenses();
+        await loadLicenses();
+
+        if (extendMode === "license" && typeof window.openKeyDetails === "function") {
+            await window.openKeyDetails(currentLicenseKey, false);
+        }
 
     } catch (err) {
 

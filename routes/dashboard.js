@@ -382,87 +382,68 @@ router.put("/dashboard/unban/:key", auth, async (req, res) => {
 });
 
 router.put("/dashboard/extend/:key", auth, async (req, res) => {
-
     try {
+        const mode = req.body.mode === "device" ? "device" : "license";
+        const license = await License.findOne({ key: req.params.key });
 
-const mode = req.body.mode === "device" ? "device" : "license";
+        if (!license) {
+            return res.status(404).json({ success: false, message: "License Not Found" });
+        }
 
-const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+        if (mode === "device") {
+            const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+            if (!Number.isInteger(value) || value <= 0) {
+                return res.status(400).json({ success: false, message: "Enter a valid positive device count." });
+            }
 
-if (!Number.isFinite(value) || value <= 0) {
+            const addCount = Math.min(10000, value);
+            license.maxUses = (license.maxUses || 0) + addCount;
+            await license.save();
 
-    return res.status(400).json({
-        success: false,
-        message: "Enter a valid positive number."
-    });
+            return res.json({
+                success: true,
+                message: "Device Limit Extended Successfully",
+                maxUses: license.maxUses
+            });
+        }
 
-}
+        let newExpiry;
+        if (req.body.expiry !== undefined) {
+            newExpiry = new Date(req.body.expiry);
+        } else {
+            // Backward compatibility for older clients that still submit a day count.
+            const days = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+            if (!Number.isFinite(days)) {
+                return res.status(400).json({ success: false, message: "Choose a valid expiry date and time." });
+            }
+            newExpiry = new Date(license.expiry || Date.now());
+            newExpiry.setDate(newExpiry.getDate() + Math.floor(days));
+        }
 
-const license = await License.findOne({
-    key: req.params.key
-});
+        if (Number.isNaN(newExpiry.getTime())) {
+            return res.status(400).json({ success: false, message: "Choose a valid expiry date and time." });
+        }
 
-if (!license) {
+        const previousExpiry = license.expiry;
+        license.expiry = newExpiry;
+        // Expiry and ban status are independent. Never unban a key by changing its date.
+        if (license.status !== "banned") {
+            license.status = newExpiry <= new Date() ? "expired" : "active";
+        }
 
-    return res.status(404).json({
-        success: false,
-        message: "License Not Found"
-    });
+        await license.save();
 
-}
-
-if (mode === "device") {
-
-    const addCount = Math.min(10000, Math.floor(value));
-
-    license.maxUses = (license.maxUses || 0) + addCount;
-
-    await license.save();
-
-    return res.json({
-
-        success: true,
-        message: "Device Limit Extended Successfully",
-        maxUses: license.maxUses
-
-    });
-
-}
-
-console.log("Expiry Before:", license.expiry);
-
-const baseDate = new Date(
-    license.expiry > new Date()
-        ? license.expiry
-        : new Date()
-);
-
-baseDate.setDate(baseDate.getDate() + Math.floor(value));
-
-license.expiry = baseDate;
-license.status = "active";
-
-await license.save();
-
-const fresh = await License.findById(license._id);
-
-res.json({
-    success: true,
-    message: "License Extended Successfully",
-    expiry: fresh.expiry
-});
-
-    } catch (err) {
-
-        console.error(err);
-
-        res.status(500).json({
-            success: false,
-            message: "Server Error"
+        return res.json({
+            success: true,
+            message: newExpiry <= new Date() ? "Key expiry updated. The key is now expired." : "Key expiry updated successfully.",
+            previousExpiry,
+            expiry: license.expiry,
+            status: license.status
         });
-
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: "Server Error" });
     }
-
 });
 
 router.put("/dashboard/reset-device/:key", auth, async (req, res) => {

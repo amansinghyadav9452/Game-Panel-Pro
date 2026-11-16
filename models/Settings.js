@@ -123,29 +123,6 @@ api:{
 
 },
 
-    appearance:{
-
-        darkMode:{
-            type:Boolean,
-            default:true
-        },
-
-        accentColor:{
-            type:String,
-            default:"blue"
-        },
-
-        sidebarCollapsed:{
-            type:Boolean,
-            default:false
-        },
-
-        animationsEnabled:{
-            type:Boolean,
-            default:true
-        }
-
-    },
 
     logs:{
 

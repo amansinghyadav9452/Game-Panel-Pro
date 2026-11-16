@@ -139,15 +139,53 @@ if (__role === "customer") {
         });
     }
 
+    const detailsLoading = document.getElementById("pkDetailsLoading");
+    const detailsContent = document.getElementById("pkDetailsContent");
+    let detailRequestId = 0;
+
+    function showDetailsError(key, message) {
+        if (!detailsLoading) return;
+        detailsLoading.hidden = false;
+        detailsLoading.innerHTML = `
+            <div class="pk-detail-loading-error">
+                <strong>Could not load key details</strong>
+                <p>${esc(message || "The request took too long or the server could not respond.")}</p>
+                <button type="button" id="retryKeyDetails">Try again</button>
+            </div>`;
+        document.getElementById("retryKeyDetails")?.addEventListener("click", () => showDetails(key, false), { once: true });
+    }
+
     async function showDetails(key, push = true) {
+        const requestId = ++detailRequestId;
+        const pagePath = window.location.pathname.includes("premium-keys") ? "/premium-keys" : "/public-keys";
+        details.hidden = false;
+        list.hidden = true;
+        document.body.classList.add("pk-details-open");
+        details.setAttribute("aria-busy", "true");
+        if (detailsLoading) {
+            detailsLoading.hidden = false;
+            detailsLoading.classList.remove("is-error");
+            detailsLoading.innerHTML = `
+                <div class="pk-detail-loading-head">
+                    <span class="pk-detail-loading-icon"></span>
+                    <div class="pk-detail-loading-copy"><span class="pk-detail-loading-line medium"></span><span class="pk-detail-loading-line short"></span></div>
+                </div>
+                <div class="pk-detail-loading-actions"><span class="pk-detail-loading-action"></span><span class="pk-detail-loading-action"></span><span class="pk-detail-loading-action"></span><span class="pk-detail-loading-action"></span></div>
+                <div class="pk-detail-loading-card"><span class="pk-detail-loading-line short"></span><span class="pk-detail-loading-line"></span><span class="pk-detail-loading-line medium"></span><span class="pk-detail-loading-line"></span><span class="pk-detail-loading-line medium"></span></div>
+                <div class="pk-detail-loading-card"><span class="pk-detail-loading-line short"></span><span class="pk-detail-loading-line"></span><span class="pk-detail-loading-line medium"></span></div>`;
+        }
+        if (detailsContent) detailsContent.hidden = true;
+        if (push) history.pushState({ publicKey: key }, "", `${pagePath}?key=${encodeURIComponent(key)}`);
+        window.scrollTo({ top: 0, behavior: "instant" });
+
         try {
             const endpoint = window.LICENSE_DETAILS_ENDPOINT || "/dashboard/license";
             const response = await apiFetch(`${endpoint}/${encodeURIComponent(key)}`);
+            if (!response.ok) throw new Error(`Server returned ${response.status}`);
             const data = await response.json();
-            if (!data.success) {
-                showToast("Error", data.message || "License not found", "error");
-                return;
-            }
+            if (requestId !== detailRequestId) return;
+            if (!data.success || !data.license) throw new Error(data.message || "Key not found");
+
             selectedKey = data.license.key;
             const l = data.license;
             const days = l.expiry ? Math.ceil((new Date(l.expiry) - new Date()) / 86400000) : 0;
@@ -186,20 +224,23 @@ if (__role === "customer") {
             ban.innerHTML = `<i class="fa-solid fa-${safeStatus === "banned" ? "circle-check" : "ban"}"></i><span>${safeStatus === "banned" ? "Unban" : "Ban"}</span>`;
             ban.classList.toggle("is-banned", safeStatus === "banned");
             ban.dataset.banAction = safeStatus === "banned" ? "unban" : "ban";
-            details.hidden = false;
-            list.hidden = true;
-            document.body.classList.add("pk-details-open");
-            if (push) history.pushState({ publicKey: l.key }, "", `/premium-keys?key=${encodeURIComponent(l.key)}`);
-            window.scrollTo({ top: 0, behavior: "instant" });
+
+            if (detailsLoading) detailsLoading.hidden = true;
+            if (detailsContent) detailsContent.hidden = false;
+            details.removeAttribute("aria-busy");
         } catch (err) {
+            if (requestId !== detailRequestId) return;
             console.error(err);
-            showToast("Error", "Could not load license details", "error");
+            details.removeAttribute("aria-busy");
+            showDetailsError(key, err.message);
         }
     }
 
     window.openKeyDetails = showDetails;
 
     function closeDetails(push = true) {
+        detailRequestId++;
+        details.removeAttribute("aria-busy");
         details.hidden = true;
         list.hidden = false;
         selectedKey = null;
@@ -245,8 +286,7 @@ if (__role === "customer") {
     document.getElementById("detailExtendBtn")?.addEventListener("click", () => {
         if (!selectedKey) return;
         currentLicenseKey = selectedKey;
-        setExtendMode("license");
-        extendModal.classList.add("active");
+        window.openKeyExpiryModal(selectedKey);
     });
     document.getElementById("detailResetBtn")?.addEventListener("click", () => {
         if (!selectedKey) return;

@@ -32,6 +32,53 @@ router.get("/customer", (req, res) => {
 
 });
 
+
+// Return only the referral code assigned to the authenticated customer.
+// This endpoint is read-only; all referral creation and management routes
+// remain protected by the admin authentication middleware.
+router.get("/customer/referral/me", customerAuth, async (req, res) => {
+    try {
+        const code = String(req.customer.referralCode || "").trim().toUpperCase();
+        if (!code) {
+            return res.status(404).json({
+                success: false,
+                message: "No referral code is assigned to this account."
+            });
+        }
+
+        const referral = await ReferralCode.findOne({ code, usedBy: req.customer._id })
+            .select("code expiryAt status createdBy note createdAt usedAt")
+            .lean();
+
+        // Customer records keep their own immutable referral code and access
+        // expiry. This fallback still displays that assigned code if an admin
+        // later removes its historical ReferralCode record.
+        const expiryAt = referral?.expiryAt || req.customer.expiryAt;
+        const status = referral?.status === "revoked"
+            ? "revoked"
+            : (new Date(expiryAt) <= new Date() ? "expired" : "active");
+
+        return res.json({
+            success: true,
+            referral: {
+                code,
+                expiryAt,
+                status,
+                createdBy: referral?.createdBy || "Admin",
+                note: referral?.note || "",
+                createdAt: referral?.createdAt || null,
+                usedAt: referral?.usedAt || null
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Could not load your assigned referral."
+        });
+    }
+});
+
 // ===================== PUBLIC =====================
 
 // Login page calls this to check a referral code before showing the
@@ -1099,59 +1146,67 @@ router.put("/customer/dashboard/unban/:key", customerAuth, async (req, res) => {
 });
 
 router.put("/customer/dashboard/extend/:key", customerAuth, async (req, res) => {
-
     try {
-
         const mode = req.body.mode === "device" ? "device" : "license";
-        const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
-
-        if (!Number.isFinite(value) || value <= 0) {
-
-            return res.status(400).json({ success: false, message: "Enter a valid positive number." });
-
-        }
-
         const doc = await findOwnKeyByParam(req, res);
-
         if (!doc) return;
 
         if (mode === "device") {
+            const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+            if (!Number.isInteger(value) || value <= 0) {
+                return res.status(400).json({ success: false, message: "Enter a valid positive device count." });
+            }
 
-            const addCount = Math.min(10000, Math.floor(value));
-
+            const addCount = Math.min(10000, value);
             doc.maxUses = (doc.maxUses || 0) + addCount;
-
             await doc.save();
-
             return res.json({ success: true, message: "Device Limit Extended Successfully", maxUses: doc.maxUses });
-
         }
 
-        const base = doc.expiry > new Date() ? doc.expiry : new Date();
+        let newExpiry;
+        if (req.body.expiry !== undefined) {
+            newExpiry = new Date(req.body.expiry);
+        } else {
+            // Backward compatibility for older clients that still submit a day count.
+            const days = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+            if (!Number.isFinite(days)) {
+                return res.status(400).json({ success: false, message: "Choose a valid expiry date and time." });
+            }
+            newExpiry = new Date(doc.expiry || Date.now());
+            newExpiry.setDate(newExpiry.getDate() + Math.floor(days));
+        }
 
-        base.setDate(base.getDate() + Math.floor(value));
+        if (Number.isNaN(newExpiry.getTime())) {
+            return res.status(400).json({ success: false, message: "Choose a valid expiry date and time." });
+        }
 
-        doc.expiry = base;
-        doc.status = "active";
+        const previousExpiry = doc.expiry;
+        doc.expiry = newExpiry;
+        if (doc.status !== "banned") {
+            doc.status = newExpiry <= new Date() ? "expired" : "active";
+        }
 
         await doc.save();
 
         const CrudLog = getCustomerCrudLogModel(req.customer._id);
+        await CrudLog.create({
+            action: "extended",
+            key: doc.key,
+            type: doc.type,
+            details: `Expiry changed from ${previousExpiry ? new Date(previousExpiry).toISOString() : "unset"} to ${newExpiry.toISOString()}`
+        });
 
-        await CrudLog.create({ action: "extended", key: doc.key, type: doc.type, details: `+${Math.floor(value)}d` });
-
-        res.json({ success: true, message: "License Extended Successfully", expiry: doc.expiry });
-
-    }
-
-    catch (err) {
-
+        return res.json({
+            success: true,
+            message: newExpiry <= new Date() ? "Key expiry updated. The key is now expired." : "Key expiry updated successfully.",
+            previousExpiry,
+            expiry: doc.expiry,
+            status: doc.status
+        });
+    } catch (err) {
         console.error(err);
-
-        res.status(500).json({ success: false, message: "Server Error" });
-
+        return res.status(500).json({ success: false, message: "Server Error" });
     }
-
 });
 
 router.put("/customer/dashboard/reset-device/:key", customerAuth, async (req, res) => {

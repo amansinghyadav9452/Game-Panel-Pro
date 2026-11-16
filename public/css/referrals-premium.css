@@ -849,3 +849,142 @@
 .referrals-page #adminDisplayName {
     color: #FFFFFF !important;
 }
+
+
+/* Customer referral view: a single, read-only record owned by the signed-in customer. */
+.customer-referral-view[hidden] { display: none !important; }
+.customer-referral-view { margin: 4px 0 0; }
+.customer-referral-card {
+    overflow: hidden;
+    padding: clamp(18px, 4vw, 28px);
+    border: 1px solid #E8D9D4;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #FFFFFF 0%, #F5F0EF 100%);
+    box-shadow: 0 14px 34px rgba(63, 34, 40, .08);
+}
+.customer-referral-card-head {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #E9DEDA;
+}
+.customer-referral-icon {
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #E5D2CE;
+    border-radius: 17px;
+    background: #F2E9E6;
+    color: #A52E3C;
+    font-size: 21px;
+}
+.customer-referral-card-head .referral-eyebrow { margin-bottom: 5px; }
+.customer-referral-card-head h2 {
+    margin: 0;
+    color: #252326;
+    font: 800 clamp(20px, 4vw, 25px)/1.2 "Plus Jakarta Sans", sans-serif;
+    letter-spacing: -.7px;
+}
+.customer-referral-card-head p:last-child {
+    margin: 5px 0 0;
+    color: #777078;
+    font: 500 12px/1.5 "Plus Jakarta Sans", sans-serif;
+}
+.customer-referral-details { padding-top: 20px; }
+.customer-referral-code-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px;
+    border: 1px solid #E9D9D4;
+    border-radius: 16px;
+    background: #FBF8F7;
+}
+.customer-referral-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #81767A;
+    font: 700 10px/1.3 "Plus Jakarta Sans", sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.customer-referral-code {
+    display: block;
+    color: #292529;
+    font: 800 clamp(17px, 3.8vw, 22px)/1.35 "JetBrains Mono", monospace;
+    overflow-wrap: anywhere;
+}
+.customer-referral-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid #DCC9C4;
+    border-radius: 11px;
+    background: #FFFFFF;
+    color: #6E2635;
+    font: 700 12px "Plus Jakarta Sans", sans-serif;
+    cursor: pointer;
+}
+.customer-referral-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+    margin-top: 12px;
+}
+.customer-referral-meta {
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid #EAE0DC;
+    border-radius: 14px;
+    background: rgba(255,255,255,.8);
+}
+.customer-referral-meta strong {
+    display: block;
+    color: #302A2D;
+    font: 700 13px/1.5 "Plus Jakarta Sans", sans-serif;
+    overflow-wrap: anywhere;
+}
+.customer-referral-status { text-transform: capitalize; }
+.customer-referral-status.active { color: #21835A !important; }
+.customer-referral-status.expired,
+.customer-referral-status.revoked { color: #B8323D !important; }
+.customer-referral-admin-note {
+    margin: 12px 0 0;
+    padding: 14px 15px;
+    border-left: 3px solid #A52E3C;
+    border-radius: 0 12px 12px 0;
+    background: #F7EFED;
+    color: #51474B;
+    font: 500 13px/1.6 "Plus Jakarta Sans", sans-serif;
+}
+.customer-referral-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin: 18px 0 0;
+    color: #82777B;
+    font: 500 11px/1.6 "Plus Jakarta Sans", sans-serif;
+}
+.customer-referral-note i { margin-top: 2px; color: #A52E3C; }
+.customer-referral-empty {
+    margin: 0;
+    padding: 18px;
+    border: 1px dashed #DCCBC6;
+    border-radius: 14px;
+    color: #71666A;
+    background: #FBF8F7;
+    font: 500 13px/1.6 "Plus Jakarta Sans", sans-serif;
+}
+@media (max-width: 560px) {
+    .customer-referral-card { padding: 17px; border-radius: 18px; }
+    .customer-referral-code-row { align-items: flex-start; flex-direction: column; }
+    .customer-referral-copy { width: 100%; }
+    .customer-referral-meta-grid { grid-template-columns: 1fr; }
+}

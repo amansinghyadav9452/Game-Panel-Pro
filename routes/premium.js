@@ -420,125 +420,86 @@ router.put("/premium/unban/:key", auth, apiAccess("premium"), async (req, res) =
 });
 
 router.put("/premium/extend/:key", auth, apiAccess("premium"), async (req, res) => {
-
     try {
-
         const mode = req.body.mode === "device" ? "device" : "license";
-
-        const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
-
-        if (!Number.isFinite(value) || value <= 0) {
-
-            return res.status(400).json({
-                success: false,
-                message: "Enter a valid positive number."
-            });
-
-        }
-
         const license = await License.findOne({
             key: req.params.key,
             type: "premium"
         });
 
         if (!license) {
-
-            return res.status(404).json({
-                success: false,
-                message: "License Not Found"
-            });
-
+            return res.status(404).json({ success: false, message: "License Not Found" });
         }
 
         if (mode === "device") {
+            const value = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+            if (!Number.isInteger(value) || value <= 0) {
+                return res.status(400).json({ success: false, message: "Enter a valid positive device count." });
+            }
 
-            const addCount = Math.min(10000, Math.floor(value));
-
+            const addCount = Math.min(10000, value);
             license.maxUses = (license.maxUses || 0) + addCount;
-
             await license.save();
 
             await logActivity({
-
                 action: "EXTEND",
-
                 licenseKey: license.key,
-
                 licenseType: "premium",
-
                 admin: req.admin.username,
-
                 details: `Device limit +${addCount} (now ${license.maxUses})`
-
             });
 
             return res.json({
-
                 success: true,
-
                 message: "Device Limit Extended Successfully",
-
                 maxUses: license.maxUses
-
             });
-
         }
 
-const baseDate = new Date(
-    license.expiry > new Date()
-        ? license.expiry
-        : new Date()
-);
+        let newExpiry;
+        if (req.body.expiry !== undefined) {
+            newExpiry = new Date(req.body.expiry);
+        } else {
+            // Backward compatibility for older clients that still submit a day count.
+            const days = Number(req.body.value !== undefined ? req.body.value : req.body.days);
+            if (!Number.isFinite(days)) {
+                return res.status(400).json({ success: false, message: "Choose a valid expiry date and time." });
+            }
+            newExpiry = new Date(license.expiry || Date.now());
+            newExpiry.setDate(newExpiry.getDate() + Math.floor(days));
+        }
 
-baseDate.setDate(
-    baseDate.getDate() + Math.floor(value)
-);
+        if (Number.isNaN(newExpiry.getTime())) {
+            return res.status(400).json({ success: false, message: "Choose a valid expiry date and time." });
+        }
 
-license.expiry = baseDate;
-license.status = "active";
+        const previousExpiry = license.expiry;
+        license.expiry = newExpiry;
+        if (license.status !== "banned") {
+            license.status = newExpiry <= new Date() ? "expired" : "active";
+        }
 
-await license.save();
+        await license.save();
 
-const fresh = await License.findById(license._id);
-
-await logActivity({
-
-    action: "EXTEND",
-
-    licenseKey: fresh.key,
-
-    licenseType: "premium",
-
-    admin: req.admin.username,
-
-    details: `${Math.floor(value)} Days Extended`
-
-});
-
-res.json({
-
-    success: true,
-
-    message: "Premium Key Extended Successfully",
-
-    expiry: fresh.expiry
-
-});
-
-    } catch (err) {
-
-        console.error(err);
-
-        res.status(500).json({
-
-            success: false,
-
-            message: "Server Error"
-
+        await logActivity({
+            action: "EXTEND",
+            licenseKey: license.key,
+            licenseType: "premium",
+            admin: req.admin.username,
+            details: `Key expiry changed from ${previousExpiry ? new Date(previousExpiry).toISOString() : "unset"} to ${newExpiry.toISOString()}`
         });
 
+        return res.json({
+            success: true,
+            message: newExpiry <= new Date() ? "Key expiry updated. The key is now expired." : "Key expiry updated successfully.",
+            previousExpiry,
+            expiry: license.expiry,
+            status: license.status
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: "Server Error" });
     }
-
 });
 
 router.put("/premium/reset-device/:key", auth, apiAccess("premium"), async (req, res) => {

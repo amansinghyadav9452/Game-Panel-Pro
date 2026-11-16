@@ -151,3 +151,89 @@
         animation:none;
     }
 }
+
+
+/* Full-screen cheetah navigation loader */
+.gp-page-navigation-loader{
+    position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
+    overflow:hidden;padding:22px;
+    background:radial-gradient(ellipse at 50% 46%,rgba(74,18,20,.22),transparent 48%),
+               linear-gradient(145deg,#08090c 0%,#111216 54%,#08090c 100%);
+    opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s ease;isolation:isolate;
+}
+.gp-page-navigation-loader::before,.gp-page-navigation-loader::after{
+    content:"";position:absolute;z-index:-1;width:70vw;height:2px;pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(225,6,0,.9),transparent);
+    box-shadow:0 0 16px rgba(225,6,0,.48),0 0 38px rgba(225,6,0,.2);transform:rotate(-24deg);
+}
+.gp-page-navigation-loader::before{top:26%;left:-25%;opacity:.52}
+.gp-page-navigation-loader::after{right:-28%;bottom:17%;opacity:.42}
+.gp-page-navigation-loader.is-visible{opacity:1;visibility:visible}
+.gp-loader-red-streak{
+    position:absolute;z-index:-1;width:55vw;height:180px;pointer-events:none;opacity:.16;filter:blur(1px);
+    background:linear-gradient(110deg,transparent 15%,rgba(225,6,0,.32) 48%,transparent 80%);transform:skewY(-22deg);
+}
+.gp-loader-red-streak-top{top:-95px;right:-12%}
+.gp-loader-red-streak-bottom{bottom:-105px;left:-15%}
+.gp-page-loader-content{
+    width:min(100%,620px);display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;transform:translateY(-1vh);
+}
+.gp-cheetah-runner-wrap{display:block;width:min(94vw,520px);margin:0 auto 20px;line-height:0;overflow:visible}
+.gp-page-loader-content{position:relative;z-index:2}
+.gp-cheetah-runner{position:relative;z-index:3;visibility:visible!important;opacity:1!important;max-width:100%;min-height:120px}
+.gp-cheetah-runner{
+    display:block!important;visibility:visible!important;opacity:1!important;width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 12px 24px rgba(0,0,0,.42));
+    transform-origin:center bottom;animation:gp-cheetah-dash .88s ease-in-out infinite alternate;
+}
+.gp-page-loader-title{
+    color:#f3f3f4;font:800 clamp(27px,7vw,46px)/1.08 system-ui,-apple-system,"Segoe UI",sans-serif;
+    letter-spacing:.035em;text-transform:uppercase;margin:0 0 27px;text-shadow:0 3px 22px rgba(0,0,0,.55);
+}
+.gp-page-loader-title b{color:#e10600;font-weight:900;text-shadow:0 0 22px rgba(225,6,0,.25)}
+.gp-page-loader-progress{
+    position:relative;display:block;width:min(86vw,500px);height:9px;overflow:hidden;
+    border:1px solid rgba(255,255,255,.2);border-radius:99px;background:rgba(255,255,255,.1);
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.5);
+}
+.gp-page-loader-progress span{
+    display:block;width:34%;height:100%;border-radius:inherit;
+    background:linear-gradient(90deg,#a90000,#e10600 58%,#ff554b);
+    box-shadow:0 0 14px rgba(225,6,0,.7);animation:gp-page-progress 1.15s ease-in-out infinite;
+}
+.gp-page-loader-caption{
+    display:block;margin-top:17px;color:#c5c5ca;
+    font:500 14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.015em;
+}
+@keyframes gp-page-progress{0%{transform:translateX(-110%)}100%{transform:translateX(410%)}}
+@keyframes gp-cheetah-dash{0%{transform:translate3d(-7px,0,0) scale(.995)}100%{transform:translate3d(7px,-3px,0) scale(1.015)}}
+@media(max-width:480px){
+    .gp-page-navigation-loader{padding:18px}
+    .gp-page-loader-content{transform:translateY(-2vh)}
+    .gp-cheetah-runner-wrap{width:min(96vw,440px);margin-bottom:13px}
+    .gp-page-loader-title{margin-bottom:23px;letter-spacing:.025em}
+    .gp-page-loader-progress{height:8px}
+    .gp-page-loader-caption{font-size:13px;margin-top:14px}
+}
+@media(prefers-reduced-motion:reduce){
+    .gp-page-navigation-loader,.gp-page-loader-progress span,.gp-cheetah-runner{animation:none;transition:none}
+    .gp-cheetah-runner{transform:none}
+}
+/* Immediate skeleton state for Public/Premium Key detail views */
+.pk-detail-loading{display:grid;gap:14px;padding:4px 0 20px}
+.pk-detail-loading[hidden]{display:none!important}
+.pk-detail-loading-head,.pk-detail-loading-actions,.pk-detail-loading-card{border:1px solid var(--hairline,#d6dce5);border-radius:18px;background:var(--surface-1,#e6ebf2);padding:18px}
+.pk-detail-loading-head{display:flex;align-items:center;gap:14px;min-height:112px}
+.pk-detail-loading-icon{width:52px;height:52px;flex:0 0 52px;border-radius:15px;background:#cbd4e1}
+.pk-detail-loading-copy{flex:1;display:grid;gap:9px}
+.pk-detail-loading-line{height:11px;border-radius:99px;background:#cbd4e1;overflow:hidden;position:relative}
+.pk-detail-loading-line.short{width:48%}.pk-detail-loading-line.medium{width:76%}
+.pk-detail-loading-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pk-detail-loading-action{height:44px;border-radius:11px;background:#cbd4e1;position:relative;overflow:hidden}
+.pk-detail-loading-card{display:grid;gap:15px;min-height:180px}
+.pk-detail-loading-card .pk-detail-loading-line{height:13px}
+.pk-detail-loading-line::after,.pk-detail-loading-icon::after,.pk-detail-loading-action::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.62),transparent);animation:gp-loading-scan 1.15s linear infinite}
+.pk-detail-loading-error{padding:24px;border:1px solid rgba(225,6,0,.2);border-radius:16px;background:var(--surface-1,#e6ebf2);color:var(--text,#20232a);text-align:center}
+.pk-detail-loading-error strong{display:block;margin-bottom:7px}.pk-detail-loading-error p{margin:0 0 14px;color:var(--muted,#667085);font-size:13px}
+.pk-detail-loading-error button{border:0;border-radius:10px;padding:10px 16px;background:#e10600;color:#fff;font-weight:700}
+@media(prefers-reduced-motion:reduce){.gp-page-navigation-loader,.gp-page-loader-spinner,.gp-page-loader-progress span,.pk-detail-loading-line::after,.pk-detail-loading-icon::after,.pk-detail-loading-action::after{animation:none;transition:none}}

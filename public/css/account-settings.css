@@ -709,16 +709,4 @@ padding:22px;
 
 }
 
-html.light-theme .session-content{
 
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-}
-
-html.light-theme .session-device{
-
-    color:var(--text);
-
-}

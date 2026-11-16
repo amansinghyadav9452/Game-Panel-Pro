@@ -414,7 +414,7 @@ body.public-keys-context #deleteModal #deleteLicenseKey,body.premium-keys-contex
 
 
 /* Final visual correction: Charcoal / Moonlit Silver / Signal Red. */
-html, html.light-theme { color-scheme: light !important; }
+html { color-scheme: light !important; }
 body.public-keys-context, body.premium-keys-context { background:#F2F2F2 !important; color:#2A2A2A !important; }
 body.public-keys-context .content, body.premium-keys-context .content { background:#F2F2F2 !important; color:#2A2A2A !important; padding-top:78px !important; }
 body.public-keys-context .topbar, body.premium-keys-context .topbar { display:block !important; margin:0 0 12px !important; padding:0 !important; min-height:0 !important; }

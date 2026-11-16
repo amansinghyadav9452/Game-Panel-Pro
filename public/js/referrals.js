@@ -1,10 +1,101 @@
 (function () {
 
     if ((typeof getPanelRole === "function" ? getPanelRole() : null) === "customer") {
-        if (typeof showToast === "function") {
-            showToast("Restricted", "Referral management is admin-only.", "error");
+        const adminSections = document.querySelectorAll(
+            ".referral-stats, .referral-generator, .referral-section"
+        );
+        adminSections.forEach((section) => section.remove());
+
+        const intro = document.querySelector(".referral-page-intro");
+        if (intro) {
+            const heading = intro.querySelector("h1");
+            const description = intro.querySelector("p:last-child");
+            if (heading) heading.textContent = "Your Referral";
+            if (description) description.textContent = "View the referral access assigned to your account.";
         }
-        setTimeout(() => window.location.replace("/panel"), 900);
+
+        const view = document.getElementById("customerReferralView");
+        const details = document.getElementById("customerReferralDetails");
+        if (view) view.hidden = false;
+
+        const escapeCustomerHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[char]));
+
+        const formatCustomerDate = (value) => {
+            if (!value) return "Not available";
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? "Not available" : date.toLocaleString();
+        };
+
+        (async () => {
+            const token = localStorage.getItem("customerToken");
+            if (!token) {
+                if (details) details.innerHTML = '<p class="customer-referral-empty">Please sign in again to view your assigned referral.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch("/customer/referral/me", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.success || !data.referral) {
+                    if (details) details.innerHTML = `<p class="customer-referral-empty">${escapeCustomerHtml(data.message || "Your assigned referral could not be loaded.")}</p>`;
+                    return;
+                }
+
+                const referral = data.referral;
+                const status = String(referral.status || "active").toLowerCase();
+                const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+                if (details) {
+                    details.innerHTML = `
+                        <div class="customer-referral-code-row">
+                            <div>
+                                <span class="customer-referral-label">Assigned referral code</span>
+                                <strong class="customer-referral-code">${escapeCustomerHtml(referral.code)}</strong>
+                            </div>
+                            <button type="button" class="customer-referral-copy" id="copyOwnReferral">
+                                <i class="fa-regular fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="customer-referral-meta-grid">
+                            <div class="customer-referral-meta">
+                                <span class="customer-referral-label">Status</span>
+                                <strong class="customer-referral-status ${escapeCustomerHtml(status)}">${escapeCustomerHtml(statusLabel)}</strong>
+                            </div>
+                            <div class="customer-referral-meta">
+                                <span class="customer-referral-label">Access valid until</span>
+                                <strong>${escapeCustomerHtml(formatCustomerDate(referral.expiryAt))}</strong>
+                            </div>
+                            <div class="customer-referral-meta">
+                                <span class="customer-referral-label">Assigned by</span>
+                                <strong>${escapeCustomerHtml(referral.createdBy || "Admin")}</strong>
+                            </div>
+                            <div class="customer-referral-meta">
+                                <span class="customer-referral-label">Assigned on</span>
+                                <strong>${escapeCustomerHtml(formatCustomerDate(referral.createdAt))}</strong>
+                            </div>
+                        </div>
+                        ${referral.note ? `<p class="customer-referral-admin-note"><span class="customer-referral-label">Admin note</span>${escapeCustomerHtml(referral.note)}</p>` : ""}
+                    `;
+
+                    document.getElementById("copyOwnReferral")?.addEventListener("click", async () => {
+                        try {
+                            await navigator.clipboard.writeText(referral.code);
+                            if (typeof showToast === "function") showToast("Copied", "Your referral code has been copied.", "success");
+                        } catch (_) {
+                            if (typeof showToast === "function") showToast("Copy unavailable", "Please select and copy the code manually.", "error");
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                if (details) details.innerHTML = '<p class="customer-referral-empty">Could not connect to the server. Please try again.</p>';
+            }
+        })();
+
         return;
     }
 
