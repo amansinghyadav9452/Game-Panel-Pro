@@ -20,7 +20,7 @@ async function command(args) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(args),
-        signal: AbortSignal.timeout(2500)
+        signal: AbortSignal.timeout(10000)
     });
 
     if (!response.ok) {
