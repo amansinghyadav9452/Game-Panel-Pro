@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { invalidate } = require("./cacheService");
 
 // Same shape as models/License.js - kept as a separate definition
 // (not imported from there) so nothing about the admin's own License
@@ -35,7 +36,42 @@ const customerKeySchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+
 customerKeySchema.index({ type: 1, status: 1 });
+
+function customerCacheNamespace(docOrQuery, suffix) {
+    const collectionName = docOrQuery?.constructor?.collection?.collectionName
+        || docOrQuery?.model?.collection?.collectionName
+        || "";
+    const match = collectionName.match(/^cust_([a-f0-9]+)_/i);
+    return match ? `customer:${match[1]}:${suffix}` : null;
+}
+
+async function invalidateCustomerNamespace(docOrQuery, suffixes) {
+    const namespaces = suffixes
+        .map(suffix => customerCacheNamespace(docOrQuery, suffix))
+        .filter(Boolean);
+    await Promise.all(namespaces.map(invalidate));
+}
+
+customerKeySchema.post("save", async function(doc) {
+    await invalidateCustomerNamespace(doc, ["keys", "dashboard"]);
+});
+customerKeySchema.post("findOneAndDelete", async function(doc) {
+    await invalidateCustomerNamespace(this, ["keys", "dashboard"]);
+});
+customerKeySchema.post("deleteMany", async function() {
+    await invalidateCustomerNamespace(this, ["keys", "dashboard"]);
+});
+customerKeySchema.post("updateMany", async function(result) {
+    if (result?.modifiedCount > 0) {
+        await invalidateCustomerNamespace(this, ["keys", "dashboard"]);
+    }
+});
+customerKeySchema.post("findOneAndUpdate", async function() {
+    await invalidateCustomerNamespace(this, ["keys", "dashboard"]);
+});
+
 
 // Keys CRUD actions (create/ban/unban/extend/delete/reset-device) done
 // by this customer on their own keys.
@@ -49,6 +85,12 @@ const customerCrudLogSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 customerCrudLogSchema.index({ createdAt: -1 });
+customerCrudLogSchema.post("save", async function(doc) {
+    await invalidateCustomerNamespace(doc, ["crud-logs", "dashboard"]);
+});
+customerCrudLogSchema.post("deleteMany", async function() {
+    await invalidateCustomerNamespace(this, ["crud-logs", "dashboard"]);
+});
 
 // End-user (game client) verification attempts against this
 // customer's keys - same idea as the admin's UserLog, just scoped.
@@ -69,6 +111,12 @@ const customerActivityLogSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 customerActivityLogSchema.index({ createdAt: -1 });
+customerActivityLogSchema.post("save", async function(doc) {
+    await invalidateCustomerNamespace(doc, ["activity-logs", "keys"]);
+});
+customerActivityLogSchema.post("deleteMany", async function() {
+    await invalidateCustomerNamespace(this, ["activity-logs"]);
+});
 
 // Mongoose throws "Cannot overwrite model" if you call mongoose.model()
 // twice with the same name - cache compiled models per customer so

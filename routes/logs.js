@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const UserLog = require("../models/UserLog");
 const Settings = require("../models/Settings");
 const auth = require("../middleware/auth");
+const { remember } = require("../services/cacheService");
 
 function getRangeCutoff(range) {
 
@@ -61,33 +62,24 @@ const cutoff = getRangeCutoff(displayRange);
 
 const filter = cutoff ? { createdAt: { $gte: cutoff } } : {};
 
-const totalLogs = await UserLog.countDocuments(filter);
+const payload = await remember(
+    "admin:user-logs",
+    JSON.stringify({ page, limit, range: displayRange }),
+    3600,
+    async () => {
+        const totalLogs = await UserLog.countDocuments(filter);
+        const totalPages = Math.ceil(totalLogs / limit);
+        const logs = await UserLog
+            .find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+        return { success: true, currentPage: page, totalPages, totalLogs, limit, range: displayRange, logs };
+    }
+);
 
-const totalPages = Math.ceil(totalLogs / limit);
-
-const logs = await UserLog
-    .find(filter)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-res.json({
-
-    success: true,
-
-    currentPage: page,
-
-    totalPages,
-
-    totalLogs,
-
-    limit,
-
-    range: displayRange,
-
-    logs
-
-});
+res.json(payload);
 
     } catch (err) {
 

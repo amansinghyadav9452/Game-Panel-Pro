@@ -11,6 +11,7 @@ const {
 } = require("../services/licenseService");
 
 const router = express.Router();
+const { remember } = require("../services/cacheService");
 const logActivity = require("../services/activityLogger");
 // Expired-license deletion now runs on a background schedule (see server.js)
 // instead of blocking every page load — see services/licenseCleanup.js.
@@ -51,67 +52,44 @@ router.get("/activity", (req, res) => {
 });
 
 router.get("/dashboard", auth, async (req, res) => {
-
     try {
-
-        // Bulk-flip any active<->expired licenses in ONE update per
-        // direction (was: fetch every license, then save() each one
-        // individually — the main reason this page felt slow).
         await bulkSyncLicenseStatuses();
 
-        const counts = await License.aggregate([
-            {
-                $group: {
-                    _id: "$status",
-                    count: { $sum: 1 }
-                }
+        const payload = await remember("admin:dashboard", "overview", 300, async () => {
+            const counts = await License.aggregate([
+                { $group: { _id: "$status", count: { $sum: 1 } } }
+            ]);
+
+            let activeKeys = 0;
+            let expiredKeys = 0;
+            let bannedKeys = 0;
+            for (const row of counts) {
+                if (row._id === "banned") bannedKeys = row.count;
+                else if (row._id === "expired") expiredKeys = row.count;
+                else if (row._id === "active") activeKeys = row.count;
             }
-        ]);
 
-        let activeKeys = 0;
-        let expiredKeys = 0;
-        let bannedKeys = 0;
-
-        for (const row of counts) {
-
-            if (row._id === "banned") bannedKeys = row.count;
-            else if (row._id === "expired") expiredKeys = row.count;
-            else if (row._id === "active") activeKeys = row.count;
-
-        }
-
-        const totalKeys = activeKeys + expiredKeys + bannedKeys;
-
-        // Counts are based on real records for the current India-local day.
-        const Activity = require("../models/Activity");
-        const now = new Date();
-        const indiaNow = new Date(now.getTime() + 330 * 60 * 1000);
-        const dayStart = new Date(Date.UTC(indiaNow.getUTCFullYear(), indiaNow.getUTCMonth(), indiaNow.getUTCDate()) - 330 * 60 * 1000);
-        const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
-        const todayActivities = await Activity.find({ createdAt: { $gte: dayStart, $lt: dayEnd } }).select("action").lean();
-        const today = {
-            totalKeys: todayActivities.filter(x => x.action === "CREATE").length,
-            activeKeys: todayActivities.filter(x => ["CREATE", "UNBAN"].includes(x.action)).length,
-            expiredKeys: await License.countDocuments({ status: "expired", expiry: { $gte: dayStart, $lt: dayEnd } }),
-            bannedKeys: todayActivities.filter(x => x.action === "BAN").length
-        };
-
-        res.json({ success: true, stats: { totalKeys, activeKeys, expiredKeys, bannedKeys, today } });
-
-    } catch (err) {
-
-        console.error(err);
-
-        res.status(500).json({
-
-            success: false,
-
-            message: "Server Error"
-
+            const totalKeys = activeKeys + expiredKeys + bannedKeys;
+            const Activity = require("../models/Activity");
+            const now = new Date();
+            const indiaNow = new Date(now.getTime() + 330 * 60 * 1000);
+            const dayStart = new Date(Date.UTC(indiaNow.getUTCFullYear(), indiaNow.getUTCMonth(), indiaNow.getUTCDate()) - 330 * 60 * 1000);
+            const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+            const todayActivities = await Activity.find({ createdAt: { $gte: dayStart, $lt: dayEnd } }).select("action").lean();
+            const today = {
+                totalKeys: todayActivities.filter(x => x.action === "CREATE").length,
+                activeKeys: todayActivities.filter(x => ["CREATE", "UNBAN"].includes(x.action)).length,
+                expiredKeys: await License.countDocuments({ status: "expired", expiry: { $gte: dayStart, $lt: dayEnd } }),
+                bannedKeys: todayActivities.filter(x => x.action === "BAN").length
+            };
+            return { success: true, stats: { totalKeys, activeKeys, expiredKeys, bannedKeys, today } };
         });
 
+        res.json(payload);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server Error" });
     }
-
 });
 
 // Daily key-verification request totals (all successful + failed attempts).

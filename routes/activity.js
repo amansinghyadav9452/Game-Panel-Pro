@@ -1,6 +1,7 @@
 const express = require("express");
 const auth = require("../middleware/auth");
 const Activity = require("../models/Activity");
+const { remember } = require("../services/cacheService");
 
 const router = express.Router();
 
@@ -8,18 +9,12 @@ router.get("/activity/recent", auth, async (req, res) => {
 
     try {
 
-        const activities = await Activity
-            .find()
-            .sort({ createdAt: -1 })
-            .lean();
-
-        res.json({
-
-            success: true,
-
-            activities
-
+        const payload = await remember("admin:activity-logs", "recent", 3600, async () => {
+            const activities = await Activity.find().sort({ createdAt: -1 }).lean();
+            return { success: true, activities };
         });
+
+        res.json(payload);
 
     } catch (err) {
 

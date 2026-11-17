@@ -2,6 +2,7 @@ const License = require("../models/License");
 const generateKey = require("./keyGenerator");
 const GameApplication = require("../models/GameApplication");
 const Admin = require("../models/Admin");
+const { remember, invalidate } = require("./cacheService");
 
 async function syncLicenseStatus(license) {
 
@@ -42,7 +43,7 @@ async function bulkSyncLicenseStatuses(scope = {}) {
 
     const now = new Date();
 
-    await Promise.all([
+    const results = await Promise.all([
 
         License.updateMany(
             {
@@ -63,6 +64,11 @@ async function bulkSyncLicenseStatuses(scope = {}) {
         )
 
     ]);
+
+    if (results.some(result => result.modifiedCount > 0)) {
+        await invalidate("admin:licenses");
+        await invalidate("admin:dashboard");
+    }
 
 }
 
@@ -117,14 +123,15 @@ if (exists) {
 
 async function listLicenses(type) {
 
-    // One bulk update instead of a save() per license.
+    // Keep expiry statuses correct, then serve the list through Redis.
+    // MongoDB remains authoritative and cache entries are invalidated on writes.
     await bulkSyncLicenseStatuses({ type });
 
-    return await License.find({
+    return remember("admin:licenses", type, 3600, () => License.find({
         type
     }).sort({
         createdAt: -1
-    });
+    }).lean());
 
 }
 

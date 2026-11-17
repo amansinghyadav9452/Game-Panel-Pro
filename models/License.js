@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { invalidate } = require("../services/cacheService");
 
 const licenseSchema = new mongoose.Schema({
 
@@ -91,5 +92,21 @@ licenseSchema.index({ type: 1, status: 1 });
 licenseSchema.index({ gameId: 1, type: 1, key: 1 });
 licenseSchema.index({ status: 1, expiry: 1 });
 licenseSchema.index({ createdAt: -1 });
+
+
+// Invalidate cached admin key lists whenever authoritative MongoDB records change.
+async function invalidateAdminLicenseCache() {
+    await Promise.all([
+        invalidate("admin:licenses"),
+        invalidate("admin:dashboard")
+    ]);
+}
+licenseSchema.post("save", invalidateAdminLicenseCache);
+licenseSchema.post("findOneAndDelete", invalidateAdminLicenseCache);
+licenseSchema.post("deleteMany", invalidateAdminLicenseCache);
+licenseSchema.post("updateMany", async function(result) {
+    if (result?.modifiedCount > 0) await invalidateAdminLicenseCache();
+});
+licenseSchema.post("findOneAndUpdate", invalidateAdminLicenseCache);
 
 module.exports = mongoose.model("License", licenseSchema);

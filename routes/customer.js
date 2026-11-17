@@ -21,6 +21,7 @@ const {
 const { resolveMarketingName } = require("../services/deviceLookup");
 
 const router = express.Router();
+const { remember } = require("../services/cacheService");
 const fetch = global.fetch;
 
 // ===================== PAGE =====================
@@ -441,8 +442,20 @@ router.get("/customer/keys", customerAuth, async (req, res) => {
         const type = req.query.type;
 
         const filter = type ? { type } : {};
+        const now = new Date();
+        await Promise.all([
+            KeyModel.updateMany({ status: "active", expiry: { $lte: now } }, { $set: { status: "expired" } }),
+            KeyModel.updateMany({ status: "expired", expiry: { $gt: now } }, { $set: { status: "active" } })
+        ]);
 
-        const keys = await KeyModel.find(filter).sort({ createdAt: -1 }).lean();
+        const customerId = String(req.customer._id);
+        const cacheFilter = type || "all";
+        const keys = await remember(
+            `customer:${customerId}:keys`,
+            `keys:${cacheFilter}`,
+            3600,
+            () => KeyModel.find(filter).sort({ createdAt: -1 }).lean()
+        );
 
         res.json({ success: true, keys });
 
@@ -717,7 +730,12 @@ router.get("/customer/logs/crud", customerAuth, async (req, res) => {
 
         const CrudLog = getCustomerCrudLogModel(req.customer._id);
 
-        const logs = await CrudLog.find({}).sort({ createdAt: -1 }).limit(200).lean();
+        const logs = await remember(
+            `customer:${String(req.customer._id)}:crud-logs`,
+            "latest:200",
+            3600,
+            () => CrudLog.find({}).sort({ createdAt: -1 }).limit(200).lean()
+        );
 
         res.json({ success: true, logs });
 
@@ -742,19 +760,24 @@ router.get("/customer/logs/activity", customerAuth, async (req, res) => {
         const page = Math.max(1, Number(req.query.page) || 1);
         const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 200));
 
-        const [logs, totalLogs] = await Promise.all([
+        const payload = await remember(
+            `customer:${String(req.customer._id)}:activity-logs`,
+            JSON.stringify({ page, limit }),
+            3600,
+            async () => {
+                const [logs, totalLogs] = await Promise.all([
+                    ActivityLog.find({})
+                        .sort({ createdAt: -1 })
+                        .skip((page - 1) * limit)
+                        .limit(limit)
+                        .lean(),
+                    ActivityLog.countDocuments({})
+                ]);
+                return { success: true, logs, currentPage: page, totalLogs };
+            }
+        );
 
-            ActivityLog.find({})
-                .sort({ createdAt: -1 })
-                .skip((page - 1) * limit)
-                .limit(limit)
-                .lean(),
-
-            ActivityLog.countDocuments({})
-
-        ]);
-
-        res.json({ success: true, logs, currentPage: page, totalLogs });
+        res.json(payload);
 
     }
 
@@ -778,15 +801,12 @@ router.get("/customer/logs/activity", customerAuth, async (req, res) => {
 // =====================================================================
 
 router.get("/customer/dashboard/stats", customerAuth, async (req, res) => {
-
     try {
-
+        const customerId = String(req.customer._id);
         const KeyModel = getCustomerKeyModel(req.customer._id);
-
-        // Keep customer key statuses in sync with their actual expiry before
-        // computing dashboard totals. Unlike admin keys, customer keys do not
-        // use the global License maintenance job.
         const now = new Date();
+
+        // Keep expiry transitions correct before consulting the short-lived stats cache.
         await Promise.all([
             KeyModel.updateMany(
                 { status: "active", expiry: { $lte: now } },
@@ -798,45 +818,38 @@ router.get("/customer/dashboard/stats", customerAuth, async (req, res) => {
             )
         ]);
 
-        const counts = await KeyModel.aggregate([
-            { $group: { _id: "$status", count: { $sum: 1 } } }
-        ]);
+        const stats = await remember(`customer:${customerId}:dashboard`, "stats", 300, async () => {
+            const counts = await KeyModel.aggregate([
+                { $group: { _id: "$status", count: { $sum: 1 } } }
+            ]);
 
-        let activeKeys = 0, expiredKeys = 0, bannedKeys = 0;
+            let activeKeys = 0, expiredKeys = 0, bannedKeys = 0;
+            for (const row of counts) {
+                if (row._id === "banned") bannedKeys = row.count;
+                else if (row._id === "expired") expiredKeys = row.count;
+                else if (row._id === "active") activeKeys = row.count;
+            }
 
-        for (const row of counts) {
+            const totalKeys = activeKeys + expiredKeys + bannedKeys;
+            const CrudLog = getCustomerCrudLogModel(req.customer._id);
+            const indiaNow = new Date(now.getTime() + 330 * 60 * 1000);
+            const dayStart = new Date(Date.UTC(indiaNow.getUTCFullYear(), indiaNow.getUTCMonth(), indiaNow.getUTCDate()) - 330 * 60 * 1000);
+            const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+            const todayLogs = await CrudLog.find({ createdAt: { $gte: dayStart, $lt: dayEnd } }).select("action").lean();
+            const today = {
+                totalKeys: todayLogs.filter(x => x.action === "created").length,
+                activeKeys: todayLogs.filter(x => ["created", "unbanned"].includes(x.action)).length,
+                expiredKeys: await KeyModel.countDocuments({ status: "expired", expiry: { $gte: dayStart, $lt: dayEnd } }),
+                bannedKeys: todayLogs.filter(x => x.action === "banned").length
+            };
+            return { totalKeys, activeKeys, expiredKeys, bannedKeys, today };
+        });
 
-            if (row._id === "banned") bannedKeys = row.count;
-            else if (row._id === "expired") expiredKeys = row.count;
-            else if (row._id === "active") activeKeys = row.count;
-
-        }
-
-        const totalKeys = activeKeys + expiredKeys + bannedKeys;
-        const CrudLog = getCustomerCrudLogModel(req.customer._id);
-        const indiaNow = new Date(now.getTime() + 330 * 60 * 1000);
-        const dayStart = new Date(Date.UTC(indiaNow.getUTCFullYear(), indiaNow.getUTCMonth(), indiaNow.getUTCDate()) - 330 * 60 * 1000);
-        const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
-        const todayLogs = await CrudLog.find({ createdAt: { $gte: dayStart, $lt: dayEnd } }).select("action").lean();
-        const today = {
-            totalKeys: todayLogs.filter(x => x.action === "created").length,
-            activeKeys: todayLogs.filter(x => ["created", "unbanned"].includes(x.action)).length,
-            expiredKeys: await KeyModel.countDocuments({ status: "expired", expiry: { $gte: dayStart, $lt: dayEnd } }),
-            bannedKeys: todayLogs.filter(x => x.action === "banned").length
-        };
-
-        res.json({ success: true, stats: { totalKeys, activeKeys, expiredKeys, bannedKeys, today } });
-
-    }
-
-    catch (err) {
-
+        res.json({ success: true, stats });
+    } catch (err) {
         console.error(err);
-
         res.status(500).json({ success: false, message: "Server Error" });
-
     }
-
 });
 
 // Customer-only verification request graph. The customer ID comes from
@@ -881,7 +894,12 @@ router.get("/customer/dashboard/recent-activity", customerAuth, async (req, res)
 
         const CrudLog = getCustomerCrudLogModel(req.customer._id);
 
-        const logs = await CrudLog.find({}).sort({ createdAt: -1 }).lean();
+        const logs = await remember(
+            `customer:${String(req.customer._id)}:crud-logs`,
+            "all-for-recent-activity",
+            3600,
+            () => CrudLog.find({}).sort({ createdAt: -1 }).lean()
+        );
 
         const actionMap = {
             created: "CREATE",
@@ -941,8 +959,18 @@ async function listByType(req, res, type) {
     try {
 
         const KeyModel = getCustomerKeyModel(req.customer._id);
+        const now = new Date();
+        await Promise.all([
+            KeyModel.updateMany({ status: "active", expiry: { $lte: now } }, { $set: { status: "expired" } }),
+            KeyModel.updateMany({ status: "expired", expiry: { $gt: now } }, { $set: { status: "active" } })
+        ]);
 
-        const keys = await KeyModel.find({ type }).sort({ createdAt: -1 }).lean();
+        const keys = await remember(
+            `customer:${String(req.customer._id)}:keys`,
+            `type:${type}`,
+            3600,
+            () => KeyModel.find({ type }).sort({ createdAt: -1 }).lean()
+        );
 
         res.json({ success: true, licenses: keys.map(keyToLicenseShape) });
 
