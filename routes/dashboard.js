@@ -13,6 +13,16 @@ const {
 const router = express.Router();
 const { remember } = require("../services/cacheService");
 const logActivity = require("../services/activityLogger");
+
+router.get("/telegram-moderation", auth, (req, res) => {
+    res.render("telegram-moderation", {
+        activePage: "telegram-moderation",
+        pageTitle: "Telegram Moderation",
+        admin: req.admin
+    });
+});
+
+
 // Expired-license deletion now runs on a background schedule (see server.js)
 // instead of blocking every page load — see services/licenseCleanup.js.
 

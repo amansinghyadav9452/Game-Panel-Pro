@@ -41,6 +41,8 @@ const ensureGameApplicationSetup = require("./services/gameApplicationSetup");
 const ensureDailyVerificationStatsSetup = require("./services/dailyVerificationStatsSetup");
 const gameApplicationRoutes = require("./routes/gameApplications");
 const pushRoutes = require("./routes/push");
+const telegramModerationRoutes = require("./routes/telegramModeration");
+const telegramModerationService = require("./services/telegramModeration");
 const { configured: redisConfigured, ping: pingRedis } = require("./config/redisRest");
 
 const fs = require("fs");
@@ -121,6 +123,12 @@ connectDB().then(async () => {
     await createAdmin();
     await createSettings();
     await ensureGameApplicationSetup();
+
+    if (process.env.TG_BOT_TOKEN && process.env.TG_BOT_AUTOSTART !== "false") {
+        telegramModerationService.start().catch(err =>
+            console.error("[Telegram bot] Startup failed:", err.message)
+        );
+    }
     // Ensure owner-scoped daily counters work before accepting verification traffic.
     await ensureDailyVerificationStatsSetup();
 
@@ -354,6 +362,7 @@ app.use(rateLimiter, referralRoutes);
 app.use("/api/game-apps", rateLimiter, gameApplicationRoutes);
 app.use(rateLimiter, customerRoutes);
 app.use(rateLimiter, pushRoutes);
+app.use("/api/telegram-moderation", rateLimiter, telegramModerationRoutes);
 
 app.use(errorHandler);
 app.get("/", (req, res) => {
@@ -373,3 +382,6 @@ server.listen(PORT, async () => {
         ? "Redis REST connected; shared rate limits and anti-replay protection are active."
         : "Redis REST is configured but unavailable; in-memory fallback is active until it recovers.");
 });
+
+process.once("SIGTERM", () => telegramModerationService.stop().finally(() => process.exit(0)));
+process.once("SIGINT", () => telegramModerationService.stop().finally(() => process.exit(0)));

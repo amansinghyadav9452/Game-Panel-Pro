@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Telegram Moderation | Game Panel Pro</title>
+  <%- include("../partials/head") %>
+  <link rel="stylesheet" href="/css/telegram-moderation.css">
+</head>
+<body>
+<div id="overlay"></div>
+<%- include("../partials/toast") %>
+<%- include("../partials/dev-chat-widget") %>
+<div class="layout">
+  <%- include("../partials/sidebar") %>
+  <main class="content">
+    <%- include("../partials/topbar") %>
+    <section class="tg-page">
+      <header class="tg-heading">
+        <div><span class="tg-kicker">AUTOMATED GROUP SAFETY</span><h1>Telegram Moderation</h1>
+        <p>Automatically remove every detected link and promotional message from connected groups.</p></div>
+        <div class="tg-status" id="tgStatus"><span class="tg-dot"></span><span>Checking status…</span></div>
+      </header>
+      <div class="tg-grid">
+        <article class="tg-card tg-control">
+          <div class="tg-card-title"><div class="tg-icon"><i class="fa-brands fa-telegram"></i></div><div><h2>Bot control</h2><p>Runs inside this panel's Node.js service</p></div></div>
+          <div class="tg-bot-identity" id="tgIdentity">Telegram bot not checked yet</div>
+          <div class="tg-actions"><button id="tgStart" class="tg-primary">Start bot</button><button id="tgStop" class="tg-secondary">Stop bot</button></div>
+          <p class="tg-note" id="tgConfigNote">Bot token must be configured as TG_BOT_TOKEN in your hosting environment.</p>
+          <div class="tg-rule"><i class="fa-solid fa-circle-check"></i><span>Strict mode: all detected links are blocked, including normal website and Telegram invite links.</span></div>
+          <div class="tg-rule"><i class="fa-solid fa-triangle-exclamation"></i><span>Promotion, sponsorship, gambling and Teen Patti advertisements are removed.</span></div>
+        </article>
+        <article class="tg-card">
+          <div class="tg-card-title"><div class="tg-icon purple"><i class="fa-solid fa-shield-halved"></i></div><div><h2>Moderation policy</h2><p>Applied automatically to group messages</p></div></div>
+          <div class="tg-policy-row"><span>Website / URL / hidden link</span><b>Delete</b></div>
+          <div class="tg-policy-row"><span>Telegram invite / channel link</span><b>Delete</b></div>
+          <div class="tg-policy-row"><span>Teen Patti / casino / betting ad</span><b>Delete</b></div>
+          <div class="tg-policy-row"><span>Promotion / sponsorship keywords</span><b>Delete</b></div>
+          <div class="tg-policy-row"><span>Normal conversation</span><b class="allow">Allow</b></div>
+          <div class="tg-warning-preview">⚠️ Promotion and links are not allowed to be shared in this group.</div>
+        </article>
+      </div>
+      <article class="tg-card tg-logs">
+        <div class="tg-card-title"><div><h2>Recent moderation activity</h2><p>Deleted messages and the reason for removal</p></div><button id="tgRefresh" class="tg-secondary small">Refresh</button></div>
+        <div class="tg-table-wrap"><table><thead><tr><th>Group</th><th>User</th><th>Reason</th><th>Message preview</th><th>Time</th></tr></thead><tbody id="tgLogs"><tr><td colspan="5">Loading moderation logs…</td></tr></tbody></table></div>
+        <div class="tg-pagination" id="tgPagination"></div>
+      </article>
+      <p class="tg-footnote">Setup requirement: add the bot to each group as an administrator with Delete Messages permission. Disable Group Privacy in BotFather if the bot must inspect ordinary group messages. This bot uses long polling, so run only one panel instance with this bot token.</p>
+    </section>
+  </main>
+</div>
+<script src="/js/telegram-moderation.js"></script>
+</body>
+</html>
