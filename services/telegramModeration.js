@@ -9,25 +9,54 @@ let lastError = "";
 let offset = 0;
 let warningAt = new Map();
 let warningTimers = new Set();
+let consecutivePollingFailures = 0;
 
 const WARNING = "⚠️ Promotion and links are not allowed to be shared in this group.";
 const LINK_RE = /(?:https?:\/\/|http:\/\/|ftp:\/\/|www\.)[^\s<>()]+|(?:t\.me|telegram\.me|telegram\.dog)\/[^\s<>()]+|\b[a-z0-9][a-z0-9.-]*\.(?:com|net|org|io|in|co|gg|me|xyz|app|dev|site|online|info|biz|link|click|top|win|bet|casino|club|live|shop|store|pro|tech)(?:\/[^\s]*)?/i;
 const PROMO_RE = /\b(teen\s*patti|casino|betting|bet\s*now|gambling|stake|rummy|poker|earn\s*money|refer\s*&?\s*earn|referral\s*bonus|join\s*(our|my)\s*(channel|group|club)|paid\s*promotion|sponsored\s*post|promotion|advertisement|advertising|dm\s*for\s*(promo|promotion)|contact\s*for\s*(promo|promotion)|giveaway|bonus\s*code)\b/i;
 
 function token() {
-  if (!process.env.TG_BOT_TOKEN) throw new Error("TG_BOT_TOKEN is not configured.");
-  return process.env.TG_BOT_TOKEN;
+  const value = String(process.env.TG_BOT_TOKEN || "").trim();
+  if (!value) throw new Error("TG_BOT_TOKEN is not configured.");
+  return value;
 }
+
+function describeError(error) {
+  let root = error;
+  while (root?.cause) root = root.cause;
+  const code = root?.code || error?.code || "UNKNOWN";
+  const message = root?.message || error?.message || "Unknown error";
+  return `${message} [${code}]`;
+}
+
 async function telegram(method, payload = {}) {
-  const response = await fetch(`https://api.telegram.org/bot${token()}/${method}`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  const data = await response.json();
+  let response;
+  try {
+    response = await fetch(`https://api.telegram.org/bot${token()}/${method}`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "connection": "keep-alive" },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(method === "getUpdates" ? 22000 : 15000)
+    });
+  } catch (error) {
+    const wrapped = new Error(`Telegram ${method} network request failed: ${describeError(error)}`);
+    wrapped.cause = error;
+    wrapped.networkError = true;
+    throw wrapped;
+  }
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (error) {
+    const wrapped = new Error(`Telegram ${method} returned an invalid response (HTTP ${response.status}).`);
+    wrapped.cause = error;
+    throw wrapped;
+  }
   if (!response.ok || !data.ok) {
-    const error = new Error(data.description || `Telegram API ${method} failed`);
+    const error = new Error(data.description || `Telegram API ${method} failed (HTTP ${response.status})`);
     error.telegramCode = data.error_code;
+    error.retryAfter = data.parameters?.retry_after;
     throw error;
   }
   return data.result;
@@ -90,20 +119,26 @@ async function moderate(update) {
 async function pollLoop() {
   while (!stopRequested) {
     try {
+      // Keep Telegram's long-poll timeout shorter than the HTTP request timeout.
       const updates = await telegram("getUpdates", {
         offset,
-        timeout: 25,
+        timeout: 15,
         allowed_updates: ["message", "edited_message", "channel_post", "edited_channel_post"]
       });
+      consecutivePollingFailures = 0;
       for (const update of updates) {
         offset = update.update_id + 1;
         await moderate(update);
       }
     } catch (error) {
       if (stopRequested) break;
-      lastError = error.message;
-      console.error("[Telegram bot] Polling error:", error.message);
-      await new Promise(resolve => setTimeout(resolve, error.telegramCode === 409 ? 5000 : 2500));
+      consecutivePollingFailures += 1;
+      lastError = describeError(error);
+      const delay = error.retryAfter
+        ? Math.max(1000, error.retryAfter * 1000)
+        : Math.min(30000, 2000 * (2 ** Math.min(consecutivePollingFailures - 1, 4)));
+      console.error(`[Telegram bot] Polling failed (attempt ${consecutivePollingFailures}); retrying in ${Math.ceil(delay / 1000)}s: ${lastError}`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 }
@@ -111,6 +146,7 @@ async function start() {
   if (running) return { running: true };
   stopRequested = false;
   lastError = "";
+  consecutivePollingFailures = 0;
   botInfo = await telegram("getMe");
   // Clear any pending webhook: long polling and webhook cannot run together.
   await telegram("deleteWebhook", { drop_pending_updates: false });
