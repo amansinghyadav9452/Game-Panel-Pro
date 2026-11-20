@@ -26,3 +26,7 @@ This feature is integrated into the Game Panel Pro Redis-caching project.
 - This implementation inspects text, captions, and Telegram message entities. OCR for image-only promotions is not included.
 - URL and promotion matching is rule-based; highly obfuscated links or brand-new slang may evade detection. Review logs and tune `LINK_RE` / `PROMO_RE` in `services/telegramModeration.js` if needed.
 - All human senders are moderated, including group admins. The bot ignores its own messages.
+
+### Broadcast channel support
+
+The bot also moderates Telegram broadcast channels when it is added as an administrator with **Delete Messages of Others** permission. Channel posts and edited channel posts are checked for links and configured promotion/gambling terms. A violating post is deleted, a short channel warning is posted, and that warning is deleted after approximately 9 seconds. Channel warnings are channel posts, not private replies.

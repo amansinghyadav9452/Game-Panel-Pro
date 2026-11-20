@@ -11,7 +11,8 @@ let warningAt = new Map();
 let warningTimers = new Set();
 let consecutivePollingFailures = 0;
 
-const WARNING = "⚠️ Promotion and links are not allowed to be shared in this group.";
+const GROUP_WARNING = "⚠️ Promotion and links are not allowed to share in this group.";
+const CHANNEL_WARNING = "⚠️ Promotion and links are not allowed to share in this channel.";
 const LINK_RE = /(?:https?:\/\/|http:\/\/|ftp:\/\/|www\.)[^\s<>()]+|(?:t\.me|telegram\.me|telegram\.dog)\/[^\s<>()]+|\b[a-z0-9][a-z0-9.-]*\.(?:com|net|org|io|in|co|gg|me|xyz|app|dev|site|online|info|biz|link|click|top|win|bet|casino|club|live|shop|store|pro|tech)(?:\/[^\s]*)?/i;
 const PROMO_RE = /\b(teen\s*patti|casino|betting|bet\s*now|gambling|stake|rummy|poker|earn\s*money|refer\s*&?\s*earn|referral\s*bonus|join\s*(our|my)\s*(channel|group|club)|paid\s*promotion|sponsored\s*post|promotion|advertisement|advertising|dm\s*for\s*(promo|promotion)|contact\s*for\s*(promo|promotion)|giveaway|bonus\s*code)\b/i;
 
@@ -83,7 +84,7 @@ async function saveLog(msg, reason) {
       messageId: msg.message_id,
       userId: from.id ? String(from.id) : "",
       username: from.username || "",
-      displayName: [from.first_name, from.last_name].filter(Boolean).join(" "),
+      displayName: [from.first_name, from.last_name].filter(Boolean).join(" ") || msg.author_signature || (msg.sender_chat?.title || ""),
       reason,
       excerpt: String(msg.text || msg.caption || "").slice(0, 240)
     });
@@ -93,7 +94,7 @@ async function saveLog(msg, reason) {
 }
 async function moderate(update) {
   const msg = messageOf(update);
-  if (!msg || !msg.chat || !["group", "supergroup"].includes(msg.chat.type)) return;
+  if (!msg || !msg.chat || !["group", "supergroup", "channel"].includes(msg.chat.type)) return;
   if (botInfo && msg.from?.id === botInfo.id) return;
   const reason = detect(update);
   if (!reason) return;
@@ -103,7 +104,8 @@ async function moderate(update) {
     const chatKey = String(msg.chat.id);
     if ((warningAt.get(chatKey) || 0) < Date.now() - 2500) {
       warningAt.set(chatKey, Date.now());
-      const warning = await telegram("sendMessage", { chat_id: msg.chat.id, text: WARNING });
+      const warningText = msg.chat.type === "channel" ? CHANNEL_WARNING : GROUP_WARNING;
+      const warning = await telegram("sendMessage", { chat_id: msg.chat.id, text: warningText });
       const timer = setTimeout(async () => {
         warningTimers.delete(timer);
         try { await telegram("deleteMessage", { chat_id: msg.chat.id, message_id: warning.message_id }); } catch (_) {}
