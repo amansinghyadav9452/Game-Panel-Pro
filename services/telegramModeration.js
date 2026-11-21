@@ -1,4 +1,5 @@
 const TelegramModerationLog = require("../models/TelegramModerationLog");
+const telegramAI = require("./telegramAI");
 
 let running = false;
 let stopRequested = false;
@@ -14,7 +15,10 @@ let consecutivePollingFailures = 0;
 const GROUP_WARNING = "⚠️ Promotion and links are not allowed to share in this group.";
 const CHANNEL_WARNING = "⚠️ Promotion and links are not allowed to share in this channel.";
 const LINK_RE = /(?:https?:\/\/|http:\/\/|ftp:\/\/|www\.)[^\s<>()]+|(?:t\.me|telegram\.me|telegram\.dog)\/[^\s<>()]+|\b[a-z0-9][a-z0-9.-]*\.(?:com|net|org|io|in|co|gg|me|xyz|app|dev|site|online|info|biz|link|click|top|win|bet|casino|club|live|shop|store|pro|tech)(?:\/[^\s]*)?/i;
-const PROMO_RE = /\b(teen\s*patti|casino|betting|bet\s*now|gambling|stake|rummy|poker|earn\s*money|refer\s*&?\s*earn|referral\s*bonus|join\s*(our|my)\s*(channel|group|club)|paid\s*promotion|sponsored\s*post|promotion|advertisement|advertising|dm\s*for\s*(promo|promotion)|contact\s*for\s*(promo|promotion)|giveaway|bonus\s*code)\b/i;
+const PROMO_RE = /\b(teen\s*patti|casino|betting|bet\s*now|gambling|stake|rummy|poker|earn\s*money|make\s*money|refer\s*&?\s*earn|referral\s*bonus|join\s*(our|my|the)\s*(channel|group|club)|subscribe\s*(to|our|my)|follow\s*(us|me|our)|paid\s*promotion|sponsored\s*(post|content)|promotion|promotional|advertisement|advertising|advert|dm\s*for\s*(promo|promotion|details)|contact\s*for\s*(promo|promotion|business)|collab(orate|oration)|giveaway|bonus\s*code|discount\s*code|investment\s*plan|crypto\s*signals|telegram\s*channel)\b/i;
+// Telegram usernames are 5-32 characters, begin with a letter, and may contain
+// letters, digits and underscores. Deliberately remove any visible @username.
+const USERNAME_RE = /(?:^|[^A-Za-z0-9_])@[A-Za-z][A-Za-z0-9_]{4,31}\b/;
 
 function token() {
   const value = String(process.env.TG_BOT_TOKEN || "").trim();
@@ -70,8 +74,10 @@ function detect(update) {
   if (!msg) return null;
   const entities = [...(msg.entities || []), ...(msg.caption_entities || [])];
   const linkedEntity = entities.some(entity => ["url", "text_link"].includes(entity.type));
+  const mentionEntity = entities.some(entity => ["mention", "text_mention"].includes(entity.type));
   const text = [msg.text, msg.caption].filter(Boolean).join("\n");
   if (linkedEntity || LINK_RE.test(text)) return "Link detected";
+  if (mentionEntity || USERNAME_RE.test(text)) return "Telegram username detected";
   if (PROMO_RE.test(text)) return "Promotion detected";
   return null;
 }
@@ -97,7 +103,18 @@ async function moderate(update) {
   if (!msg || !msg.chat || !["group", "supergroup", "channel"].includes(msg.chat.type)) return;
   if (botInfo && msg.from?.id === botInfo.id) return;
   const reason = detect(update);
-  if (!reason) return;
+  if (!reason) {
+    // AI is deliberately downstream of moderation: deleted content is never sent to the model.
+    if (telegramAI.enabled() && msg.chat.type !== "channel" && msg.from && !msg.from.is_bot) {
+      try {
+        await telegramAI.generateReply(msg, botInfo?.username);
+      } catch (error) {
+        lastError = `AI: ${error.message}`;
+        console.error("[Telegram AI] Reply failed:", error.message);
+      }
+    }
+    return;
+  }
   try {
     await telegram("deleteMessage", { chat_id: msg.chat.id, message_id: msg.message_id });
     await saveLog(msg, reason);

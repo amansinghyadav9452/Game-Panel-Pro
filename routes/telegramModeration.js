@@ -2,9 +2,12 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const TelegramModerationLog = require("../models/TelegramModerationLog");
 const service = require("../services/telegramModeration");
+const telegramAI = require("../services/telegramAI");
 const router = express.Router();
 
-router.get("/status", auth, (req, res) => res.json({ success: true, ...service.status() }));
+router.get("/status", auth, (req, res) => res.json({ success: true, ...service.status(), ai: telegramAI.status() }));
+
+router.get("/ai-status", auth, (req, res) => res.json({ success: true, ...telegramAI.status() }));
 
 router.post("/start", auth, async (req, res) => {
   try {

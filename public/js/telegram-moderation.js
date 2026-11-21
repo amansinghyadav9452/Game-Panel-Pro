@@ -18,6 +18,13 @@
     $("tgConfigNote").textContent = data.configured ? (data.lastError ? `Last error: ${data.lastError}` : "Bot token detected. Start the bot to begin moderation.") : "Add TG_BOT_TOKEN to your hosting environment, then redeploy.";
     $("tgStart").disabled = data.running || !data.configured;
     $("tgStop").disabled = !data.running;
+    if (data.ai) {
+      $("tgAiProvider").textContent = data.ai.enabled ? `${data.ai.provider || "AI"} primary${data.ai.fallbackProvider && data.ai.fallbackProvider !== "none" ? ` · ${data.ai.fallbackProvider} fallback` : ""}` : "API key missing";
+      $("tgAiModel").textContent = data.ai.model || "—";
+      $("tgAiNote").textContent = data.ai.enabled
+        ? "AI providers are configured. Gemini is primary and Groq is the fallback (or as selected in environment settings). Replies are subject to cooldowns."
+        : "Add GEMINI_API_KEY (and optionally GROQ_API_KEY as fallback) to hosting environment and redeploy. Telegram moderation remains active without AI.";
+    }
   }
   async function refreshStatus() {
     try { setStatus(await api("/status")); }

@@ -30,3 +30,8 @@ This feature is integrated into the Game Panel Pro Redis-caching project.
 ### Broadcast channel support
 
 The bot also moderates Telegram broadcast channels when it is added as an administrator with **Delete Messages of Others** permission. Channel posts and edited channel posts are checked for links and configured promotion/gambling terms. A violating post is deleted, a short channel warning is posted, and that warning is deleted after approximately 9 seconds. Channel warnings are channel posts, not private replies.
+
+
+### Additional moderation rules
+- Visible Telegram usernames such as `@username` are removed (including caption text and Telegram mention entities).
+- Promotion detection includes common sponsorship, referral, giveaway, subscription, discount, investment, and gambling phrases. Keyword-based detection is heuristic and cannot identify every disguised advertisement.
