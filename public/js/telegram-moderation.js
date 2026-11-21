@@ -19,11 +19,12 @@
     $("tgStart").disabled = data.running || !data.configured;
     $("tgStop").disabled = !data.running;
     if (data.ai) {
-      $("tgAiProvider").textContent = data.ai.enabled ? `${data.ai.provider || "AI"} primary${data.ai.fallbackProvider && data.ai.fallbackProvider !== "none" ? ` · ${data.ai.fallbackProvider} fallback` : ""}` : "API key missing";
-      $("tgAiModel").textContent = data.ai.model || "—";
+      const chain = Array.isArray(data.ai.chain) ? data.ai.chain : [];
+      $("tgAiProvider").textContent = data.ai.enabled ? (chain.length > 1 ? `${chain[0].id} primary · ${chain.length - 1} fallback model${chain.length > 2 ? "s" : ""}` : `${data.ai.provider || "AI"} primary · no fallback`) : "API key missing";
+      $("tgAiModel").textContent = chain.length ? chain.map(c => `${c.id}${c.coolingDownSeconds ? " (cooldown)" : ""}`).join(" → ") : (data.ai.model || "—");
       $("tgAiNote").textContent = data.ai.enabled
-        ? "AI providers are configured. Gemini is primary and Groq is the fallback (or as selected in environment settings). Replies are subject to cooldowns."
-        : "Add GEMINI_API_KEY (and optionally GROQ_API_KEY as fallback) to hosting environment and redeploy. Telegram moderation remains active without AI.";
+        ? `${chain.length} AI model${chain.length > 1 ? "s" : ""} in the automatic fallback chain. If one hits its limit or fails, the next one answers. Replies are subject to cooldowns.`
+        : "Add at least one AI API key (GEMINI_API_KEY, GROQ_API_KEY, CEREBRAS_API_KEY, OPENROUTER_API_KEY, MISTRAL_API_KEY, SAMBANOVA_API_KEY, NVIDIA_API_KEY or GITHUB_MODELS_TOKEN) to hosting environment and redeploy. Telegram moderation remains active without AI.";
     }
   }
   async function refreshStatus() {
