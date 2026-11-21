@@ -45,6 +45,6 @@ Create a Gemini key in [Google AI Studio](https://aistudio.google.com/). Create 
 2. Keep `TG_BOT_TOKEN` and `TG_BOT_AUTOSTART=true` configured.
 3. Redeploy the service.
 4. Check Admin → Telegram Moderation for bot status and AI provider configuration.
-5. Test with a direct `@botusername` mention or a question in the group.
+5. Test with a direct `@swati` mention (the long bot username also remains supported) or a question in the group.
 
 The Telegram bot must be an administrator with the permissions required by the existing moderation feature. Only one running instance should long-poll with a given bot token.

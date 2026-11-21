@@ -70,17 +70,19 @@ function messageOf(update) {
   return update.message || update.edited_message || update.channel_post || update.edited_channel_post;
 }
 function hasOwnBotMention(msg, botUsername) {
-  if (!botUsername) return false;
-  const expected = String(botUsername).replace(/^@/, '').toLowerCase();
+  const expectedNames = new Set(['swati']);
+  if (botUsername) expectedNames.add(String(botUsername).replace(/^@/, '').toLowerCase());
   const text = String(msg.text || msg.caption || '');
   const entities = [...(msg.entities || []), ...(msg.caption_entities || [])];
   // Telegram entity offsets/lengths are UTF-16 code units, matching JS slice().
   for (const entity of entities) {
     if (entity.type !== 'mention') continue;
     const value = text.slice(entity.offset, entity.offset + entity.length).replace(/^@/, '').toLowerCase();
-    if (value === expected) return true;
+    if (expectedNames.has(value)) return true;
   }
-  return new RegExp(`(?:^|[^A-Za-z0-9_])@${expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'i').test(text);
+  // A plain standalone “swati” also addresses the bot; exempt it from username moderation.
+  if (/(?:^|[^A-Za-z0-9_])swati(?![A-Za-z0-9_])/i.test(text)) return true;
+  return [...expectedNames].some(name => new RegExp(`(?:^|[^A-Za-z0-9_])@${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'i').test(text));
 }
 function detect(update) {
   const msg = messageOf(update);
@@ -88,13 +90,14 @@ function detect(update) {
   const entities = [...(msg.entities || []), ...(msg.caption_entities || [])];
   const linkedEntity = entities.some(entity => ["url", "text_link"].includes(entity.type));
   const botMention = hasOwnBotMention(msg, botInfo?.username);
+  // Explicitly addressing SWATI opts this message into AI chat; never delete it via moderation.
+  if (botMention) return null;
   const mentionEntity = entities.some(entity => entity.type === "text_mention" || entity.type === "mention" && !botMention);
   const text = [msg.text, msg.caption].filter(Boolean).join("\n");
   if (linkedEntity || LINK_RE.test(text)) return "Link detected";
   // A mention of this bot is an intentional AI trigger, not a promotional username.
-  const withoutBotMention = botInfo?.username
-    ? text.replace(new RegExp(`(?:^|[^A-Za-z0-9_])@${String(botInfo.username).replace(/^@/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'ig'), ' ')
-    : text;
+  const ownNames = ['swati', ...(botInfo?.username ? [String(botInfo.username).replace(/^@/, '')] : [])];
+  const withoutBotMention = ownNames.reduce((value, name) => value.replace(new RegExp(`(?:^|[^A-Za-z0-9_])@${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'ig'), ' '), text);
   if (mentionEntity || USERNAME_RE.test(withoutBotMention)) return "Telegram username detected";
   if (PROMO_RE.test(text)) return "Promotion detected";
   return null;
