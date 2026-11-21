@@ -14,11 +14,19 @@ function configured(provider) {
   if (provider === 'groq') return Boolean(process.env.GROQ_API_KEY);
   return false;
 }
-function providerOrder() {
+function providerSettings() {
   const primary = providerName(process.env.AI_PROVIDER || 'gemini');
   const fallback = providerName(process.env.AI_FALLBACK_PROVIDER || 'groq');
-  return [primary, fallback].filter((p, i, arr) => ['gemini', 'groq'].includes(p) && configured(p) && arr.indexOf(p) === i);
+  const requested = [primary, fallback].filter((p, i, arr) => ['gemini', 'groq'].includes(p) && arr.indexOf(p) === i);
+  return {
+    primary,
+    fallback,
+    requested,
+    configured: requested.filter(configured),
+    missing: requested.filter(p => !configured(p))
+  };
 }
+function providerOrder() { return providerSettings().configured; }
 function enabled() { return Boolean(token() && providerOrder().length); }
 function isQuestion(text) {
   const value = String(text || '').trim();
@@ -59,7 +67,7 @@ async function callGemini(messages) {
     signal: AbortSignal.timeout(25000)
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error?.message || `Gemini request failed (${response.status})`);
+  if (!response.ok) { const detail = data.error?.message || response.statusText || 'Unknown provider error'; const error = new Error(`Gemini HTTP ${response.status}: ${detail}`); error.status = response.status; throw error; }
   let answer = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
   if (!answer) throw new Error('Gemini returned an empty response.');
   const finishReason = data.candidates?.[0]?.finishReason;
@@ -82,7 +90,7 @@ async function callGroq(messages) {
     body: JSON.stringify({ model, temperature: 0.85, max_tokens: Number(process.env.TG_AI_MAX_OUTPUT_TOKENS || 900), messages }), signal: AbortSignal.timeout(25000)
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error?.message || `Groq request failed (${response.status})`);
+  if (!response.ok) { const detail = data.error?.message || response.statusText || 'Unknown provider error'; const error = new Error(`Groq HTTP ${response.status}: ${detail}`); error.status = response.status; throw error; }
   let answer = String(data.choices?.[0]?.message?.content || '').trim();
   if (!answer) throw new Error('Groq returned an empty response.');
   if (data.choices?.[0]?.finish_reason === 'length' && !/[.!?…]["')\]]?$/.test(answer)) {
@@ -98,17 +106,39 @@ async function callGroq(messages) {
   return { answer, model };
 }
 async function generateWithProviders(messages) {
+  const settings = providerSettings();
+  const providers = settings.configured;
   const errors = [];
-  for (const provider of providerOrder()) {
+
+  if (settings.missing.length) {
+    console.error(`[Telegram AI] Provider key missing: ${settings.missing.join(', ')}. Add the matching API key in Render Environment.`);
+  }
+  if (!providers.length) {
+    throw new Error(`No configured AI provider. Requested: ${settings.requested.join(', ') || 'none'}. Check GEMINI_API_KEY and GROQ_API_KEY.`);
+  }
+
+  for (let index = 0; index < providers.length; index += 1) {
+    const provider = providers[index];
+    const model = provider === 'gemini'
+      ? (process.env.GEMINI_MODEL || 'gemini-3.6-flash')
+      : (process.env.GROQ_MODEL || 'openai/gpt-oss-20b');
+    console.log(`[Telegram AI] Requesting provider ${index + 1}/${providers.length}: ${provider} (model=${model})`);
     try {
       const result = provider === 'gemini' ? await callGemini(messages) : await callGroq(messages);
+      console.log(`[Telegram AI] Provider success: ${provider} (model=${result.model})`);
       return { ...result, provider };
     } catch (error) {
-      errors.push(`${provider}: ${error.message}`);
-      console.error(`[Telegram AI] ${provider} failed; ${provider === providerOrder()[0] ? 'trying configured fallback' : 'no more providers'}:`, error.message);
+      const detail = `${provider}: ${error.message}`;
+      errors.push(detail);
+      const nextProvider = providers[index + 1];
+      if (nextProvider) {
+        console.error(`[Telegram AI] ${provider} failed; switching to ${nextProvider}: ${error.message}`);
+      } else {
+        console.error(`[Telegram AI] ${provider} failed; no configured fallback remains: ${error.message}`);
+      }
     }
   }
-  throw new Error(errors.join(' | ') || 'No AI provider is configured.');
+  throw new Error(`All configured AI providers failed. ${errors.join(' | ')}`);
 }
 async function generateReply(msg, botUsername) {
   const chatId = String(msg.chat.id), userId = String(msg.from?.id || msg.sender_chat?.id || 'CHANNEL');
@@ -145,6 +175,7 @@ async function rememberGroup(chatId, memory) {
 function status() {
   const primary = providerName(process.env.AI_PROVIDER || 'gemini');
   const fallback = providerName(process.env.AI_FALLBACK_PROVIDER || 'groq');
-  return { enabled: Boolean(token() && providerOrder().length), provider: primary, fallbackProvider: fallback, configuredProviders: providerOrder(), model: primary === 'groq' ? (process.env.GROQ_MODEL || 'openai/gpt-oss-20b') : (process.env.GEMINI_MODEL || 'gemini-3.6-flash'), memoryRetentionDays: 14, personality: 'savage', activity: 'smart', learning: 'hybrid' };
+  const settings = providerSettings();
+  return { enabled: Boolean(token() && settings.configured.length), provider: primary, fallbackProvider: fallback, configuredProviders: settings.configured, missingProviderKeys: settings.missing, geminiKeyConfigured: Boolean(process.env.GEMINI_API_KEY), groqKeyConfigured: Boolean(process.env.GROQ_API_KEY), model: primary === 'groq' ? (process.env.GROQ_MODEL || 'openai/gpt-oss-20b') : (process.env.GEMINI_MODEL || 'gemini-3.6-flash'), memoryRetentionDays: 14, personality: 'savage', activity: 'smart', learning: 'hybrid' };
 }
 module.exports = { enabled, generateReply, rememberGroup, status };

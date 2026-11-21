@@ -132,7 +132,7 @@ async function moderate(update) {
         await telegramAI.generateReply(msg, botInfo?.username);
       } catch (error) {
         lastError = `AI: ${error.message}`;
-        console.error("[Telegram AI] Reply failed:", error.message);
+        console.error("[Telegram AI] Reply failed:", error.stack || error.message);
       }
     }
     return;
