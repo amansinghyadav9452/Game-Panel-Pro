@@ -69,15 +69,33 @@ async function telegram(method, payload = {}) {
 function messageOf(update) {
   return update.message || update.edited_message || update.channel_post || update.edited_channel_post;
 }
+function hasOwnBotMention(msg, botUsername) {
+  if (!botUsername) return false;
+  const expected = String(botUsername).replace(/^@/, '').toLowerCase();
+  const text = String(msg.text || msg.caption || '');
+  const entities = [...(msg.entities || []), ...(msg.caption_entities || [])];
+  // Telegram entity offsets/lengths are UTF-16 code units, matching JS slice().
+  for (const entity of entities) {
+    if (entity.type !== 'mention') continue;
+    const value = text.slice(entity.offset, entity.offset + entity.length).replace(/^@/, '').toLowerCase();
+    if (value === expected) return true;
+  }
+  return new RegExp(`(?:^|[^A-Za-z0-9_])@${expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'i').test(text);
+}
 function detect(update) {
   const msg = messageOf(update);
   if (!msg) return null;
   const entities = [...(msg.entities || []), ...(msg.caption_entities || [])];
   const linkedEntity = entities.some(entity => ["url", "text_link"].includes(entity.type));
-  const mentionEntity = entities.some(entity => ["mention", "text_mention"].includes(entity.type));
+  const botMention = hasOwnBotMention(msg, botInfo?.username);
+  const mentionEntity = entities.some(entity => entity.type === "text_mention" || entity.type === "mention" && !botMention);
   const text = [msg.text, msg.caption].filter(Boolean).join("\n");
   if (linkedEntity || LINK_RE.test(text)) return "Link detected";
-  if (mentionEntity || USERNAME_RE.test(text)) return "Telegram username detected";
+  // A mention of this bot is an intentional AI trigger, not a promotional username.
+  const withoutBotMention = botInfo?.username
+    ? text.replace(new RegExp(`(?:^|[^A-Za-z0-9_])@${String(botInfo.username).replace(/^@/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'ig'), ' ')
+    : text;
+  if (mentionEntity || USERNAME_RE.test(withoutBotMention)) return "Telegram username detected";
   if (PROMO_RE.test(text)) return "Promotion detected";
   return null;
 }
@@ -105,7 +123,8 @@ async function moderate(update) {
   const reason = detect(update);
   if (!reason) {
     // AI is deliberately downstream of moderation: deleted content is never sent to the model.
-    if (telegramAI.enabled() && msg.chat.type !== "channel" && msg.from && !msg.from.is_bot) {
+    const senderIsBot = Boolean(msg.from?.is_bot);
+    if (telegramAI.enabled() && !senderIsBot && (msg.from || msg.chat.type === "channel")) {
       try {
         await telegramAI.generateReply(msg, botInfo?.username);
       } catch (error) {

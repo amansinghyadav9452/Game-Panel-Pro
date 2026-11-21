@@ -90,11 +90,11 @@ async function generateWithProviders(messages) {
   throw new Error(errors.join(' | ') || 'No AI provider is configured.');
 }
 async function generateReply(msg, botUsername) {
-  const chatId = String(msg.chat.id), userId = String(msg.from?.id || '');
+  const chatId = String(msg.chat.id), userId = String(msg.from?.id || msg.sender_chat?.id || 'CHANNEL');
   const text = String(msg.text || msg.caption || '').trim();
   if (!text || text.length > 3000) return { skipped: true };
 
-  await TelegramAIMessage.create({ chatId, chatTitle: msg.chat.title || '', messageId: msg.message_id, userId, username: msg.from?.username || '', displayName: [msg.from?.first_name, msg.from?.last_name].filter(Boolean).join(' '), text: text.slice(0, 1500) });
+  await TelegramAIMessage.create({ chatId, chatTitle: msg.chat.title || '', messageId: msg.message_id, userId, username: msg.from?.username || msg.sender_chat?.username || '', displayName: [msg.from?.first_name, msg.from?.last_name].filter(Boolean).join(' ') || msg.sender_chat?.title || 'Channel admin', text: text.slice(0, 1500) });
   if (!isTrigger(msg, botUsername)) return { skipped: true };
   if (!cooldownAllowed(chatId, userId)) return { skipped: true, reason: 'cooldown' };
 
@@ -112,7 +112,9 @@ async function generateReply(msg, botUsername) {
   ];
   const generated = await generateWithProviders(prompt);
   const answer = generated.answer.slice(0, 3800);
-  const sent = await telegram('sendMessage', { chat_id: msg.chat.id, text: answer, reply_to_message_id: msg.message_id, allow_sending_without_reply: true });
+  const sendPayload = { chat_id: msg.chat.id, text: answer };
+  if (msg.chat.type !== 'channel') { sendPayload.reply_to_message_id = msg.message_id; sendPayload.allow_sending_without_reply = true; }
+  const sent = await telegram('sendMessage', sendPayload);
   await TelegramAIMessage.create({ chatId, chatTitle: msg.chat.title || '', messageId: sent.message_id, userId: 'BOT', username: botUsername || 'FTW_SWATI', displayName: 'FTW SWATI', text: answer });
   return { replied: true, messageId: sent.message_id, provider: generated.provider, model: generated.model };
 }
