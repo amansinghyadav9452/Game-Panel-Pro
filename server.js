@@ -43,6 +43,7 @@ const gameApplicationRoutes = require("./routes/gameApplications");
 const pushRoutes = require("./routes/push");
 const telegramModerationRoutes = require("./routes/telegramModeration");
 const telegramModerationService = require("./services/telegramModeration");
+const telegramAIService = require("./services/telegramAI");
 const { configured: redisConfigured, ping: pingRedis } = require("./config/redisRest");
 
 const fs = require("fs");
@@ -123,6 +124,7 @@ connectDB().then(async () => {
     await createAdmin();
     await createSettings();
     await ensureGameApplicationSetup();
+    await telegramAIService.loadAdminProviderSettings();
 
     if (process.env.TG_BOT_TOKEN && process.env.TG_BOT_AUTOSTART !== "false") {
         telegramModerationService.start().catch(err =>

@@ -139,6 +139,11 @@ api:{
 
     },
 
+    telegramAI: {
+        providerOrder: { type: [String], default: [] },
+        disabledProviders: { type: [String], default: [] }
+    },
+
     notifications:{
 
         telegram:{

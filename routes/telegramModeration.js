@@ -5,9 +5,39 @@ const service = require("../services/telegramModeration");
 const telegramAI = require("../services/telegramAI");
 const router = express.Router();
 
-router.get("/status", auth, (req, res) => res.json({ success: true, ...service.status(), ai: telegramAI.status() }));
+router.get("/status", auth, async (req, res) => {
+  await telegramAI.loadAdminProviderSettings();
+  res.json({ success: true, ...service.status(), ai: telegramAI.status() });
+});
 
-router.get("/ai-status", auth, (req, res) => res.json({ success: true, ...telegramAI.status() }));
+router.get("/providers", auth, async (req, res) => {
+  await telegramAI.loadAdminProviderSettings();
+  res.json({ success: true, providers: telegramAI.status().providerCatalog, order: telegramAI.status().requestedProviderOrder });
+});
+
+router.put("/providers", auth, async (req, res) => {
+  try {
+    await telegramAI.loadAdminProviderSettings();
+    const allowed = new Set(telegramAI.providerCatalog().map(item => item.id));
+    const order = Array.isArray(req.body?.order) ? req.body.order.map(x => String(x).trim().toLowerCase()) : [];
+    const disabled = Array.isArray(req.body?.disabled) ? req.body.disabled.map(x => String(x).trim().toLowerCase()) : [];
+    if (!order.length || order.length > allowed.size || order.some(id => !allowed.has(id)) || new Set(order).size !== order.length) {
+      return res.status(400).json({ success: false, message: "Select a valid provider order without duplicates." });
+    }
+    if (disabled.some(id => !allowed.has(id)) || new Set(disabled).size !== disabled.length) {
+      return res.status(400).json({ success: false, message: "Invalid provider toggle selection." });
+    }
+    const enabledConfigured = order.filter(id => !disabled.includes(id) && telegramAI.providerCatalog().some(p => p.id === id && p.configured));
+    if (!enabledConfigured.length) return res.status(400).json({ success: false, message: "Enable at least one provider with a configured API key and model." });
+    await telegramAI.saveAdminProviderSettings(order, disabled);
+    res.json({ success: true, message: "AI provider priority saved.", ai: telegramAI.status() });
+  } catch (error) {
+    console.error("Telegram AI provider settings save failed:", error);
+    res.status(500).json({ success: false, message: "Could not save provider settings." });
+  }
+});
+
+router.get("/ai-status", auth, async (req, res) => { await telegramAI.loadAdminProviderSettings(); res.json({ success: true, ...telegramAI.status() }); });
 
 router.post("/start", auth, async (req, res) => {
   try {

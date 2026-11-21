@@ -27,6 +27,17 @@
         <p class="tg-note" id="tgAiNote">Configure GEMINI_API_KEY and optionally GROQ_API_KEY as fallback, then redeploy to enable AI replies. Moderation continues independently if AI is unavailable.</p>
         <p class="tg-footnote">AI responds to direct mentions, replies to the bot, and question-like messages in groups. It does not answer every message. Shared and member memories are kept separate; personal memory is used only to adapt replies to that same member.</p>
       </article>
+      <article class="tg-card tg-provider-card">
+        <div class="tg-card-title"><div class="tg-icon purple"><i class="fa-solid fa-sliders"></i></div><div><h2>AI Provider Management</h2><p>Choose the primary model and control the automatic fallback sequence</p></div></div>
+        <div class="tg-provider-toolbar">
+          <label for="tgPrimaryProvider">Primary provider</label>
+          <select id="tgPrimaryProvider" aria-label="Primary AI provider"></select>
+          <span class="tg-secure-hint"><i class="fa-solid fa-lock"></i> Admin-only settings</span>
+        </div>
+        <div id="tgProviderList" class="tg-provider-list"><div class="tg-provider-loading">Loading available providers…</div></div>
+        <div class="tg-provider-footer"><p id="tgProviderMessage">Provider order is saved securely in the panel database.</p><button id="tgSaveProviders" class="tg-primary">Save provider order</button></div>
+        <p class="tg-footnote">Only providers with configured API keys and model IDs can run. API keys stay in hosting environment variables and are never displayed or stored by this page. Telegram moderation continues even if every AI provider is unavailable.</p>
+      </article>
       <div class="tg-grid">
         <article class="tg-card tg-control">
           <div class="tg-card-title"><div class="tg-icon"><i class="fa-brands fa-telegram"></i></div><div><h2>Bot control</h2><p>Runs inside this panel's Node.js service</p></div></div>

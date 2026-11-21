@@ -4,6 +4,9 @@
   const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
   const $ = id => document.getElementById(id);
   let page = 1;
+  let providers = [];
+  let providerOrder = [];
+  let disabledProviders = [];
   async function api(path, options = {}) {
     const res = await fetch(`/api/telegram-moderation${path}`, { ...options, headers });
     const data = await res.json().catch(() => ({}));
@@ -31,6 +34,62 @@
     try { setStatus(await api("/status")); }
     catch (e) { $("tgStatus").textContent = e.message; }
   }
+  function renderProviders() {
+    const active = providerOrder.filter(id => providers.some(p => p.id === id));
+    providerOrder = [...active, ...providers.map(p => p.id).filter(id => !active.includes(id))];
+    const primary = $("tgPrimaryProvider");
+    primary.innerHTML = providerOrder.map(id => providers.find(p => p.id === id)).filter(Boolean).map(p => `<option value="${esc(p.id)}">${esc(p.label)}${p.configured ? "" : " · Not configured"}</option>`).join("");
+    primary.value = providerOrder.find(id => !disabledProviders.includes(id) && providers.find(p => p.id === id)?.configured) || providerOrder[0] || "";
+    $("tgProviderList").innerHTML = providerOrder.map((id, index) => {
+      const p = providers.find(item => item.id === id); if (!p) return "";
+      const off = disabledProviders.includes(id);
+      const state = off ? "Disabled" : p.configured ? "Ready" : "API key / model missing";
+      return `<div class="tg-provider-row ${index === 0 ? "primary" : ""} ${off ? "disabled" : ""}" data-provider="${esc(id)}">
+        <span class="tg-provider-rank">${index + 1}</span>
+        <div><div class="tg-provider-name">${esc(p.label)}</div><div class="tg-provider-model">${esc(p.model || "Model not configured")}</div></div>
+        <span class="tg-provider-state ${off ? "off" : p.configured ? "ready" : "missing"}">${state}</span>
+        <div class="tg-provider-moves"><button type="button" data-move="up" data-id="${esc(id)}" aria-label="Move up" ${index === 0 ? "disabled" : ""}><i class="fa-solid fa-chevron-up"></i></button><button type="button" data-move="down" data-id="${esc(id)}" aria-label="Move down" ${index === providerOrder.length - 1 ? "disabled" : ""}><i class="fa-solid fa-chevron-down"></i></button></div>
+        <label class="tg-provider-toggle"><input type="checkbox" data-toggle="${esc(id)}" ${off ? "" : "checked"}> Enabled</label>
+      </div>`;
+    }).join("") || '<div class="tg-provider-loading">No supported providers found.</div>';
+  }
+  async function loadProviders() {
+    try {
+      const data = await api("/providers");
+      providers = data.providers || [];
+      providerOrder = Array.isArray(data.order) && data.order.length ? [...data.order] : providers.map(p => p.id);
+      disabledProviders = providers.filter(p => !p.enabled).map(p => p.id);
+      renderProviders();
+    } catch (error) { $("tgProviderList").textContent = error.message; }
+  }
+  $("tgProviderList").addEventListener("click", event => {
+    const button = event.target.closest("button[data-move]"); if (!button) return;
+    const index = providerOrder.indexOf(button.dataset.id); const next = button.dataset.move === "up" ? index - 1 : index + 1;
+    if (index < 0 || next < 0 || next >= providerOrder.length) return;
+    [providerOrder[index], providerOrder[next]] = [providerOrder[next], providerOrder[index]];
+    renderProviders();
+  });
+  $("tgProviderList").addEventListener("change", event => {
+    const id = event.target.dataset.toggle; if (!id) return;
+    if (event.target.checked) disabledProviders = disabledProviders.filter(x => x !== id);
+    else if (!disabledProviders.includes(id)) disabledProviders.push(id);
+    renderProviders();
+  });
+  $("tgPrimaryProvider").addEventListener("change", event => {
+    const id = event.target.value; providerOrder = [id, ...providerOrder.filter(x => x !== id)]; renderProviders();
+  });
+  $("tgSaveProviders").addEventListener("click", async () => {
+    const button = $("tgSaveProviders"), message = $("tgProviderMessage");
+    button.disabled = true; button.textContent = "Saving…"; message.textContent = "Validating provider configuration…";
+    try {
+      const data = await api("/providers", { method: "PUT", body: JSON.stringify({ order: providerOrder, disabled: disabledProviders }) });
+      providers = data.ai.providerCatalog || providers;
+      providerOrder = data.ai.configuredProviders?.length ? [...data.ai.configuredProviders, ...providerOrder.filter(id => !data.ai.configuredProviders.includes(id))] : providerOrder;
+      message.textContent = data.message || "Settings saved.";
+      renderProviders(); setStatus({ ...data.ai, running: document.querySelector("#tgStatus")?.classList.contains("online"), configured: true });
+    } catch (error) { message.textContent = error.message; }
+    finally { button.disabled = false; button.textContent = "Save provider order"; }
+  });
   async function loadLogs() {
     const body = $("tgLogs");
     try {
@@ -59,6 +118,6 @@
     catch (e) { alert(e.message); }
   });
   $("tgRefresh").addEventListener("click", () => loadLogs());
-  refreshStatus(); loadLogs();
+  refreshStatus(); loadLogs(); loadProviders();
   setInterval(refreshStatus, 15000);
 })();

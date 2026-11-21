@@ -128,12 +128,15 @@ async function moderate(update) {
     // AI is deliberately downstream of moderation: deleted content is never sent to the model.
     const senderIsBot = Boolean(msg.from?.is_bot);
     if (telegramAI.enabled() && !senderIsBot && (msg.from || msg.chat.type === "channel")) {
-      try {
-        await telegramAI.generateReply(msg, botInfo?.username);
-      } catch (error) {
-        lastError = `AI: ${error.message}`;
-        console.error("[Telegram AI] Reply failed:", error.stack || error.message);
-      }
+      // Never hold Telegram getUpdates processing open while an AI provider is
+      // generating a response. A slow provider used to stall the polling loop,
+      // making SWATI appear asleep after a few messages.
+      Promise.resolve()
+        .then(() => telegramAI.generateReply(msg, botInfo?.username))
+        .catch(error => {
+          lastError = `AI: ${error.message}`;
+          console.error("[Telegram AI] Background reply failed:", error.stack || error.message);
+        });
     }
     return;
   }
@@ -167,10 +170,10 @@ async function pollLoop() {
         allowed_updates: ["message", "edited_message", "channel_post", "edited_channel_post"]
       });
       consecutivePollingFailures = 0;
-      for (const update of updates) {
-        offset = update.update_id + 1;
-        await moderate(update);
-      }
+      // Advance offsets immediately and process the batch without serially
+      // waiting on slow Telegram moderation calls. AI replies are detached above.
+      for (const update of updates) offset = Math.max(offset, update.update_id + 1);
+      await Promise.allSettled(updates.map(update => moderate(update)));
     } catch (error) {
       if (stopRequested) break;
       consecutivePollingFailures += 1;
