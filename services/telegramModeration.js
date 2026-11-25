@@ -121,16 +121,20 @@ async function saveLog(msg, reason) {
 }
 async function moderate(update) {
   const msg = messageOf(update);
-  if (!msg || !msg.chat || !["group", "supergroup", "channel"].includes(msg.chat.type)) return;
+  if (!msg || !msg.chat) return;
   if (botInfo && msg.from?.id === botInfo.id) return;
-  const reason = detect(update);
+  const chatType = msg.chat.type;
+  const isModeratedChat = ["group", "supergroup", "channel"].includes(chatType);
+  const isPrivateChat = chatType === "private";
+  if (!isModeratedChat && !isPrivateChat) return;
+
+  // Link/promotion moderation remains group/channel-only. Private chats are
+  // treated as a direct conversation with SWATI, not as moderated communities.
+  const reason = isModeratedChat ? detect(update) : null;
   if (!reason) {
-    // AI is deliberately downstream of moderation: deleted content is never sent to the model.
     const senderIsBot = Boolean(msg.from?.is_bot);
-    if (telegramAI.enabled() && !senderIsBot && (msg.from || msg.chat.type === "channel")) {
-      // Never hold Telegram getUpdates processing open while an AI provider is
-      // generating a response. A slow provider used to stall the polling loop,
-      // making SWATI appear asleep after a few messages.
+    if (telegramAI.enabled() && !senderIsBot && (msg.from || chatType === "channel")) {
+      // AI runs detached from getUpdates so slow providers never block polling.
       Promise.resolve()
         .then(() => telegramAI.generateReply(msg, botInfo?.username))
         .catch(error => {
