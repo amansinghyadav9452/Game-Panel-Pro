@@ -11,6 +11,9 @@ let offset = 0;
 let warningAt = new Map();
 let warningTimers = new Set();
 let consecutivePollingFailures = 0;
+const unansweredTimers = new Map();
+const adminCache = new Map();
+const PROFANITY_RE = /\b(fuck(?:er|ing)?|shit(?:ty)?|bitch(?:es)?|asshole|bastard|motherfucker|madarchod|bhenchod|behenchod|chutiya|gaand|gandu|bsdk|bhosdike|harami|randi|lodu|lawde|lund|mc|bc)\b/i;
 
 const GROUP_WARNING = "⚠️ Promotion and links are not allowed to share in this group.";
 const CHANNEL_WARNING = "⚠️ Promotion and links are not allowed to share in this channel.";
@@ -84,24 +87,65 @@ function hasOwnBotMention(msg, botUsername) {
   if (/(?:^|[^A-Za-z0-9_])swati(?![A-Za-z0-9_])/i.test(text)) return true;
   return [...expectedNames].some(name => new RegExp(`(?:^|[^A-Za-z0-9_])@${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'i').test(text));
 }
-function detect(update) {
+async function getChatAdmins(chatId) {
+  const key = String(chatId), cached = adminCache.get(key);
+  if (cached && cached.until > Date.now()) return cached.usernames;
+  try {
+    const admins = await telegram('getChatAdministrators', { chat_id: chatId });
+    const usernames = new Set(admins.map(a => String(a.user?.username || '').toLowerCase()).filter(Boolean));
+    adminCache.set(key, { usernames, until: Date.now() + 5 * 60 * 1000 });
+    return usernames;
+  } catch (_) { return new Set(); }
+}
+async function isAdminMessage(msg) {
+  if (!msg.from?.id || !['group','supergroup','channel'].includes(msg.chat.type)) return false;
+  try {
+    const member = await telegram('getChatMember', { chat_id: msg.chat.id, user_id: msg.from.id });
+    return ['creator','administrator'].includes(member.status);
+  } catch (_) { return false; }
+}
+async function detect(update) {
   const msg = messageOf(update);
   if (!msg) return null;
+  const text = [msg.text, msg.caption].filter(Boolean).join('\n');
+  if (PROFANITY_RE.test(text)) return 'Abusive language detected';
   const entities = [...(msg.entities || []), ...(msg.caption_entities || [])];
-  const linkedEntity = entities.some(entity => ["url", "text_link"].includes(entity.type));
-  const botMention = hasOwnBotMention(msg, botInfo?.username);
-  // Explicitly addressing SWATI opts this message into AI chat; never delete it via moderation.
-  if (botMention) return null;
-  const mentionEntity = entities.some(entity => entity.type === "text_mention" || entity.type === "mention" && !botMention);
-  const text = [msg.text, msg.caption].filter(Boolean).join("\n");
-  if (linkedEntity || LINK_RE.test(text)) return "Link detected";
-  // A mention of this bot is an intentional AI trigger, not a promotional username.
+  if (hasOwnBotMention(msg, botInfo?.username)) return null;
+  const senderAdmin = await isAdminMessage(msg);
+  const adminUsernames = await getChatAdmins(msg.chat.id);
   const ownNames = ['swati', ...(botInfo?.username ? [String(botInfo.username).replace(/^@/, '')] : [])];
-  const withoutBotMention = ownNames.reduce((value, name) => value.replace(new RegExp(`(?:^|[^A-Za-z0-9_])@${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_])`, 'ig'), ' '), text);
-  if (mentionEntity || USERNAME_RE.test(withoutBotMention)) return "Telegram username detected";
-  if (PROMO_RE.test(text)) return "Promotion detected";
+  const withoutBotMention = ownNames.reduce((value, name) => value.replace(new RegExp('(?:^|[^A-Za-z0-9_])@' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z0-9_])', 'ig'), ' '), text);
+  const mentioned = [...withoutBotMention.matchAll(/(?:^|[^A-Za-z0-9_])@([A-Za-z][A-Za-z0-9_]{4,31})\b/g)].map(m => m[1].toLowerCase());
+  const badMention = mentioned.some(name => !adminUsernames.has(name));
+  const badTextMention = entities.some(e => e.type === 'text_mention' && !adminUsernames.has(String(e.user?.username || '').toLowerCase()));
+  const linked = entities.some(e => ['url','text_link'].includes(e.type)) || LINK_RE.test(text);
+  if (linked) return 'Link detected';
+  if (badMention || badTextMention) return senderAdmin ? null : 'Telegram username detected';
+  if (PROMO_RE.test(text)) return 'Promotion detected';
   return null;
 }
+function scheduleUnanswered(msg) {
+  if (!msg?.chat || !['group','supergroup','channel'].includes(msg.chat.type) || !msg.from?.id || msg.from.is_bot) return;
+  const text = String(msg.text || msg.caption || '').trim();
+  if (!text || !(/\?/.test(text) || /\b(kaise|kyu|kyun|kya|kab|kahan|kidhar|where|what|when|why|how|who|help|batao|btao)\b/i.test(text))) return;
+  const key = `${msg.chat.id}:${msg.from.id}`;
+  const old = unansweredTimers.get(key); if (old) clearTimeout(old.timer);
+  const entry = { messageId: msg.message_id, msg, timer: null };
+  entry.timer = setTimeout(async () => {
+    unansweredTimers.delete(key);
+    try { await telegramAI.generateReply(msg, botInfo?.username, { forceTrigger: true, delayedUnanswered: true }); }
+    catch (error) { lastError = `Delayed AI reply: ${error.message}`; console.error('[Telegram AI] Delayed reply failed:', error.message); }
+  }, 120000);
+  entry.timer.unref?.(); unansweredTimers.set(key, entry);
+}
+function cancelAnsweredTimer(msg) {
+  const repliedId = msg.reply_to_message?.message_id;
+  if (!repliedId) return;
+  for (const [key, entry] of unansweredTimers) if (String(entry.msg.chat.id) === String(msg.chat.id) && entry.messageId === repliedId) {
+    clearTimeout(entry.timer); unansweredTimers.delete(key);
+  }
+}
+
 async function saveLog(msg, reason) {
   const from = msg.from || {};
   try {
@@ -119,6 +163,52 @@ async function saveLog(msg, reason) {
     console.error("[Telegram moderation] Log save failed:", error.message);
   }
 }
+async function handleCommand(msg) {
+  const raw = String(msg.text || '').trim();
+  if (!raw.startsWith('/')) return false;
+  const [head, ...args] = raw.split(/\s+/);
+  const command = head.split('@')[0].slice(1).toLowerCase();
+  const chatId = msg.chat.id;
+  const replyUser = msg.reply_to_message?.from;
+  if (['start','help'].includes(command)) {
+    await telegram('sendMessage', { chat_id: chatId, text: 'Hiii! 💗 Main SWATI hoon. Mujhse normal chat karo ya /swati ke saath apna message likho. Commands: /rules, /id, /swati. Admin moderation: /warn, /mute, /unmute, /ban (reply to a member), /unban USER_ID.' , reply_to_message_id: msg.message_id });
+    return true;
+  }
+  if (command === 'rules') {
+    await telegram('sendMessage', { chat_id: chatId, text: '📌 Group rules:\n• No abusive language\n• No ads, promotions or links\n• No unsolicited usernames/mentions\n• Respect everyone', reply_to_message_id: msg.message_id }); return true;
+  }
+  if (command === 'id') {
+    await telegram('sendMessage', { chat_id: chatId, text: `Chat ID: ${chatId}\nYour ID: ${msg.from?.id || 'unavailable'}`, reply_to_message_id: msg.message_id }); return true;
+  }
+  if (command === 'swati') return false;
+  if (!['warn','mute','unmute','ban','unban'].includes(command)) return false;
+  if (!(await isAdminMessage(msg))) {
+    await telegram('sendMessage', { chat_id: chatId, text: 'Ye command sirf group admins use kar sakte hain.', reply_to_message_id: msg.message_id }); return true;
+  }
+  const targetId = command === 'unban' ? args[0] : replyUser?.id;
+  if (!targetId) {
+    await telegram('sendMessage', { chat_id: chatId, text: command === 'unban' ? 'Usage: /unban USER_ID' : 'Is command ko member ke message par reply karke use karo.', reply_to_message_id: msg.message_id }); return true;
+  }
+  if (String(targetId) === String(botInfo?.id)) {
+    await telegram('sendMessage', { chat_id: chatId, text: 'Mujhe hi ban/mute karne ka plan hai? Cute try. 😌', reply_to_message_id: msg.message_id }); return true;
+  }
+  if (command === 'warn') {
+    await telegram('sendMessage', { chat_id: chatId, text: `⚠️ ${replyUser?.first_name || 'Member'}, please follow the group rules.`, reply_to_message_id: msg.reply_to_message.message_id });
+  } else if (command === 'mute') {
+    await telegram('restrictChatMember', { chat_id: chatId, user_id: targetId, permissions: { can_send_messages: false, can_send_audios: false, can_send_documents: false, can_send_photos: false, can_send_videos: false, can_send_video_notes: false, can_send_voice_notes: false, can_send_polls: false, can_send_other_messages: false, can_add_web_page_previews: false }, use_independent_chat_permissions: true, until_date: Math.floor(Date.now()/1000) + 3600 });
+    await telegram('sendMessage', { chat_id: chatId, text: '🔇 Member muted for 1 hour.' });
+  } else if (command === 'unmute') {
+    await telegram('restrictChatMember', { chat_id: chatId, user_id: targetId, permissions: { can_send_messages: true, can_send_audios: true, can_send_documents: true, can_send_photos: true, can_send_videos: true, can_send_video_notes: true, can_send_voice_notes: true, can_send_polls: true, can_send_other_messages: true, can_add_web_page_previews: true }, use_independent_chat_permissions: true });
+    await telegram('sendMessage', { chat_id: chatId, text: '🔊 Member unmuted.' });
+  } else if (command === 'ban') {
+    await telegram('banChatMember', { chat_id: chatId, user_id: targetId });
+    await telegram('sendMessage', { chat_id: chatId, text: '⛔ Member banned.' });
+  } else if (command === 'unban') {
+    await telegram('unbanChatMember', { chat_id: chatId, user_id: targetId, only_if_banned: true });
+    await telegram('sendMessage', { chat_id: chatId, text: 'Member unbanned.' });
+  }
+  return true;
+}
 async function moderate(update) {
   const msg = messageOf(update);
   if (!msg || !msg.chat) return;
@@ -127,11 +217,14 @@ async function moderate(update) {
   const isModeratedChat = ["group", "supergroup", "channel"].includes(chatType);
   const isPrivateChat = chatType === "private";
   if (!isModeratedChat && !isPrivateChat) return;
+  if (msg.chat.type !== 'channel' && await handleCommand(msg)) return;
 
   // Link/promotion moderation remains group/channel-only. Private chats are
   // treated as a direct conversation with SWATI, not as moderated communities.
-  const reason = isModeratedChat ? detect(update) : null;
+  cancelAnsweredTimer(msg);
+  const reason = isModeratedChat ? await detect(update) : null;
   if (!reason) {
+    if (isModeratedChat) scheduleUnanswered(msg);
     const senderIsBot = Boolean(msg.from?.is_bot);
     if (telegramAI.enabled() && !senderIsBot && (msg.from || chatType === "channel")) {
       // AI runs detached from getUpdates so slow providers never block polling.
@@ -150,7 +243,7 @@ async function moderate(update) {
     const chatKey = String(msg.chat.id);
     if ((warningAt.get(chatKey) || 0) < Date.now() - 2500) {
       warningAt.set(chatKey, Date.now());
-      const warningText = msg.chat.type === "channel" ? CHANNEL_WARNING : GROUP_WARNING;
+      const warningText = reason === "Abusive language detected" ? "🚫 Abusive language is not allowed. Please keep the conversation respectful. This message was removed." : (msg.chat.type === "channel" ? CHANNEL_WARNING : GROUP_WARNING);
       const warning = await telegram("sendMessage", { chat_id: msg.chat.id, text: warningText });
       const timer = setTimeout(async () => {
         warningTimers.delete(timer);
@@ -196,6 +289,18 @@ async function start() {
   lastError = "";
   consecutivePollingFailures = 0;
   botInfo = await telegram("getMe");
+  try { await telegram('setMyCommands', { commands: [
+    { command: 'start', description: 'Start chatting with SWATI' },
+    { command: 'help', description: 'Show available commands' },
+    { command: 'rules', description: 'Show group rules' },
+    { command: 'id', description: 'Show chat and user IDs' },
+    { command: 'swati', description: 'Talk to SWATI' },
+    { command: 'warn', description: 'Warn a replied-to member (admin)' },
+    { command: 'mute', description: 'Mute a replied-to member (admin)' },
+    { command: 'unmute', description: 'Unmute a replied-to member (admin)' },
+    { command: 'ban', description: 'Ban a replied-to member (admin)' },
+    { command: 'unban', description: 'Unban by user ID (admin)' }
+  ] }); } catch (error) { console.warn('[Telegram bot] Command menu setup failed:', error.message); }
   // Clear any pending webhook: long polling and webhook cannot run together.
   await telegram("deleteWebhook", { drop_pending_updates: false });
   running = true;
@@ -206,6 +311,8 @@ async function start() {
 async function stop() {
   stopRequested = true;
   for (const timer of warningTimers) clearTimeout(timer);
+  for (const entry of unansweredTimers.values()) clearTimeout(entry.timer);
+  unansweredTimers.clear();
   warningTimers.clear();
   if (pollingPromise) await Promise.race([
     pollingPromise,

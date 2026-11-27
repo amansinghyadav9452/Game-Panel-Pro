@@ -35,3 +35,13 @@ The bot also moderates Telegram broadcast channels when it is added as an admini
 ### Additional moderation rules
 - Visible Telegram usernames such as `@username` are removed (including caption text and Telegram mention entities).
 - Promotion detection includes common sponsorship, referral, giveaway, subscription, discount, investment, and gambling phrases. Keyword-based detection is heuristic and cannot identify every disguised advertisement.
+
+## SWATI moderation and command updates
+
+- The bot now registers `/start`, `/help`, `/rules`, `/id`, `/swati`, `/warn`, `/mute`, `/unmute`, `/ban`, and `/unban` in Telegram's command menu.
+- `/warn`, `/mute`, `/unmute`, and `/ban` are reply-to-member commands and require the caller to be a chat administrator. `/unban USER_ID` also requires an administrator.
+- Unanswered group/channel questions are eligible for a one-time SWATI follow-up after 2 minutes. A direct Telegram reply to that message cancels the timer.
+- Abusive-language matches are deleted with a warning. Link, promotion and ad matches are deleted. Admins may mention usernames, and usernames belonging to chat admins are exempt from username moderation. The bot's own username/name is exempt.
+- The bot needs Telegram admin permissions appropriate to the chat: delete messages, restrict members, ban users, and post messages. Channel moderation additionally requires channel admin rights.
+
+The profanity filter is a configurable starter dictionary, not a perfect semantic classifier; extend `PROFANITY_RE` for the languages and spellings used in your community.
